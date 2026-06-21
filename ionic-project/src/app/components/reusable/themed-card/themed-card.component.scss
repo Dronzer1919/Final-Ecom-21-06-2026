@@ -1,0 +1,83 @@
+@use 'src/theme/mixins.scss' as *;
+
+.themed-card {
+  @include themed-card(1);
+  transition: all 0.3s ease;
+  
+  &.elevation-1 {
+    @include themed-card(1);
+  }
+  
+  &.elevation-2 {
+    @include themed-card(2);
+  }
+  
+  &.elevation-3 {
+    @include themed-card(3);
+  }
+  
+  &.clickable {
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: get-shadow(3);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: get-shadow(2);
+    }
+  }
+  
+  .card-header {
+    padding: 16px;
+    border-bottom: 1px solid get-border-color();
+    
+    .header-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      
+      .header-icon {
+        font-size: 28px;
+        margin-top: 4px;
+      }
+      
+      .header-text {
+        flex: 1;
+        
+        .card-title {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: get-text-color();
+          margin: 0 0 4px 0;
+        }
+        
+        .card-subtitle {
+          font-size: 0.875rem;
+          color: rgba(var(--ion-text-color-rgb), 0.7);
+          margin: 0;
+        }
+      }
+    }
+  }
+  
+  .card-content {
+    padding: 16px;
+    color: get-text-color();
+    line-height: 1.6;
+  }
+  
+  .card-footer {
+    padding: 12px 16px;
+    border-top: 1px solid get-border-color();
+    background: get-background('surface');
+    
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: rgba(var(--ion-text-color-rgb), 0.7);
+    }
+  }
+}

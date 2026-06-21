@@ -1,0 +1,90 @@
+<div class="wishlist-page">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container">
+      <button class="back-btn" (click)="navigateBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        Back
+      </button>
+      <h1 class="page-title">My Wishlist</h1>
+      <button class="cart-btn" (click)="viewCart()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        Cart
+        <span class="badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div class="container" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading your wishlist...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="container" *ngIf="error && !loading">
+    <div class="error-message">
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="loadWishlist()">Retry</button>
+    </div>
+  </div>
+
+  <!-- Empty Wishlist -->
+  <div class="container" *ngIf="wishlistItems.length === 0 && !loading && !error">
+    <div class="empty-wishlist">
+      <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+      </svg>
+      <h2>Your wishlist is empty</h2>
+      <p>Add products you love to your wishlist!</p>
+      <app-theme-button type="primary" (clicked)="continueShopping()">Continue Shopping</app-theme-button>
+    </div>
+  </div>
+
+  <!-- Wishlist Items -->
+  <div class="container" *ngIf="wishlistItems.length > 0 && !loading">
+    <div class="wishlist-header">
+      <h2>{{ wishlistItems.length }} {{ wishlistItems.length === 1 ? 'Item' : 'Items' }} in Wishlist</h2>
+      <button class="btn-clear" (click)="clearWishlist()">Clear All</button>
+    </div>
+
+    <div class="wishlist-grid">
+      <div class="product-card" *ngFor="let item of wishlistItems" (click)="navigateToProduct(item.productId)">
+        <div class="product-badge" *ngIf="getDiscountPercentage(item) > 0">
+          {{ getDiscountPercentage(item) }}% OFF
+        </div>
+
+        <div class="product-image">
+          <img [src]="item.image" [alt]="item.name">
+        </div>
+
+        <div class="product-info">
+          <h3 class="product-name">{{ item.name }}</h3>
+          
+          <div class="product-meta" *ngIf="item.brand || item.category">
+            <span class="brand" *ngIf="item.brand">{{ item.brand }}</span>
+            <span class="category" *ngIf="item.category">{{ item.category }}</span>
+          </div>
+
+          <div class="product-price">
+            <span class="current-price">₹{{ getDiscountedPrice(item) | number:'1.2-2' }}</span>
+            <span class="original-price" *ngIf="item.discountValue">₹{{ item.price | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="product-actions">
+            <app-theme-button type="primary" (clicked)="addToCart(item, $event)">Add to Cart</app-theme-button>
+            <app-theme-button type="secondary" (clicked)="moveToCart(item); $event.stopPropagation()">Move to Cart</app-theme-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

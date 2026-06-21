@@ -1,0 +1,97 @@
+// Theme-aware button styles
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Primary button - filled with theme primary color
+.theme-btn-primary {
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+
+  &:not(:disabled):hover {
+    background: var(--ion-color-primary-shade);
+    box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+  }
+}
+
+// Secondary button - filled with theme secondary color
+.theme-btn-secondary {
+  background: var(--ion-color-secondary);
+  color: var(--ion-color-secondary-contrast);
+
+  &:not(:disabled):hover {
+    background: var(--ion-color-secondary-shade);
+    box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.3);
+  }
+}
+
+// Outline button - border with primary color
+.theme-btn-outline {
+  background: transparent;
+  color: var(--ion-color-primary);
+  border: 2px solid var(--ion-color-primary);
+
+  &:not(:disabled):hover {
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+    border-color: var(--ion-color-primary-shade);
+    color: var(--ion-color-primary-shade);
+  }
+}
+
+// Button sizes
+.theme-btn-small {
+  padding: 6px 16px;
+  font-size: 13px;
+  height: 32px;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.theme-btn-medium {
+  padding: 10px 20px;
+  font-size: 14px;
+  height: 40px;
+}
+
+.theme-btn-large {
+  padding: 12px 28px;
+  font-size: 16px;
+  height: 48px;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Full width button
+.theme-btn-full {
+  width: 100%;
+}

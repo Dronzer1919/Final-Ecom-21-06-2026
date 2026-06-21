@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Central Warehouse",
+    "code": "WH001",
+    "email": "warehouse@unitedgoals.com",
+    "phone": "+91 9876543220",
+    "address": "Industrial Area, Sector 18, Gurgaon, Haryana 122001",
+    "city": "Gurgaon",
+    "state": "Haryana",
+    "country": "India",
+    "zipCode": "122001",
+    "isActive": true
+  },
+  {
+    "name": "South Warehouse",
+    "code": "WH002",
+    "email": "south@unitedgoals.com",
+    "phone": "+91 9876543221",
+    "address": "Electronics City, Bangalore, Karnataka 560100",
+    "city": "Bangalore",
+    "state": "Karnataka",
+    "country": "India",
+    "zipCode": "560100",
+    "isActive": true
+  },
+  {
+    "name": "West Warehouse",
+    "code": "WH003",
+    "email": "west@unitedgoals.com",
+    "phone": "+91 9876543222",
+    "address": "MIDC Area, Pune, Maharashtra 411019",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "zipCode": "411019",
+    "isActive": true
+  }
+]

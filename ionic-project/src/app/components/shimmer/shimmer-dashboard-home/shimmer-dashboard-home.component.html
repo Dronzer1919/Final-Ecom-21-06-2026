@@ -1,0 +1,92 @@
+<div class="sdh-page">
+
+  <!-- ── Welcome Header ───────────────────────────────────────────────────── -->
+  <div class="sdh-welcome-header">
+    <div class="sdh-welcome-left">
+      <div class="sh-block sdh-welcome-title"></div>
+      <div class="sh-block sdh-welcome-sub"></div>
+    </div>
+    <div class="sh-block sdh-date-range"></div>
+  </div>
+
+  <!-- ── Welcome Banner ───────────────────────────────────────────────────── -->
+  <div class="sdh-banner">
+    <!-- Left content -->
+    <div class="sdh-banner-content">
+      <div class="sh-block sdh-banner-emoji"></div>
+      <div class="sh-block sdh-banner-title"></div>
+      <div class="sh-block sdh-banner-sub"></div>
+      <div class="sdh-banner-btns">
+        <div class="sh-block sdh-btn"></div>
+        <div class="sh-block sdh-btn sdh-btn-outline"></div>
+      </div>
+    </div>
+    <!-- Right mini-stats -->
+    <div class="sdh-mini-stats">
+      <div class="sdh-mini-stat" *ngFor="let s of stats">
+        <div class="sh-block sdh-stat-icon"></div>
+        <div class="sdh-stat-info">
+          <div class="sh-block sdh-stat-value"></div>
+          <div class="sh-block sdh-stat-label"></div>
+        </div>
+        <div class="sh-block sdh-stat-chart"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Charts Row ────────────────────────────────────────────────────────── -->
+  <div class="sdh-charts-row">
+    <div class="sdh-chart-card" *ngFor="let c of chartCards">
+      <div class="sdh-chart-card-header">
+        <div class="sh-block sdh-chart-title"></div>
+        <div class="sh-block sdh-chart-filter"></div>
+      </div>
+      <div class="sh-block sdh-chart-area"></div>
+      <div class="sdh-chart-footer">
+        <div class="sh-block sdh-chart-legend"></div>
+        <div class="sh-block sdh-chart-legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lists Row ─────────────────────────────────────────────────────────── -->
+  <div class="sdh-lists-row">
+
+    <!-- Recent Transactions -->
+    <div class="sdh-list-card">
+      <div class="sdh-list-header">
+        <div class="sh-block sdh-list-title"></div>
+        <div class="sh-block sdh-list-link"></div>
+      </div>
+      <div class="sdh-list-row" *ngFor="let r of listRows">
+        <div class="sh-block sdh-row-icon"></div>
+        <div class="sdh-row-body">
+          <div class="sh-block sdh-row-primary"></div>
+          <div class="sh-block sdh-row-secondary"></div>
+        </div>
+        <div class="sdh-row-right">
+          <div class="sh-block sdh-row-amount"></div>
+          <div class="sh-block sdh-row-badge"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recently Registered -->
+    <div class="sdh-list-card">
+      <div class="sdh-list-header">
+        <div class="sh-block sdh-list-title"></div>
+        <div class="sh-block sdh-list-link"></div>
+      </div>
+      <div class="sdh-list-row" *ngFor="let r of listRows">
+        <div class="sh-block sdh-row-emoji"></div>
+        <div class="sdh-row-body">
+          <div class="sh-block sdh-row-primary"></div>
+          <div class="sh-block sdh-row-secondary"></div>
+        </div>
+        <div class="sh-block sdh-row-badge"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

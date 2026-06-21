@@ -1,0 +1,88 @@
+<div class="b2b-categories-container">
+  <!-- Header -->
+  <app-header 
+    [wishlistCount]="wishlistCount" 
+    [cartItemCount]="cartItemCount"
+    [activeRoute]="'b2b'"
+    (accountClick)="viewAccount()"
+    (wishlistClick)="viewWishlist()"
+    (cartClick)="viewCart()">
+  </app-header>
+
+  <!-- Categories Grid -->
+  <div class="categories-section">
+    <h2>Shop by Category</h2>
+    <div class="categories-grid">
+      <div 
+        *ngFor="let category of categories" 
+        class="category-card"
+        [class.active]="selectedCategory === category.id"
+        (click)="selectCategory(category.id)">
+        <div class="category-icon">{{category.icon}}</div>
+        <h3>{{category.name}}</h3>
+        <p class="category-description">{{category.description}}</p>
+        <span class="product-count">{{getCategoryProductCount(category.id)}} Products</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Section -->
+  <div class="products-section">
+    <div class="section-header">
+      <h2>
+        <span *ngIf="!selectedCategory">All Products</span>
+        <span *ngIf="selectedCategory">
+          {{ getSelectedCategoryName() }} Products
+        </span>
+      </h2>
+      <span class="product-count-badge">{{filteredProducts.length}} Products Available</span>
+    </div>
+
+    <div class="products-grid">
+      <div 
+        *ngFor="let product of filteredProducts" 
+        class="product-card"
+        (click)="viewProductDetails(product)">
+        <div class="product-image">
+          <img [src]="product.image" [alt]="product.productName">
+          <div class="vendor-badge">
+            <span class="vendor-icon">👥</span>
+            <span>{{product.vendorCount}} Vendors</span>
+          </div>
+        </div>
+        
+        <div class="product-info">
+          <h3 class="product-name">{{product.productName}}</h3>
+          <p class="product-category">{{product.category}}</p>
+          
+          <div class="price-range">
+            <span class="label">PRICE RANGE:</span>
+            <div class="price-line">
+              <span class="price">₹{{product.priceRange.min}} - ₹{{product.priceRange.max}}</span>
+              <span class="unit">/ {{product.unit}}</span>
+            </div>
+          </div>
+
+          <div class="product-actions">
+            <button class="btn-buy-now" (click)="viewProductDetails(product); $event.stopPropagation()">Buy Now</button>
+            <button class="btn-cart-icon" (click)="addToCart(product, $event)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredProducts.length === 0" class="empty-state">
+      <div class="empty-icon">📦</div>
+      <h3>No Products Found</h3>
+      <p>No products available in this category</p>
+      <button class="btn-clear" (click)="selectedCategory = ''">View All Products</button>
+    </div>
+  </div>
+</div>

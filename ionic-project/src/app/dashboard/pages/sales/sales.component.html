@@ -1,0 +1,177 @@
+<div class="sales-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Sales</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon btn-pdf" (click)="exportPDF()" title="Export to PDF">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+      </button>
+      <button class="btn-icon btn-excel" (click)="exportExcel()" title="Export to Excel">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      </button>
+      <button class="btn-icon btn-refresh" title="Refresh">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+      </button>
+      <button class="btn-icon btn-sort" title="Sort">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="21" x2="4" y2="14"></line>
+          <line x1="4" y1="10" x2="4" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12" y2="3"></line>
+          <line x1="20" y1="21" x2="20" y2="16"></line>
+          <line x1="20" y1="12" x2="20" y2="3"></line>
+          <line x1="1" y1="14" x2="7" y2="14"></line>
+          <line x1="9" y1="8" x2="15" y2="8"></line>
+          <line x1="17" y1="16" x2="23" y2="16"></line>
+        </svg>
+      </button>
+      <app-theme-button type="primary" [routerLink]="['/dashboard/pos']">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add Sale
+      </app-theme-button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="search-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <input type="text" placeholder="Search" [(ngModel)]="searchTerm" />
+    </div>
+    <div class="filter-actions">
+      <select class="filter-select" [(ngModel)]="selectedStatus">
+        <option value="">All Status</option>
+        <option value="Completed">Completed</option>
+        <option value="Pending">Pending</option>
+        <option value="Ordered">Ordered</option>
+      </select>
+      <select class="filter-select" [(ngModel)]="selectedPaymentStatus">
+        <option value="">Payment Status</option>
+        <option value="Paid">Paid</option>
+        <option value="Unpaid">Unpaid</option>
+        <option value="Partial">Partial</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Sales Table -->
+  <div class="table-container">
+    <!-- Shimmer Loading State -->
+    <app-shimmer *ngIf="isLoading" type="b2b-table" [count]="10"></app-shimmer>
+
+    <table *ngIf="!isLoading" class="sales-table">
+      <thead>
+        <tr>
+          <th>Date &#x21C5;</th>
+          <th>Reference</th>
+          <th>Customer</th>
+          <th>Warehouse</th>
+          <th>Status</th>
+          <th>Grand Total</th>
+          <th>Paid</th>
+          <th>Due</th>
+          <th>Payment Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="paginatedSales.length === 0">
+          <td colspan="9" class="no-data">No sales found</td>
+        </tr>
+        <tr *ngFor="let sale of paginatedSales" class="sale-row">
+          <td class="date-cell">{{ sale.date }}</td>
+          <td class="ref-cell">{{ sale.reference }}</td>
+          <td class="customer-cell">{{ sale.customer }}</td>
+          <td class="warehouse-cell">{{ sale.warehouse }}</td>
+          <td class="status-cell">
+            <span class="status-badge" [ngClass]="sale.status.toLowerCase()">
+              &#9679; {{ sale.status }}
+            </span>
+          </td>
+          <td class="amount-cell">&#8377;{{ sale.grandTotal.toFixed(2) }}</td>
+          <td class="amount-cell paid">&#8377;{{ sale.paid.toFixed(2) }}</td>
+          <td class="amount-cell due">&#8377;{{ sale.due.toFixed(2) }}</td>
+          <td class="payment-status-cell">
+            <span class="payment-badge" [ngClass]="sale.paymentStatus.toLowerCase()">
+              &#9679; {{ sale.paymentStatus }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading" class="pagination-bar">
+    <div class="rows-per-page">
+      <span>Row Per Page</span>
+      <select [(ngModel)]="rowsPerPage">
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+        <option [value]="100">100</option>
+      </select>
+      <span class="entries-info">Entries</span>
+    </div>
+    <div class="pagination-controls">
+      <button
+        class="page-btn"
+        (click)="goToPage(currentPage - 1)"
+        [disabled]="currentPage === 1"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <button
+        *ngFor="let page of pageNumbers"
+        class="page-btn"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+
+      <span *ngIf="totalPages > 5 && currentPage < totalPages - 2" class="page-ellipsis">...</span>
+
+      <button
+        *ngIf="totalPages > 5"
+        class="page-btn"
+        [class.active]="currentPage === totalPages"
+        (click)="goToPage(totalPages)"
+      >
+        {{ totalPages }}
+      </button>
+
+      <button
+        class="page-btn"
+        (click)="goToPage(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

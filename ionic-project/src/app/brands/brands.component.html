@@ -1,0 +1,113 @@
+<div class="brands-page">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container">
+      <button class="back-btn" (click)="navigateHome()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        Back to Home
+      </button>
+      <h1>All Brands</h1>
+      <p class="subtitle">Browse our collection of {{ totalBrands }} brands</p>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div class="container" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading brands...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="container" *ngIf="error && !loading">
+    <div class="error-message">
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="loadBrands()">Retry</button>
+    </div>
+  </div>
+
+  <!-- Brands Grid -->
+  <div class="container" *ngIf="!loading && !error">
+    <div class="brands-grid" *ngIf="brands.length > 0">
+      <div class="brand-card" *ngFor="let brand of brands" 
+           (click)="navigateToBrand(brand._id!)"
+           [title]="'View products from ' + brand.name">
+        <div class="brand-logo">
+          <img [src]="getBrandLogo(brand)" 
+               [alt]="brand.name"
+               loading="lazy">
+        </div>
+        <div class="brand-info">
+          <h3>{{ brand.name }}</h3>
+          <p class="brand-description" *ngIf="brand.description">{{ brand.description }}</p>
+          <span class="status-badge" [class.active]="brand.isActive">
+            {{ brand.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="brands.length === 0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+        <rect x="2" y="9" width="4" height="12"></rect>
+        <circle cx="4" cy="4" r="2"></circle>
+      </svg>
+      <h3>No brands found</h3>
+      <p>There are no brands available at the moment.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="pagination-btn" 
+              [disabled]="currentPage === 1"
+              (click)="previousPage()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        Previous
+      </button>
+
+      <div class="page-numbers">
+        <button *ngIf="currentPage > 3" 
+                class="page-btn" 
+                (click)="goToPage(1)">
+          1
+        </button>
+        <span *ngIf="currentPage > 3" class="ellipsis">...</span>
+
+        <button *ngFor="let page of pages"
+                class="page-btn"
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)">
+          {{ page }}
+        </button>
+
+        <span *ngIf="currentPage < totalPages - 2" class="ellipsis">...</span>
+        <button *ngIf="currentPage < totalPages - 2" 
+                class="page-btn" 
+                (click)="goToPage(totalPages)">
+          {{ totalPages }}
+        </button>
+      </div>
+
+      <button class="pagination-btn" 
+              [disabled]="currentPage === totalPages"
+              (click)="nextPage()">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m9 18 6-6-6-6"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Page Info -->
+    <div class="page-info" *ngIf="brands.length > 0">
+      Showing {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalBrands) }} of {{ totalBrands }} brands
+    </div>
+  </div>
+</div>

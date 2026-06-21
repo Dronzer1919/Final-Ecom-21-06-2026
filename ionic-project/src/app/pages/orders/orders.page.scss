@@ -1,0 +1,143 @@
+.orders-page {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.filter-bar {
+  margin-bottom: 1rem;
+}
+
+.filter-search {
+  --background: var(--ion-background-color, #fff);
+  --border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.filter-selects {
+  display: flex;
+  gap: 8px;
+
+  ion-select {
+    flex: 1;
+    background: var(--ion-background-color, #fff);
+    border: 1px solid var(--theme-border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+.center-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+
+  ion-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  p { color: #888; margin-bottom: 1rem; }
+
+  &.error-state ion-icon { color: var(--ion-color-danger, #dc3545); }
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.order-card {
+  border-radius: 12px;
+  border: 1px solid var(--theme-border-color, #e0e0e0);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin: 0;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.order-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.order-id {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ion-color-primary, #FF8C42);
+}
+
+.order-date {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.order-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+
+  ion-badge {
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+  }
+}
+
+.order-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+
+.order-items-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+}
+
+.item-name-pill {
+  background: var(--theme-surface, #f5f5f5);
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 20px;
+  color: #555;
+}
+
+.item-more {
+  font-size: 0.8rem;
+  color: var(--ion-color-primary, #FF8C42);
+  padding: 3px 4px;
+}
+
+.order-total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ion-color-primary, #FF8C42);
+  white-space: nowrap;
+  margin-left: 1rem;
+}
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  ion-button {
+    --border-radius: 8px;
+    height: 36px;
+    font-size: 0.85rem;
+  }
+}

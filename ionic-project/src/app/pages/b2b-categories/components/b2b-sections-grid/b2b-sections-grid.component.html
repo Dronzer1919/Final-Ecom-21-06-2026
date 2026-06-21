@@ -1,0 +1,73 @@
+<!-- Search + count bar -->
+<div class="filter-bar">
+  <div class="search-box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input type="text" placeholder="Search categories..." [(ngModel)]="searchTerm" (input)="onSearch()">
+  </div>
+  @if (!isLoading) {
+    <div class="total-badge">{{ filtered.length }} categories</div>
+  }
+</div>
+
+<!-- Shimmer -->
+@if (isLoading) {
+  <div class="cards-grid">
+    @for (i of [1,2,3,4]; track i) {
+      <div class="cat-card shimmer-card">
+        <div class="shimmer-img"></div>
+        <div class="card-body">
+          <div class="shimmer-line wide"></div>
+          <div class="shimmer-line"></div>
+          <div class="shimmer-line short"></div>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<!-- Error -->
+@if (!isLoading && error) {
+  <div class="empty-state-box">
+    <div class="empty-icon">⚠️</div>
+    <h3>Something went wrong</h3>
+    <p>{{ error }}</p>
+  </div>
+}
+
+<!-- Grid -->
+@if (!isLoading && !error) {
+  <div class="cards-grid">
+    @for (section of filtered; track section.id) {
+      <div class="cat-card" (click)="select(section)">
+        <div class="card-img">
+          @if (section.image) {
+            <img [src]="section.image" [alt]="section.name" class="card-img-photo">
+          } @else {
+            <div class="card-img-icon">{{ section.icon }}</div>
+          }
+        </div>
+        <div class="card-body">
+          <p class="card-name">{{ section.name }}</p>
+          <p class="card-desc">{{ section.description }}</p>
+          <div class="card-actions">
+            <button class="btn-explore">
+              Explore
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+    @empty {
+      <div class="empty-state-box full-col">
+        <div class="empty-icon">📂</div>
+        <h3>No Categories Found</h3>
+        <p>No B2B categories have been set up yet.</p>
+      </div>
+    }
+  </div>
+}

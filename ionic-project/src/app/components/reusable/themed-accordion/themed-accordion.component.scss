@@ -1,0 +1,77 @@
+@use 'src/theme/mixins.scss' as *;
+
+.themed-accordion {
+  width: 100%;
+  
+  .accordion-item {
+    background: get-background('card');
+    border: 1px solid get-border-color();
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    
+    &.expanded {
+      box-shadow: get-shadow(2);
+    }
+  }
+  
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    background: get-background('card');
+    
+    &:hover {
+      background: get-background('surface');
+    }
+    
+    &:active {
+      opacity: 0.8;
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      
+      .header-icon {
+        font-size: 24px;
+      }
+      
+      .header-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: get-text-color();
+      }
+    }
+    
+    .toggle-icon {
+      font-size: 20px;
+      transition: transform 0.3s ease;
+    }
+  }
+  
+  .accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: get-background('surface');
+    
+    &.expanded {
+      max-height: 1000px; // Adjust based on content
+    }
+    
+    .content-inner {
+      padding: 16px;
+      color: get-text-color();
+      line-height: 1.6;
+      border-top: 1px solid get-border-color();
+    }
+  }
+}

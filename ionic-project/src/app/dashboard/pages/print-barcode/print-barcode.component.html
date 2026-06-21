@@ -1,0 +1,146 @@
+<div class="print-barcode-page">
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Print Barcode</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon btn-refresh" title="Refresh">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+      </button>
+      <button class="btn-icon btn-collapse" title="Collapse">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-container">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Warehouse <span class="required">*</span></label>
+        <select class="form-select" [(ngModel)]="selectedWarehouse" (change)="onWarehouseChange()">
+          <option value="">Select</option>
+          <option value="warehouse1">Lavish Warehouse</option>
+          <option value="warehouse2">Quaint Warehouse</option>
+          <option value="warehouse3">Traditional Warehouse</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Store <span class="required">*</span></label>
+        <select class="form-select" [(ngModel)]="selectedStore" (change)="onStoreChange()">
+          <option value="">Select</option>
+          <option value="store1">Electro Mart</option>
+          <option value="store2">Quantum Gadgets</option>
+          <option value="store3">Prime Bazaar</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Product <span class="required">*</span></label>
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text" placeholder="Search Product by Code" [(ngModel)]="searchProduct" (input)="onProductSearch($event)" />
+      </div>
+    </div>
+
+    <div class="product-table-wrapper">
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>SKU</th>
+            <th>Code</th>
+            <th>Qty</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="products.length === 0">
+            <td colspan="4" class="no-data">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3h18v18H3zM3 9h18M9 21V9"></path>
+              </svg>
+              <span>No Data Available</span>
+            </td>
+          </tr>
+          <tr *ngFor="let product of products">
+            <td>{{ product.name }}</td>
+            <td>{{ product.sku }}</td>
+            <td>{{ product.code }}</td>
+            <td>{{ product.qty }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="form-row barcode-options">
+      <div class="form-group">
+        <label class="form-label">Paper Size <span class="required">*</span></label>
+        <select class="form-select" [(ngModel)]="selectedPaperSize">
+          <option value="">Select</option>
+          <option value="a4">A4</option>
+          <option value="letter">Letter</option>
+          <option value="label">Label</option>
+        </select>
+      </div>
+      <div class="toggle-options">
+        <div class="toggle-item">
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="showStoreName" class="toggle-checkbox" />
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">Show Store Name</span>
+          </label>
+        </div>
+        <div class="toggle-item">
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="showProductName" class="toggle-checkbox" />
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">Show Product Name</span>
+          </label>
+        </div>
+        <div class="toggle-item">
+          <label class="toggle-label">
+            <input type="checkbox" [(ngModel)]="showPrice" class="toggle-checkbox" />
+            <span class="toggle-slider"></span>
+            <span class="toggle-text">Show Price</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-warning" (click)="generateOffCode()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Generate Off Code
+      </button>
+      <app-theme-button type="outline" (clicked)="resetBarcode()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <polyline points="23 20 23 14 17 14"></polyline>
+          <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+        </svg>
+        Reset Barcode
+      </app-theme-button>
+      <button class="btn-danger" (click)="printBarcode()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Print Barcode
+      </button>
+    </div>
+  </div>
+</div>

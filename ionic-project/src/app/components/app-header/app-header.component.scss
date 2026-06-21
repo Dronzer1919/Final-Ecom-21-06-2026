@@ -1,0 +1,245 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--ion-background-color, #ffffff);
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+
+  .container {
+    width: min(100%, 1280px);
+    margin: 0 auto;
+    padding-inline: 1.5rem;
+  }
+}
+
+.header-top {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+  background: var(--ion-background-color, #ffffff);
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+}
+
+.header-left {
+  flex-shrink: 0;
+}
+
+.brand-name {
+  color: var(--ion-color-primary);
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.header-center {
+  flex: 1;
+  max-width: 640px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(var(--ion-color-light-rgb), 0.7);
+  border: 1px solid rgba(var(--ion-color-medium-rgb), 0.18);
+  border-radius: 12px;
+  padding: 0.35rem 0.5rem 0.35rem 1rem;
+
+  input {
+    flex: 1;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: var(--ion-text-color, #111827);
+  }
+
+  input::placeholder {
+    color: var(--ion-color-medium);
+  }
+}
+
+.search-btn,
+.icon-btn {
+  border: 0;
+  background: transparent;
+  color: var(--ion-text-color, #111827);
+  cursor: pointer;
+}
+
+.search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  ion-icon {
+    font-size: 1.2rem;
+  }
+
+  &:hover {
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+    color: var(--ion-color-primary);
+  }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  ion-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  span:not(.badge) {
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  &:hover {
+    background: rgba(var(--ion-color-primary-rgb), 0.08);
+    color: var(--ion-color-primary);
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ion-color-danger);
+  color: var(--ion-color-danger-contrast);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.header-bottom {
+  background: var(--ion-color-primary);
+
+  .container {
+    overflow-x: auto;
+  }
+}
+
+.nav-menu {
+  display: flex;
+  gap: 2rem;
+  min-width: max-content;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.95rem 0;
+  color: var(--ion-color-primary-contrast);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.88;
+  transition: opacity 0.2s ease;
+
+  &:hover,
+  &.active {
+    opacity: 1;
+  }
+
+  &.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--ion-color-primary-contrast);
+    border-radius: 999px 999px 0 0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .header-top {
+    .container {
+      gap: 1rem;
+      padding-inline: 1.25rem;
+    }
+  }
+
+  .header-right {
+    gap: 0.25rem;
+  }
+
+  .icon-btn span:not(.badge) {
+    display: none;
+  }
+
+  .nav-menu {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header .container {
+    padding-inline: 1rem;
+  }
+
+  .header-top {
+    padding: 0.85rem 0;
+
+    .container {
+      flex-wrap: wrap;
+    }
+  }
+
+  .header-left,
+  .header-center,
+  .header-right {
+    width: 100%;
+  }
+
+  .header-right {
+    justify-content: space-between;
+  }
+
+  .icon-btn span:not(.badge) {
+    display: inline;
+  }
+
+  .nav-menu {
+    gap: 1rem;
+  }
+
+  .nav-link {
+    padding: 0.8rem 0;
+    font-size: 0.88rem;
+  }
+}

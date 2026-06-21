@@ -1,0 +1,90 @@
+<div class="st-page">
+
+  <!-- ── PAGE HEADER ─────────────────────────────────────────────────────── -->
+  @if (showHeader) {
+    <div class="st-header">
+      <div class="st-header-left">
+        <div class="st-title sh-block"></div>
+      </div>
+      <div class="st-header-right">
+        <div class="st-icon-btn sh-block" *ngFor="let b of iconButtons"></div>
+        <div class="st-action-btn sh-block" *ngFor="let b of actionButtons"></div>
+      </div>
+    </div>
+  }
+
+  <!-- ── FILTERS BAR ─────────────────────────────────────────────────────── -->
+  @if (showFilters) {
+    <div class="st-filters">
+      <div class="st-search sh-block"></div>
+      <div class="st-filter-select sh-block" *ngFor="let f of filterArray"></div>
+    </div>
+  }
+
+  <!-- ── TABLE ───────────────────────────────────────────────────────────── -->
+  <div class="st-table-wrap">
+
+    <!-- Table header row -->
+    <div class="st-thead">
+      <div
+        class="st-th sh-block"
+        *ngFor="let col of visibleColumns"
+        [class]="'col-type-' + col.type"
+      ></div>
+    </div>
+
+    <!-- Data rows -->
+    <div class="st-tbody-row" *ngFor="let row of rowArray">
+      <div
+        class="st-td"
+        *ngFor="let col of visibleColumns"
+        [class]="'col-type-' + col.type"
+      >
+        <!-- image + text cell -->
+        <ng-container *ngIf="col.type === 'image-text'">
+          <div class="cell-image-text">
+            <div class="cell-img sh-block"></div>
+            <div class="cell-text sh-block"></div>
+          </div>
+        </ng-container>
+
+        <!-- avatar + text cell -->
+        <ng-container *ngIf="col.type === 'avatar-text'">
+          <div class="cell-avatar-text">
+            <div class="cell-avatar sh-block"></div>
+            <div class="cell-text sh-block"></div>
+          </div>
+        </ng-container>
+
+        <!-- badge cell -->
+        <ng-container *ngIf="col.type === 'badge'">
+          <div class="cell-badge sh-block"></div>
+        </ng-container>
+
+        <!-- actions cell -->
+        <ng-container *ngIf="col.type === 'actions'">
+          <div class="cell-actions">
+            <div class="cell-action-icon sh-block" *ngFor="let a of rowActions"></div>
+          </div>
+        </ng-container>
+
+        <!-- all other cells: text / text-wide / currency / date / number -->
+        <ng-container
+          *ngIf="col.type !== 'image-text' && col.type !== 'avatar-text' && col.type !== 'badge' && col.type !== 'actions'"
+        >
+          <div class="cell-text sh-block" [class.cell-text-wide]="col.type === 'text-wide'"></div>
+        </ng-container>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── PAGINATION ─────────────────────────────────────────────────────── -->
+  @if (showPagination) {
+    <div class="st-pagination">
+      <div class="st-page-select sh-block"></div>
+      <div class="st-page-btn sh-block" *ngFor="let p of pageButtons"></div>
+    </div>
+  }
+
+</div>

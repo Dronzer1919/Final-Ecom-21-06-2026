@@ -1,0 +1,157 @@
+<div class="shimmer-wrapper" [ngSwitch]="type">
+  <div *ngSwitchCase="'banner'" class="banner-skeleton shimmer-surface">
+    <div class="banner-copy">
+      <div class="shimmer-block shimmer-line title"></div>
+      <div class="shimmer-block shimmer-line subtitle"></div>
+      <div class="shimmer-block shimmer-pill"></div>
+    </div>
+    <div class="banner-art shimmer-block"></div>
+  </div>
+
+  <div *ngSwitchCase="'brand'" class="grid-skeleton brand-grid">
+    <div *ngFor="let item of placeholders" class="brand-card shimmer-surface">
+      <div class="brand-logo shimmer-block"></div>
+      <div class="shimmer-block shimmer-line short"></div>
+    </div>
+  </div>
+
+  <div *ngSwitchCase="'category'" [class]="layout === 'horizontal' ? 'category-scroll' : 'grid-skeleton category-grid'">
+    <div *ngFor="let item of placeholders" class="category-card shimmer-surface">
+      <div class="category-thumb shimmer-block"></div>
+      <div class="shimmer-block shimmer-line medium"></div>
+      <div class="shimmer-block shimmer-line short"></div>
+    </div>
+  </div>
+
+  <div *ngSwitchCase="'b2b-category'" class="grid-skeleton b2b-category-grid">
+    <div *ngFor="let item of placeholders" class="b2b-category-card shimmer-surface">
+      <div class="category-icon shimmer-block"></div>
+      <div class="shimmer-block shimmer-line medium"></div>
+      <div class="shimmer-block shimmer-line long"></div>
+      <div class="shimmer-block shimmer-line short"></div>
+    </div>
+  </div>
+
+  <div *ngSwitchCase="'b2b-supplier'" class="grid-skeleton b2b-supplier-grid">
+    <div *ngFor="let item of placeholders" class="supplier-card shimmer-surface">
+      <div class="supplier-image shimmer-block"></div>
+      <div class="supplier-content">
+        <div class="price-section">
+          <div class="shimmer-block shimmer-line price"></div>
+        </div>
+        <div class="shimmer-block shimmer-line medium"></div>
+        <div class="rating-row">
+          <div class="shimmer-block shimmer-line short"></div>
+          <div class="shimmer-block shimmer-line short"></div>
+        </div>
+        <div class="shimmer-block shimmer-line long"></div>
+        <div class="action-row">
+          <div class="shimmer-block shimmer-pill medium"></div>
+          <div class="shimmer-block shimmer-pill short"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngSwitchCase="'b2b-table'" class="table-skeleton">
+    <table class="shimmer-table">
+      <thead>
+        <tr>
+          <th><div class="shimmer-block shimmer-line short"></div></th>
+          <th><div class="shimmer-block shimmer-line short"></div></th>
+          <th><div class="shimmer-block shimmer-line short"></div></th>
+          <th><div class="shimmer-block shimmer-line short"></div></th>
+          <th><div class="shimmer-block shimmer-line short"></div></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of placeholders" class="shimmer-row">
+          <td>
+            <div class="supplier-cell-shimmer">
+              <div class="shimmer-block shimmer-pill short"></div>
+              <div class="shimmer-block shimmer-line medium"></div>
+            </div>
+          </td>
+          <td><div class="shimmer-block shimmer-line medium"></div></td>
+          <td><div class="shimmer-block shimmer-line short"></div></td>
+          <td>
+            <div class="rating-shimmer">
+              <div class="shimmer-block shimmer-line short"></div>
+              <div class="shimmer-block shimmer-line short"></div>
+            </div>
+          </td>
+          <td>
+            <div class="actions-shimmer">
+              <div class="shimmer-block shimmer-icon"></div>
+              <div class="shimmer-block shimmer-icon"></div>
+              <div class="shimmer-block shimmer-icon"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngSwitchCase="'cart'" class="cart-skeleton">
+    <div *ngFor="let item of placeholders" class="cart-item-shimmer shimmer-surface">
+      <div class="cart-image shimmer-block"></div>
+      <div class="cart-details">
+        <div class="shimmer-block shimmer-line medium"></div>
+        <div class="shimmer-block shimmer-line short"></div>
+        <div class="shimmer-block shimmer-line short"></div>
+      </div>
+      <div class="cart-actions-shimmer">
+        <div class="quantity-shimmer">
+          <div class="shimmer-block shimmer-pill short"></div>
+        </div>
+        <div class="shimmer-block shimmer-line short"></div>
+        <div class="shimmer-block shimmer-icon"></div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngSwitchCase="'footer'" class="footer-skeleton">
+    <div class="footer-columns">
+      <!-- Brand column -->
+      <div class="footer-col">
+        <div class="shimmer-block shimmer-line" style="width:60%; height:22px; margin-bottom:12px;"></div>
+        <div class="shimmer-block shimmer-line medium" style="margin-bottom:8px;"></div>
+        <div class="shimmer-block shimmer-line short" style="margin-bottom:16px;"></div>
+        <div class="footer-social-shimmer">
+          <div class="shimmer-block shimmer-icon"></div>
+          <div class="shimmer-block shimmer-icon"></div>
+          <div class="shimmer-block shimmer-icon"></div>
+          <div class="shimmer-block shimmer-icon"></div>
+        </div>
+      </div>
+      <!-- Link columns x3 -->
+      <div class="footer-col" *ngFor="let col of [1,2,3]">
+        <div class="shimmer-block shimmer-line" style="width:50%; height:18px; margin-bottom:14px;"></div>
+        <div class="footer-links-shimmer">
+          <div class="shimmer-block shimmer-line medium" *ngFor="let row of [1,2,3,4,5]"></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom-shimmer">
+      <div class="shimmer-block shimmer-line" style="width:40%; height:14px; margin:0 auto;"></div>
+    </div>
+  </div>
+
+  <div *ngSwitchDefault class="grid-skeleton product-grid">
+    <div *ngFor="let item of placeholders" class="product-card shimmer-surface">
+      <div class="product-media shimmer-block"></div>
+      <div class="product-body">
+        <div class="shimmer-block shimmer-line medium"></div>
+        <div class="shimmer-block shimmer-line short"></div>
+        <div class="price-row">
+          <div class="shimmer-block shimmer-line price"></div>
+          <div class="shimmer-block shimmer-line strike"></div>
+        </div>
+        <div class="action-row">
+          <div class="shimmer-block shimmer-pill grow"></div>
+          <div class="shimmer-block shimmer-icon"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

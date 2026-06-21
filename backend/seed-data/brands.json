@@ -1,0 +1,122 @@
+[
+  {
+    "name": "ZARA",
+    "code": "ZARA001",
+    "description": "Spanish fast fashion retailer known for trendy clothing and accessories",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Zara_Logo.svg/300px-Zara_Logo.svg.png",
+    "website": "https://www.zara.com",
+    "isActive": true
+  },
+  {
+    "name": "Nike",
+    "code": "NIKE001",
+    "description": "Global leader in athletic footwear, apparel, equipment and accessories",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/300px-Logo_NIKE.svg.png",
+    "website": "https://www.nike.com",
+    "isActive": true
+  },
+  {
+    "name": "H&M",
+    "code": "HM001",
+    "description": "Swedish multinational clothing retailer offering fashion and quality at the best price",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/H%26M-Logo.svg/300px-H%26M-Logo.svg.png",
+    "website": "https://www.hm.com",
+    "isActive": true
+  },
+  {
+    "name": "Sony",
+    "code": "SONY001",
+    "description": "Japanese multinational conglomerate specializing in electronics, gaming, and entertainment",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/300px-Sony_logo.svg.png",
+    "website": "https://www.sony.com",
+    "isActive": true
+  },
+  {
+    "name": "Adidas",
+    "code": "ADI001",
+    "description": "German multinational corporation designing and manufacturing sports shoes, clothing and accessories",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/300px-Adidas_Logo.svg.png",
+    "website": "https://www.adidas.com",
+    "isActive": true
+  },
+  {
+    "name": "Under Armour",
+    "code": "UA001",
+    "description": "American sports equipment company manufacturing footwear, sports and casual apparel",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Under_armour_logo.svg/300px-Under_armour_logo.svg.png",
+    "website": "https://www.underarmour.com",
+    "isActive": true
+  },
+  {
+    "name": "Apple",
+    "code": "APPLE001",
+    "description": "American technology company known for iPhone, iPad, Mac, and other innovative products",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/300px-Apple_logo_black.svg.png",
+    "website": "https://www.apple.com",
+    "isActive": true
+  },
+  {
+    "name": "Samsung",
+    "code": "SAMSUNG001",
+    "description": "South Korean multinational conglomerate specializing in electronics and technology",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Samsung_Logo.svg/300px-Samsung_Logo.svg.png",
+    "website": "https://www.samsung.com",
+    "isActive": true
+  },
+  {
+    "name": "Puma",
+    "code": "PUMA001",
+    "description": "German multinational corporation designing and manufacturing athletic and casual footwear, apparel and accessories",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/PUMA_logo.svg/300px-PUMA_logo.svg.png",
+    "website": "https://www.puma.com",
+    "isActive": true
+  },
+  {
+    "name": "Canon",
+    "code": "CANON001",
+    "description": "Japanese multinational corporation specializing in imaging and optical products",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Canon_wordmark.svg/300px-Canon_wordmark.svg.png",
+    "website": "https://www.canon.com",
+    "isActive": true
+  },
+  {
+    "name": "Logitech",
+    "code": "LOGI001",
+    "description": "Swiss manufacturer of computer peripherals and software",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Logitech_logo.svg/300px-Logitech_logo.svg.png",
+    "website": "https://www.logitech.com",
+    "isActive": true
+  },
+  {
+    "name": "Dyson",
+    "code": "DYSON001",
+    "description": "British technology company known for innovative household appliances",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Dyson_logo.svg/300px-Dyson_logo.svg.png",
+    "website": "https://www.dyson.com",
+    "isActive": true
+  },
+  {
+    "name": "OnePlus",
+    "code": "ONEPLUS001",
+    "description": "Chinese smartphone manufacturer known for flagship killer devices",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/OnePlus_Logo_2022.svg/300px-OnePlus_Logo_2022.svg.png",
+    "website": "https://www.oneplus.com",
+    "isActive": true
+  },
+  {
+    "name": "LG",
+    "code": "LG001",
+    "description": "South Korean multinational electronics company producing consumer electronics and appliances",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/LG_logo_%282015%29.svg/300px-LG_logo_%282015%29.svg.png",
+    "website": "https://www.lg.com",
+    "isActive": true
+  },
+  {
+    "name": "Reebok",
+    "code": "REEBOK001",
+    "description": "British-American footwear and apparel brand specializing in fitness and lifestyle products",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Reebok_logo.svg/300px-Reebok_logo.svg.png",
+    "website": "https://www.reebok.com",
+    "isActive": true
+  }
+]

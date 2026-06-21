@@ -1,0 +1,136 @@
+<div class="b2b-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="page-title-wrap">
+        <span class="page-badge">B2B</span>
+        <h1 class="page-title">B2B Management</h1>
+      </div>
+      <p class="page-subtitle">Manage categories, subcategories, products and vendors for your B2B marketplace</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/dashboard/b2b-management/step-form" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Quick Setup Wizard
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <a *ngFor="let stat of stats" [routerLink]="stat.route" class="stat-card">
+      <div class="stat-icon" [style.background]="stat.color + '18'" [style.color]="stat.color">
+        <!-- Category icon -->
+        <ng-container *ngIf="stat.icon === 'category'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+          </svg>
+        </ng-container>
+        <!-- Subcategory icon -->
+        <ng-container *ngIf="stat.icon === 'subcategory'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          </svg>
+        </ng-container>
+        <!-- Product icon -->
+        <ng-container *ngIf="stat.icon === 'product'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+          </svg>
+        </ng-container>
+        <!-- Vendor icon -->
+        <ng-container *ngIf="stat.icon === 'vendor'">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </ng-container>
+      </div>
+      <div class="stat-body">
+        <p class="stat-label">{{ stat.label }}</p>
+        <p class="stat-value" *ngIf="!isLoadingStats">{{ stat.value }}</p>
+        <div class="stat-skeleton" *ngIf="isLoadingStats"></div>
+      </div>
+      <svg class="stat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Sections -->
+  <div class="sections-grid">
+    <!-- Quick Links -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2 class="section-title">Quick Navigation</h2>
+        <span class="section-subtitle">Manage all B2B components</span>
+      </div>
+      <div class="quick-links">
+        <a *ngFor="let link of quickLinks" [routerLink]="link.route" class="quick-link">
+          <div class="ql-indicator" [style.background]="link.color"></div>
+          <div class="ql-body">
+            <div class="ql-title-row">
+              <span class="ql-title">{{ link.label }}</span>
+              <span *ngIf="link.badge" class="ql-badge">{{ link.badge }}</span>
+            </div>
+            <p class="ql-desc">{{ link.description }}</p>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- B2B Overview Info -->
+    <div class="section-card info-card">
+      <div class="section-header">
+        <h2 class="section-title">B2B Catalog Structure</h2>
+      </div>
+      <div class="info-tree">
+        <div class="tree-node root">
+          <span class="tree-icon">🏢</span>
+          <span class="tree-label">B2B Marketplace</span>
+        </div>
+        <div class="tree-children">
+          <div class="tree-node">
+            <span class="tree-icon">📂</span>
+            <span class="tree-label">Category — e.g. <strong>Grocery</strong></span>
+          </div>
+          <div class="tree-children">
+            <div class="tree-node">
+              <span class="tree-icon">📁</span>
+              <span class="tree-label">Sub-Category — e.g. <strong>Grocery &amp; Staples</strong>, Packed Foods, Dairy &amp; Frozen</span>
+            </div>
+            <div class="tree-children">
+              <div class="tree-node">
+                <span class="tree-icon">🗂️</span>
+                <span class="tree-label">Sub-Sub Category — e.g. <strong>Rice</strong>, Dals, Spices</span>
+              </div>
+              <div class="tree-children">
+                <div class="tree-node">
+                  <span class="tree-icon">📦</span>
+                  <span class="tree-label">Product — e.g. <strong>Indrayani Rice</strong>, Basmati Rice, Delhi Rice</span>
+                </div>
+                <div class="tree-children">
+                  <div class="tree-node">
+                    <span class="tree-icon">🏪</span>
+                    <span class="tree-label">Vendor / Supplier — multiple per product (bulk pricing, GST)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-tip">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Use the <strong>Quick Setup Wizard</strong> to create the full 5-level hierarchy in one flow.
+      </div>
+    </div>
+  </div>
+</div>

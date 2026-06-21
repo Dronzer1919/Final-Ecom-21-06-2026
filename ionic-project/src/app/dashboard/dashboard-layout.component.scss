@@ -1,0 +1,81 @@
+﻿@use '../../styles/variables' as *;
+@use '../../styles/mixins' as m;
+
+.dashboard-wrapper {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--dash-bg-secondary);
+  position: relative;
+}
+
+.main-content {
+  position: absolute;
+  top: 70px;
+  left: 260px;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  padding: $padding-lg;
+  background-color: var(--dash-bg-secondary);
+
+  @include m.respond-to('md') {
+    left: 0;
+  }
+
+  @include m.respond-to('sm') {
+    padding: $padding-md;
+  }
+}
+
+.content-container {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  bottom: $padding-lg;
+  right: $padding-lg;
+  width: 56px;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--dash-primary);
+  color: var(--dash-text-inverse);
+  border: none;
+  border-radius: $border-radius-round;
+  box-shadow: var(--dash-shadow-lg);
+  cursor: pointer;
+  z-index: $z-index-dropdown + 2;
+  transition: all $transition-normal;
+
+  @include m.respond-to('md') {
+    display: flex;
+  }
+
+  &:hover {
+    background-color: var(--dash-primary-hover);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.sidebar-overlay {
+  display: none;
+
+  @include m.respond-to('md') {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: $z-index-dropdown - 2;
+  }
+}

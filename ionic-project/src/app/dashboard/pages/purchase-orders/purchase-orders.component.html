@@ -1,0 +1,143 @@
+<div class="purchase-orders-container">
+  <div class="header">
+    <div class="actions">
+      <app-theme-button type="primary" (clicked)="exportPDF()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export PDF
+      </app-theme-button>
+      <button class="btn-export" (click)="exportExcel()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+        Export Excel
+      </button>
+      <app-theme-button type="primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Purchase Order
+      </app-theme-button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <div class="search-box">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchText" placeholder="Search by reference or supplier...">
+      </div>
+      <div class="filter-supplier">
+        <select [(ngModel)]="filterSupplier">
+          <option value="">All Suppliers</option>
+          <option value="ABC Electronics">ABC Electronics</option>
+          <option value="Tech Supplies Co">Tech Supplies Co</option>
+          <option value="Global Traders">Global Traders</option>
+          <option value="Metro Wholesale">Metro Wholesale</option>
+        </select>
+      </div>
+      <div class="filter-status">
+        <select [(ngModel)]="filterStatus">
+          <option value="">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Sent">Sent</option>
+          <option value="Ordered">Ordered</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Reference</th>
+          <th>Supplier</th>
+          <th>Warehouse</th>
+          <th>Status</th>
+          <th>Grand Total</th>
+          <th>Delivery Date</th>
+          <th>Created By</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of paginatedOrders">
+          <td>{{ order.date }}</td>
+          <td>{{ order.reference }}</td>
+          <td>{{ order.supplier }}</td>
+          <td>{{ order.warehouse }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="{
+              'pending': order.status === 'Pending',
+              'sent': order.status === 'Sent',
+              'ordered': order.status === 'Ordered',
+              'completed': order.status === 'Completed'
+            }">
+              {{ order.status }}
+            </span>
+          </td>
+          <td>₹{{ order.grandTotal.toLocaleString() }}</td>
+          <td>{{ order.deliveryDate }}</td>
+          <td>{{ order.createdBy }}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-icon" (click)="viewOrder(order)" title="View">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+              <button class="btn-icon" (click)="editOrder(order)" title="Edit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                </svg>
+              </button>
+              <button class="btn-icon delete" (click)="deleteOrder(order)" title="Delete">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="table-footer">
+      <div class="rows-per-page">
+        Show
+        <select [(ngModel)]="rowsPerPage" (change)="currentPage = 1">
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+        entries
+      </div>
+      <div class="pagination-info">
+        Showing {{ Math.min((currentPage - 1) * rowsPerPage + 1, filteredOrders.length) }} 
+        to {{ Math.min(currentPage * rowsPerPage, filteredOrders.length) }} 
+        of {{ filteredOrders.length }} entries
+      </div>
+      <div class="pagination">
+        <button class="page-btn" (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+        <button *ngFor="let page of pages" class="page-btn" [class.active]="page === currentPage" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        <button class="page-btn" (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,104 @@
+[
+  {
+    "name": "Smartphones",
+    "code": "SUB001",
+    "description": "Mobile phones and smartphones",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Footwear",
+    "code": "SUB002",
+    "description": "Shoes, sneakers, and footwear",
+    "categoryName": "Fashion"
+  },
+  {
+    "name": "Gaming Consoles",
+    "code": "SUB003",
+    "description": "Gaming consoles and accessories",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Laptops",
+    "code": "SUB004",
+    "description": "Laptop computers",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Televisions",
+    "code": "SUB005",
+    "description": "Smart TVs and televisions",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Cameras",
+    "code": "SUB006",
+    "description": "Digital cameras and DSLR",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Wireless Earbuds",
+    "code": "SUB007",
+    "description": "Wireless earbuds and TWS",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Smartwatches",
+    "code": "SUB008",
+    "description": "Smartwatches and fitness trackers",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Computer Accessories",
+    "code": "SUB009",
+    "description": "Mouse, keyboards, and accessories",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Tablets",
+    "code": "SUB010",
+    "description": "Tablet computers",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Home Appliances",
+    "code": "SUB011",
+    "description": "Vacuum cleaners and appliances",
+    "categoryName": "Home & Living"
+  },
+  {
+    "name": "Headphones",
+    "code": "SUB012",
+    "description": "Over-ear and on-ear headphones",
+    "categoryName": "Electronics"
+  },
+  {
+    "name": "Rice",
+    "code": "SUB013",
+    "description": "Basmati, Sona Masoori, and other rice varieties",
+    "categoryName": "Grocery"
+  },
+  {
+    "name": "Pulses",
+    "code": "SUB014",
+    "description": "Lentils, dal, and dried pulses",
+    "categoryName": "Grocery"
+  },
+  {
+    "name": "Spices",
+    "code": "SUB015",
+    "description": "Whole and ground spices",
+    "categoryName": "Grocery"
+  },
+  {
+    "name": "Oil",
+    "code": "SUB016",
+    "description": "Edible oils for cooking",
+    "categoryName": "Grocery"
+  },
+  {
+    "name": "Sugar",
+    "code": "SUB017",
+    "description": "Refined and raw sugar varieties",
+    "categoryName": "Grocery"
+  }
+]

@@ -1,0 +1,6 @@
+<button 
+  [class]="'theme-btn theme-btn-' + type + ' theme-btn-' + size + (fullWidth ? ' theme-btn-full' : '')"
+  [disabled]="disabled"
+  (click)="onClick($event)">
+  <ng-content></ng-content>
+</button>

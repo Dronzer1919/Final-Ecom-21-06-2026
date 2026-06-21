@@ -1,0 +1,80 @@
+<div class="themed-table-container">
+  <!-- Loading Overlay -->
+  <div *ngIf="loading" class="loading-overlay">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper">
+    <table class="themed-table" [class.striped]="striped" [class.hoverable]="hoverable">
+      <thead>
+        <tr>
+          <th 
+            *ngFor="let column of columns"
+            [style.width]="column.width || 'auto'"
+            [class.sortable]="column.sortable"
+            (click)="onSort(column)">
+            <div class="th-content">
+              <span>{{ column.label }}</span>
+              <ion-icon 
+                *ngIf="column.sortable && sortColumn === column.key"
+                [name]="sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'"
+                class="sort-icon">
+              </ion-icon>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr 
+          *ngFor="let row of paginatedData"
+          (click)="onRowClick(row)"
+          class="table-row">
+          <td *ngFor="let column of columns">
+            {{ row[column.key] }}
+          </td>
+        </tr>
+        <tr *ngIf="paginatedData.length === 0 && !loading">
+          <td [attr.colspan]="columns.length" class="no-data">
+            No data available
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <div class="pagination-info">
+      Showing {{ ((pagination.currentPage - 1) * pagination.pageSize) + 1 }} 
+      to {{ Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems) }} 
+      of {{ pagination.totalItems }} items
+    </div>
+    
+    <div class="pagination-controls">
+      <ion-button 
+        fill="clear" 
+        size="small"
+        [disabled]="pagination.currentPage === 1"
+        (click)="onPageChange(pagination.currentPage - 1)">
+        <ion-icon name="chevron-back" slot="icon-only"></ion-icon>
+      </ion-button>
+      
+      <ion-button 
+        *ngFor="let page of getPageNumbers()"
+        [fill]="page === pagination.currentPage ? 'solid' : 'clear'"
+        size="small"
+        (click)="onPageChange(page)">
+        {{ page }}
+      </ion-button>
+      
+      <ion-button 
+        fill="clear" 
+        size="small"
+        [disabled]="pagination.currentPage === totalPages"
+        (click)="onPageChange(pagination.currentPage + 1)">
+        <ion-icon name="chevron-forward" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+</div>

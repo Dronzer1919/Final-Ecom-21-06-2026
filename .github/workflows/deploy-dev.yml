@@ -1,0 +1,114 @@
+name: Deploy Dev Branch
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect Changed Areas
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'ionic-project/**'
+
+  deploy-backend:
+    name: Deploy Backend to Hostinger VPS
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' && secrets.VPS_HOST != '' && secrets.VPS_USERNAME != '' && secrets.VPS_SSH_KEY != '' && secrets.VPS_APP_DIR != ''
+    steps:
+      - name: Deploy with SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.VPS_APP_DIR }}"
+            git fetch origin
+            git checkout dev
+            git pull origin dev
+
+            cd backend
+            npm ci --omit=dev
+
+            if pm2 describe sindhu-api >/dev/null 2>&1; then
+              pm2 restart sindhu-api --update-env
+            else
+              pm2 start src/server.js --name sindhu-api
+            fi
+
+            pm2 save
+
+  deploy-frontend:
+    name: Deploy Frontend to Hostinger Web Hosting
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true' && secrets.HOSTINGER_FTP_SERVER != '' && secrets.HOSTINGER_FTP_USERNAME != '' && secrets.HOSTINGER_FTP_PASSWORD != ''
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ionic-project/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ionic-project
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ionic-project
+        run: npm run build -- --configuration production
+
+      - name: Upload www to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.HOSTINGER_FTP_SERVER }}
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          password: ${{ secrets.HOSTINGER_FTP_PASSWORD }}
+          local-dir: ionic-project/www/
+          server-dir: ${{ secrets.HOSTINGER_FTP_TARGET_DIR }}
+          dangerous-clean-slate: false
+
+  deploy-summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs:
+      - changes
+      - deploy-backend
+      - deploy-frontend
+    if: always()
+    steps:
+      - name: Print summary
+        run: |
+          echo "Backend changed: ${{ needs.changes.outputs.backend }}"
+          echo "Frontend changed: ${{ needs.changes.outputs.frontend }}"
+          echo "If a deploy job was skipped, check changed files and GitHub secrets."

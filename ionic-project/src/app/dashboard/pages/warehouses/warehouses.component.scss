@@ -1,0 +1,503 @@
+.warehouses-container {
+  padding: 24px;
+  background: var(--dash-bg-secondary);
+  min-height: 100vh;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.detail-card {
+  background: var(--dash-bg-primary, #fff);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+
+  &-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--dash-border-primary, #e5e7eb);
+
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--dash-text-primary, #111827);
+      margin: 0;
+    }
+  }
+
+  &-body {
+    padding: 20px 24px;
+    flex: 1;
+  }
+
+  &-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--dash-border-primary, #e5e7eb);
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--dash-text-secondary, #6b7280);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--dash-bg-secondary, #f3f4f6);
+    color: var(--dash-text-primary, #111827);
+  }
+}
+
+.detail-badge-row {
+  margin-bottom: 16px;
+}
+
+.detail-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fee2e2;
+  color: #dc2626;
+
+  &.active {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dash-text-tertiary, #9ca3af);
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--dash-text-primary, #111827);
+  font-weight: 500;
+}
+
+.detail-section {
+  margin-top: 20px;
+
+  &-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--dash-text-secondary, #6b7280);
+    margin: 0 0 12px;
+  }
+}
+
+.btn-edit-modal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--dash-primary, #4f46e5);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 0.88;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+
+  a {
+    color: var(--dash-text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--dash-text-primary);
+    }
+  }
+
+  .separator {
+    color: var(--dash-text-tertiary);
+  }
+
+  .current {
+    color: var(--dash-text-primary);
+    font-weight: 500;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--dash-bg-primary);
+  border: 1px solid var(--dash-border-primary);
+  border-radius: 6px;
+  color: var(--dash-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--dash-bg-secondary);
+    border-color: var(--dash-border-secondary);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: var(--dash-primary);
+  border: none;
+  border-radius: 6px;
+  color: var(--dash-text-inverse);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--dash-primary-hover);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.table-container {
+  background: var(--dash-bg-primary);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--dash-border-primary);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--dash-bg-secondary);
+  border: 1px solid var(--dash-border-primary);
+  border-radius: 6px;
+  width: 300px;
+
+  svg {
+    color: var(--dash-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    color: var(--dash-text-primary);
+
+    &::placeholder {
+      color: var(--dash-text-tertiary);
+    }
+  }
+}
+
+.filter-status {
+  select {
+    padding: 8px 32px 8px 12px;
+    border: 1px solid var(--dash-border-primary);
+    border-radius: 6px;
+    background: var(--dash-bg-primary);
+    color: var(--dash-text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%236c757d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+
+    &:hover {
+      border-color: var(--dash-border-secondary);
+    }
+  }
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: var(--dash-bg-secondary);
+    border-bottom: 1px solid var(--dash-border-primary);
+
+    th {
+      padding: 12px 20px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--dash-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid var(--dash-border-primary);
+      transition: background 0.2s;
+
+      &:hover {
+        background: var(--dash-row-hover);
+      }
+
+      td {
+        padding: 16px 20px;
+        font-size: 14px;
+        color: var(--dash-text-primary);
+      }
+    }
+  }
+}
+
+.warehouse-name {
+  font-weight: 500;
+  color: var(--dash-text-primary);
+}
+
+.contact-person {
+  .person-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--dash-bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--dash-bg-tertiary);
+  color: var(--dash-text-secondary);
+
+  &.active {
+    background: rgba(var(--dash-success), 0.15);
+    color: var(--dash-success);
+  }
+}
+
+.actions-column {
+  width: 120px;
+  text-align: right;
+  white-space: nowrap;
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--dash-text-secondary);
+    transition: color 0.2s;
+    vertical-align: middle;
+
+    &:hover {
+      color: var(--dash-text-primary);
+    }
+
+    &.delete:hover {
+      color: var(--dash-error);
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-top: 1px solid var(--dash-border-primary);
+}
+
+.rows-per-page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--dash-text-secondary);
+
+  select {
+    padding: 6px 28px 6px 10px;
+    border: 1px solid var(--dash-border-primary);
+    border-radius: 4px;
+    background: var(--dash-bg-primary);
+    color: var(--dash-text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%236c757d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+  }
+}
+
+.pagination {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  .page-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    background: var(--dash-bg-primary);
+    border: 1px solid var(--dash-border-primary);
+    border-radius: 4px;
+    color: var(--dash-text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      background: var(--dash-bg-secondary);
+      border-color: var(--dash-border-secondary);
+    }
+
+    &.active {
+      background: var(--dash-primary);
+      border-color: var(--dash-primary);
+      color: var(--dash-text-inverse);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    color: var(--dash-text-secondary);
+    padding: 0 4px;
+  }
+}
+
+.warehouses-container,
+.warehouses-container .table-container,
+.warehouses-container .table-header,
+.warehouses-container .table-footer,
+.warehouses-container .search-box,
+.warehouses-container .filter-status select,
+.warehouses-container .rows-per-page,
+.warehouses-container .rows-per-page select,
+.warehouses-container .data-table,
+.warehouses-container .data-table thead,
+.warehouses-container .data-table tbody tr,
+.warehouses-container .data-table th,
+.warehouses-container .data-table td,
+.warehouses-container .warehouse-name,
+.warehouses-container .contact-person,
+.warehouses-container .contact-person .avatar,
+.warehouses-container .status-badge,
+.warehouses-container .action-btn,
+.warehouses-container .page-btn,
+.warehouses-container .pagination span {
+  opacity: 1 !important;
+  filter: none !important;
+}

@@ -1,0 +1,151 @@
+<div class="billers-container">
+  <div class="header">
+    <div class="actions">
+      <button class="btn-export" (click)="exportPDF()" title="Export to PDF">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+        PDF
+      </button>
+      <button class="btn-export" (click)="exportExcel()" title="Export to Excel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+        Excel
+      </button>
+      <button class="btn-export">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"/>
+        </svg>
+      </button>
+      <app-theme-button type="primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Add Biller
+      </app-theme-button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Search" 
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+      <div class="filter-status">
+        <select [(ngModel)]="selectedStatus">
+          <option value="">Status</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Shimmer Loading State -->
+    <app-shimmer *ngIf="isLoading" type="b2b-table" [count]="10"></app-shimmer>
+
+    <table *ngIf="!isLoading" class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Biller</th>
+          <th>Company Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Country</th>
+          <th>Status</th>
+          <th class="actions-column"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let biller of paginatedBillers">
+          <td class="code">{{ biller.code }}</td>
+          <td class="biller-info">
+            <div class="info-wrapper">
+              <div class="avatar">{{ biller.avatar }}</div>
+              <span>{{ biller.name }}</span>
+            </div>
+          </td>
+          <td>{{ biller.companyName }}</td>
+          <td>{{ biller.email }}</td>
+          <td>{{ biller.phone }}</td>
+          <td>{{ biller.country }}</td>
+          <td>
+            <span class="status-badge" [class.active]="biller.status === 'Active'">
+              {{ biller.status }}
+            </span>
+          </td>
+          <td class="actions-column">
+            <button class="action-btn" (click)="onView(biller)" title="View">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button><button class="action-btn" (click)="onEdit(biller)" title="Edit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button><button class="action-btn delete" (click)="onDelete(biller)" title="Delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading" class="table-footer">
+      <div class="rows-per-page">
+        <span>Row Per Page</span>
+        <select [(ngModel)]="rowsPerPage">
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+        </select>
+        <span>Entries</span>
+      </div>
+      <div class="pagination">
+        <button 
+          class="page-btn" 
+          (click)="previousPage()" 
+          [disabled]="currentPage === 1"
+        >
+          &lt;
+        </button>
+        <button 
+          *ngFor="let page of pageNumbers" 
+          class="page-btn" 
+          [class.active]="currentPage === page"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+        <span *ngIf="totalPages > 5">...</span>
+        <button 
+          *ngIf="totalPages > 5 && currentPage < totalPages - 2"
+          class="page-btn"
+          (click)="goToPage(totalPages)"
+        >
+          {{ totalPages }}
+        </button>
+        <button 
+          class="page-btn" 
+          (click)="nextPage()" 
+          [disabled]="currentPage === totalPages"
+        >
+          &gt;
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

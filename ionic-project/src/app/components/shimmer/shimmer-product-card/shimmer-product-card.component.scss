@@ -1,0 +1,134 @@
+.products-grid-shimmer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 10px 0;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+.product-card-shimmer {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    border-radius: 6px;
+  }
+}
+
+.shimmer-image {
+  width: 100%;
+  height: 250px;
+  position: relative;
+
+  @media (max-width: 768px) {
+    height: 180px;
+  }
+
+  @media (max-width: 480px) {
+    height: 150px;
+  }
+}
+
+.shimmer-content {
+  padding: 15px;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
+}
+
+.shimmer-title {
+  height: 20px;
+  margin-bottom: 10px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    height: 16px;
+    margin-bottom: 8px;
+  }
+}
+
+.shimmer-subtitle {
+  height: 16px;
+  margin-bottom: 12px;
+  width: 70%;
+
+  @media (max-width: 768px) {
+    height: 14px;
+    margin-bottom: 10px;
+  }
+}
+
+.shimmer-price {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+}
+
+.shimmer-price-current {
+  height: 24px;
+  width: 80px;
+
+  @media (max-width: 768px) {
+    height: 20px;
+    width: 60px;
+  }
+}
+
+.shimmer-price-old {
+  height: 18px;
+  width: 60px;
+
+  @media (max-width: 768px) {
+    height: 16px;
+    width: 50px;
+  }
+}
+
+.shimmer-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+  }
+}
+
+.shimmer-button-large {
+  height: 40px;
+  flex: 1;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    height: 36px;
+  }
+}
+
+.shimmer-button-small {
+  height: 40px;
+  width: 40px;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    height: 36px;
+    width: 36px;
+  }
+}

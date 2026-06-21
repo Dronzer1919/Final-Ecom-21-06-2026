@@ -1,0 +1,29 @@
+[
+  {
+    "title": "LATEST NIKE SHOES",
+    "subtitle": "Get Best Deal on more wishes",
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200&h=400&fit=crop",
+    "buttonText": "SHOP NOW",
+    "buttonLink": "/shop",
+    "order": 1,
+    "isActive": true
+  },
+  {
+    "title": "TRENDING ELECTRONICS",
+    "subtitle": "Up to 50% off on smartphones & laptops",
+    "image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&h=400&fit=crop",
+    "buttonText": "EXPLORE NOW",
+    "buttonLink": "/shop",
+    "order": 2,
+    "isActive": true
+  },
+  {
+    "title": "FASHION SALE",
+    "subtitle": "Top brands at unbeatable prices",
+    "image": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=400&fit=crop",
+    "buttonText": "SHOP FASHION",
+    "buttonLink": "/shop",
+    "order": 3,
+    "isActive": true
+  }
+]

@@ -1,0 +1,232 @@
+<div class="warehouses-container">
+  <div class="header">
+    <div class="actions">
+      <button class="btn-export" (click)="exportPDF()" title="Export to PDF">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+        PDF
+      </button>
+      <button class="btn-export" (click)="exportExcel()" title="Export to Excel">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+        Excel
+      </button>
+      <button class="btn-export">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"/>
+        </svg>
+      </button>
+      <app-theme-button type="primary" (clicked)="addWarehouse()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Add Warehouse
+      </app-theme-button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input 
+          type="text" 
+          placeholder="Search" 
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+      <div class="filter-status">
+        <select [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange()">
+          <option value="">Status</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Shimmer Loading State -->
+    <app-shimmer *ngIf="isLoading" type="b2b-table" [count]="10"></app-shimmer>
+
+    <table *ngIf="!isLoading" class="data-table">
+      <thead>
+        <tr>
+          <th>Warehouse</th>
+          <th>Code</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Capacity</th>
+          <th>Created On</th>
+          <th>Status</th>
+          <th class="actions-column">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let warehouse of paginatedWarehouses">
+          <td class="warehouse-name">{{ warehouse.name }}</td>
+          <td>{{ warehouse.code }}</td>
+          <td>{{ warehouse.phone || '-' }}</td>
+          <td>{{ warehouse.email || '-' }}</td>
+          <td>{{ warehouse.capacity ?? '-' }}</td>
+          <td>{{ warehouse.createdAt | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="status-badge" [class.active]="warehouse.isActive">
+              {{ warehouse.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="actions-column">
+            <button class="action-btn" (click)="onView(warehouse)" title="View">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button><button class="action-btn" (click)="onEdit(warehouse)" title="Edit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button><button class="action-btn delete" (click)="onDelete(warehouse)" title="Delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading" class="table-footer">
+      <div class="rows-per-page">
+        <span>Row Per Page</span>
+        <select [(ngModel)]="rowsPerPage" (ngModelChange)="onSearchChange()">
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+        </select>
+        <span>Entries</span>
+      </div>
+      <div class="pagination">
+        <button 
+          class="page-btn" 
+          (click)="previousPage()" 
+          [disabled]="currentPage === 1"
+        >
+          &lt;
+        </button>
+        <button 
+          *ngFor="let page of pageNumbers" 
+          class="page-btn" 
+          [class.active]="currentPage === page"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+        <span *ngIf="totalPages > 5">...</span>
+        <button 
+          *ngIf="totalPages > 5 && currentPage < totalPages - 2"
+          class="page-btn"
+          (click)="goToPage(totalPages)"
+        >
+          {{ totalPages }}
+        </button>
+        <button 
+          class="page-btn" 
+          (click)="nextPage()" 
+          [disabled]="currentPage === totalPages"
+        >
+          &gt;
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Warehouse Detail Modal -->
+<div class="modal-overlay" *ngIf="selectedWarehouse" (click)="closeDetailCard()">
+  <div class="detail-card" (click)="$event.stopPropagation()">
+    <div class="detail-card-header">
+      <h2>Warehouse Details</h2>
+      <button class="btn-close" (click)="closeDetailCard()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="detail-card-body">
+      <div class="detail-badge-row">
+        <span class="detail-status-badge" [class.active]="selectedWarehouse.isActive">
+          {{ selectedWarehouse.isActive ? 'Active' : 'Inactive' }}
+        </span>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Name</span>
+          <span class="detail-value">{{ selectedWarehouse.name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Code</span>
+          <span class="detail-value">{{ selectedWarehouse.code }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Phone</span>
+          <span class="detail-value">{{ selectedWarehouse.phone || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Email</span>
+          <span class="detail-value">{{ selectedWarehouse.email || '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Capacity</span>
+          <span class="detail-value">{{ selectedWarehouse.capacity ?? '-' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Created On</span>
+          <span class="detail-value">{{ selectedWarehouse.createdAt | date: 'dd MMM yyyy, hh:mm a' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Updated On</span>
+          <span class="detail-value">{{ selectedWarehouse.updatedAt | date: 'dd MMM yyyy, hh:mm a' }}</span>
+        </div>
+      </div>
+      <div class="detail-section" *ngIf="selectedWarehouse.address">
+        <h3 class="detail-section-title">Address</h3>
+        <div class="detail-grid">
+          <div class="detail-item" *ngIf="selectedWarehouse.address.street">
+            <span class="detail-label">Street</span>
+            <span class="detail-value">{{ selectedWarehouse.address.street }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedWarehouse.address.city">
+            <span class="detail-label">City</span>
+            <span class="detail-value">{{ selectedWarehouse.address.city }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedWarehouse.address.state">
+            <span class="detail-label">State</span>
+            <span class="detail-value">{{ selectedWarehouse.address.state }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedWarehouse.address.country">
+            <span class="detail-label">Country</span>
+            <span class="detail-value">{{ selectedWarehouse.address.country }}</span>
+          </div>
+          <div class="detail-item" *ngIf="selectedWarehouse.address.zipCode">
+            <span class="detail-label">Zip Code</span>
+            <span class="detail-value">{{ selectedWarehouse.address.zipCode }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-card-footer">
+      <button class="btn-edit-modal" (click)="onEdit(selectedWarehouse); closeDetailCard()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Edit Warehouse
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+@use 'src/theme/mixins.scss' as *;
+
+.demo-container {
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.demo-section {
+  margin-bottom: 48px;
+  
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: get-text-color();
+    margin-bottom: 8px;
+  }
+  
+  .section-description {
+    font-size: 1rem;
+    color: rgba(var(--ion-text-color-rgb), 0.7);
+    margin-bottom: 24px;
+  }
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.demo-item {
+  @include themed-card(1);
+  
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: get-text-color();
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ion-color-primary);
+  }
+  
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+    app-themed-button {
+      width: 100%;
+    }
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.accordion-container {
+  max-width: 800px;
+}
+
+pre {
+  background: get-background('surface');
+  border: 1px solid get-border-color();
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+  
+  code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.875rem;
+    color: get-text-color();
+    line-height: 1.5;
+  }
+}
+
+h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: get-text-color();
+  margin: 24px 0 12px 0;
+  
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .demo-container {
+    padding: 12px;
+  }
+  
+  .demo-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .demo-section {
+    margin-bottom: 32px;
+    
+    .section-title {
+      font-size: 1.5rem;
+    }
+  }
+}

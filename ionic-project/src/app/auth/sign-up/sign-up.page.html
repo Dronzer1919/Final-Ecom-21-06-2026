@@ -1,0 +1,162 @@
+<div class="auth-container">
+  <div class="auth-content">
+    <div class="auth-form-section">
+      <div class="auth-form-wrapper">
+        <div class="auth-form-content">
+          <div class="title-with-back">
+            <button type="button" class="back-button" routerLink="/home">
+              <ion-icon name="arrow-back"></ion-icon>
+            </button>
+            <h1 class="auth-title">Create Account</h1>
+          </div>
+          <p class="auth-subtitle">Join our platform and start shopping today.</p>
+
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+              <label for="fullName" class="form-label">Full Name <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input
+                  id="fullName"
+                  type="text"
+                  class="form-input"
+                  [class.input-error]="isFieldInvalid('fullName')"
+                  formControlName="fullName"
+                  placeholder="Enter your full name"
+                />
+                <span class="input-icon">
+                  <ion-icon name="person-outline"></ion-icon>
+                </span>
+              </div>
+              <span class="error-text" *ngIf="isFieldInvalid('fullName')">
+                {{ getErrorMessage('fullName') }}
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">Email <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input
+                  id="email"
+                  type="email"
+                  class="form-input"
+                  [class.input-error]="isFieldInvalid('email')"
+                  formControlName="email"
+                  placeholder="Enter your email"
+                />
+                <span class="input-icon">
+                  <ion-icon name="mail-outline"></ion-icon>
+                </span>
+              </div>
+              <span class="error-text" *ngIf="isFieldInvalid('email')">
+                {{ getErrorMessage('email') }}
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="phone" class="form-label">Phone <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input
+                  id="phone"
+                  type="tel"
+                  class="form-input"
+                  [class.input-error]="isFieldInvalid('phone')"
+                  formControlName="phone"
+                  placeholder="Enter your phone number"
+                />
+                <span class="input-icon">
+                  <ion-icon name="call-outline"></ion-icon>
+                </span>
+              </div>
+              <span class="error-text" *ngIf="isFieldInvalid('phone')">
+                {{ getErrorMessage('phone') }}
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="password" class="form-label">Password <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input
+                  id="password"
+                  [type]="showPassword ? 'text' : 'password'"
+                  class="form-input"
+                  [class.input-error]="isFieldInvalid('password')"
+                  formControlName="password"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  class="input-icon icon-button"
+                  (click)="togglePasswordVisibility('password')"
+                >
+                  <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                </button>
+              </div>
+              <span class="error-text" *ngIf="isFieldInvalid('password')">
+                {{ getErrorMessage('password') }}
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label">Confirm Password <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <input
+                  id="confirmPassword"
+                  [type]="showConfirmPassword ? 'text' : 'password'"
+                  class="form-input"
+                  [class.input-error]="isFieldInvalid('confirmPassword') || signUpForm.errors?.['mismatch']"
+                  formControlName="confirmPassword"
+                  placeholder="Confirm your password"
+                />
+                <button
+                  type="button"
+                  class="input-icon icon-button"
+                  (click)="togglePasswordVisibility('confirmPassword')"
+                >
+                  <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+                </button>
+              </div>
+              <span class="error-text" *ngIf="isFieldInvalid('confirmPassword')">
+                {{ getErrorMessage('confirmPassword') }}
+              </span>
+              <span class="error-text" *ngIf="signUpForm.errors?.['mismatch'] && signUpForm.get('confirmPassword')?.touched">
+                Passwords do not match
+              </span>
+            </div>
+
+            <div class="form-options">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" formControlName="agreeToTerms" />
+                <span class="checkbox-label">I agree to the Terms and Conditions</span>
+              </label>
+              <span class="error-text" *ngIf="isFieldInvalid('agreeToTerms')">
+                You must agree to the terms and conditions
+              </span>
+            </div>
+
+            <app-theme-button type="primary" [fullWidth]="true" [disabled]="isLoading" (clicked)="onSubmit()">
+              <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+              <span *ngIf="!isLoading">Create Account</span>
+              <span *ngIf="isLoading">Creating Account...</span>
+            </app-theme-button>
+          </form>
+
+          <div class="auth-footer-link">
+            <span>Already have an account?</span>
+            <a routerLink="/auth/sign-in">Sign In</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-image-section">
+      <div class="auth-image-content">
+        <img src="assets/svg/signUP.svg" alt="Sign Up" class="auth-illustration">
+        <h2>Welcome!</h2>
+        <p>Create an account to access exclusive deals and features</p>
+      </div>
+    </div>
+

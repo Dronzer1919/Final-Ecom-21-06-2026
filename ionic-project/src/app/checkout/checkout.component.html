@@ -1,0 +1,182 @@
+<div class="checkout-container">
+  <div class="container">
+    <h1 class="checkout-title">Checkout</h1>
+
+    <div class="checkout-content">
+      <!-- Shipping Address Form -->
+      <div class="checkout-form">
+        <div class="form-section">
+          <h2>Shipping Address</h2>
+          <form [formGroup]="checkoutForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fullName">Full Name*</label>
+                <input
+                  type="text"
+                  id="fullName"
+                  formControlName="fullName"
+                  [class.error]="isFieldInvalid('fullName')"
+                />
+                @if (isFieldInvalid('fullName')) {
+                  <span class="error-message">{{ getFieldError('fullName') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number*</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  formControlName="phone"
+                  [class.error]="isFieldInvalid('phone')"
+                  placeholder="10-digit mobile number"
+                />
+                @if (isFieldInvalid('phone')) {
+                  <span class="error-message">{{ getFieldError('phone') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="address">Address*</label>
+              <textarea
+                id="address"
+                formControlName="address"
+                rows="3"
+                [class.error]="isFieldInvalid('address')"
+                placeholder="House No., Street, Area"
+              ></textarea>
+              @if (isFieldInvalid('address')) {
+                <span class="error-message">{{ getFieldError('address') }}</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">City*</label>
+                <input
+                  type="text"
+                  id="city"
+                  formControlName="city"
+                  [class.error]="isFieldInvalid('city')"
+                />
+                @if (isFieldInvalid('city')) {
+                  <span class="error-message">{{ getFieldError('city') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="state">State*</label>
+                <input
+                  type="text"
+                  id="state"
+                  formControlName="state"
+                  [class.error]="isFieldInvalid('state')"
+                />
+                @if (isFieldInvalid('state')) {
+                  <span class="error-message">{{ getFieldError('state') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="pincode">Pincode*</label>
+                <input
+                  type="text"
+                  id="pincode"
+                  formControlName="pincode"
+                  [class.error]="isFieldInvalid('pincode')"
+                  placeholder="6-digit pincode"
+                />
+                @if (isFieldInvalid('pincode')) {
+                  <span class="error-message">{{ getFieldError('pincode') }}</span>
+                }
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="form-section">
+          <h2>Payment Method</h2>
+          <div class="payment-methods">
+            <div
+              class="payment-option"
+              [class.selected]="paymentMethod === 'online'"
+              (click)="selectPaymentMethod('online')"
+            >
+              <input
+                type="radio"
+                name="payment"
+                id="online"
+                [checked]="paymentMethod === 'online'"
+              />
+              <label for="online">
+                <strong>Online Payment (Razorpay)</strong>
+                <span>Pay securely using UPI, Cards, Net Banking</span>
+              </label>
+            </div>
+
+            <div
+              class="payment-option"
+              [class.selected]="paymentMethod === 'cod'"
+              (click)="selectPaymentMethod('cod')"
+            >
+              <input
+                type="radio"
+                name="payment"
+                id="cod"
+                [checked]="paymentMethod === 'cod'"
+              />
+              <label for="cod">
+                <strong>Cash on Delivery</strong>
+                <span>Pay when you receive the product</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <div class="summary-box">
+          <h2>Order Summary</h2>
+
+          <div class="order-items">
+            @for (item of cartItems; track item.productId) {
+              <div class="summary-item">
+                <div class="item-info">
+                  <p class="item-name">{{ item.name }}</p>
+                  <p class="item-quantity">Qty: {{ item.quantity }}</p>
+                </div>
+                <p class="item-price">₹{{ (item.price * item.quantity) | number:'1.2-2' }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="summary-totals">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span>₹{{ subtotal | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Tax (18%)</span>
+              <span>₹{{ tax | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row total">
+              <span>Total</span>
+              <span>₹{{ total | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <app-theme-button type="primary" [fullWidth]="true" [disabled]="isProcessing" (clicked)="placeOrder()">
+            @if (isProcessing) {
+              <span>Processing...</span>
+            } @else {
+              <span>Place Order</span>
+            }
+          </app-theme-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

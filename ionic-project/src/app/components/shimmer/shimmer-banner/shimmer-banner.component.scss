@@ -1,0 +1,105 @@
+.banner-shimmer {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 60px 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+
+  @media (max-width: 768px) {
+    padding: 40px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 30px 10px;
+  }
+}
+
+.banner-content-shimmer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+.shimmer-text {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    gap: 15px;
+  }
+}
+
+.shimmer-title {
+  height: 48px;
+  width: 80%;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    height: 36px;
+    width: 90%;
+  }
+
+  @media (max-width: 480px) {
+    height: 28px;
+  }
+}
+
+.shimmer-title-2 {
+  height: 48px;
+  width: 90%;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    height: 36px;
+  }
+
+  @media (max-width: 480px) {
+    height: 28px;
+  }
+}
+
+.shimmer-subtitle {
+  height: 24px;
+  width: 70%;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    height: 20px;
+    width: 80%;
+  }
+}
+
+.shimmer-button {
+  height: 48px;
+  width: 150px;
+  border-radius: 4px;
+
+  @media (max-width: 768px) {
+    height: 44px;
+    width: 130px;
+  }
+}
+
+.shimmer-image {
+  height: 300px;
+  border-radius: 8px;
+
+  @media (max-width: 768px) {
+    height: 250px;
+  }
+
+  @media (max-width: 480px) {
+    height: 200px;
+  }
+}

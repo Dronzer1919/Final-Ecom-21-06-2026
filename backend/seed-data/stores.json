@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Main Store",
+    "code": "STORE001",
+    "email": "store@unitedgoals.com",
+    "phone": "+91 9876543210",
+    "address": "123 Main Street, Mumbai, Maharashtra 400001",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "country": "India",
+    "zipCode": "400001",
+    "isActive": true
+  },
+  {
+    "name": "Delhi Branch",
+    "code": "STORE002",
+    "email": "delhi@unitedgoals.com",
+    "phone": "+91 9876543211",
+    "address": "456 Connaught Place, New Delhi, Delhi 110001",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "country": "India",
+    "zipCode": "110001",
+    "isActive": true
+  },
+  {
+    "name": "Bangalore Store",
+    "code": "STORE003",
+    "email": "bangalore@unitedgoals.com",
+    "phone": "+91 9876543212",
+    "address": "789 MG Road, Bangalore, Karnataka 560001",
+    "city": "Bangalore",
+    "state": "Karnataka",
+    "country": "India",
+    "zipCode": "560001",
+    "isActive": true
+  }
+]

@@ -1,0 +1,243 @@
+// ── Shared shimmer animation ──────────────────────────────────────────────────
+@keyframes sp-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.sh-block {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e8e8e8 20%,
+    #f0f0f0 40%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: sp-shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sh-block {
+    background: linear-gradient(
+      90deg,
+      #2a2a2a 0%,
+      #333 20%,
+      #2a2a2a 40%,
+      #2a2a2a 100%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+// ── Page wrapper ──────────────────────────────────────────────────────────────
+.sp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 800px;
+  box-sizing: border-box;
+}
+
+// ── Page Header ───────────────────────────────────────────────────────────────
+.sp-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-page-title {
+  width: 160px;
+  height: 28px;
+  border-radius: 8px;
+}
+
+.sp-page-sub {
+  width: 280px;
+  height: 14px;
+}
+
+// ── Profile Card ──────────────────────────────────────────────────────────────
+.sp-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #ebebeb;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// ── Avatar Section ────────────────────────────────────────────────────────────
+.sp-avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.sp-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sp-avatar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-user-name {
+  width: 180px;
+  height: 20px;
+  border-radius: 5px;
+}
+
+.sp-user-email {
+  width: 220px;
+  height: 14px;
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────────
+.sp-divider {
+  height: 1px;
+  background: #f0f1f3;
+}
+
+// ── Form Header ───────────────────────────────────────────────────────────────
+.sp-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sp-section-title {
+  width: 180px;
+  height: 18px;
+  border-radius: 5px;
+}
+
+.sp-section-title-sm {
+  width: 140px;
+}
+
+.sp-edit-btn {
+  width: 100px;
+  height: 34px;
+  border-radius: 8px;
+}
+
+// ── Form Fields ───────────────────────────────────────────────────────────────
+.sp-form-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.sp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-label {
+  width: 90px;
+  height: 13px;
+}
+
+.sp-input {
+  height: 42px;
+  border-radius: 8px;
+}
+
+// ── Form Actions ──────────────────────────────────────────────────────────────
+.sp-form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.sp-save-btn {
+  width: 100px;
+  height: 38px;
+  border-radius: 8px;
+}
+
+.sp-cancel-btn {
+  width: 80px;
+  height: 38px;
+  border-radius: 8px;
+}
+
+// ── Info Grid ─────────────────────────────────────────────────────────────────
+.sp-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sp-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f8f8f8;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.sp-info-label {
+  width: 120px;
+  height: 13px;
+}
+
+.sp-info-value {
+  width: 160px;
+  height: 13px;
+}
+
+// ── Mobile ────────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .sp-page {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .sp-card {
+    padding: 20px;
+    gap: 18px;
+  }
+
+  .sp-avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  .sp-form-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-page-sub {
+    width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sp-avatar-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .sp-user-name {
+    width: 140px;
+  }
+
+  .sp-user-email {
+    width: 170px;
+  }
+}

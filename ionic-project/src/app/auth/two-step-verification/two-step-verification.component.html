@@ -1,0 +1,125 @@
+<div class="auth-container">
+  <div class="auth-content">
+    <!-- Left Section - Form -->
+    <div class="auth-form-section">
+      <div class="auth-form-wrapper">
+        <!-- Logo -->
+        <div class="auth-logo">
+          <img src="assets/images/logo.png" alt="" />
+        </div>
+
+        <!-- 2 Step Verification Form -->
+        <div class="auth-form-content">
+          <h1 class="auth-title">2 Step Verification</h1>
+          <p class="auth-subtitle">
+            Please enter the OTP received to confirm your account ownership. 
+            A code has been send to <strong>{{ maskedEmail }}</strong>
+          </p>
+
+          <!-- Error Message -->
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <form [formGroup]="otpForm" (ngSubmit)="onSubmit()">
+            <!-- OTP Input Fields -->
+            <div class="otp-input-group">
+              <input
+                id="digit1"
+                type="text"
+                class="otp-input"
+                formControlName="digit1"
+                maxlength="1"
+                (input)="onOtpInput($event, 'digit2')"
+                (keydown)="onOtpKeydown($event, '')"
+                autofocus
+              />
+              <input
+                id="digit2"
+                type="text"
+                class="otp-input"
+                formControlName="digit2"
+                maxlength="1"
+                (input)="onOtpInput($event, 'digit3')"
+                (keydown)="onOtpKeydown($event, 'digit1')"
+              />
+              <input
+                id="digit3"
+                type="text"
+                class="otp-input"
+                formControlName="digit3"
+                maxlength="1"
+                (input)="onOtpInput($event, 'digit4')"
+                (keydown)="onOtpKeydown($event, 'digit2')"
+              />
+              <input
+                id="digit4"
+                type="text"
+                class="otp-input"
+                formControlName="digit4"
+                maxlength="1"
+                (input)="onOtpInput($event, 'digit5')"
+                (keydown)="onOtpKeydown($event, 'digit3')"
+              />
+              <input
+                id="digit5"
+                type="text"
+                class="otp-input"
+                formControlName="digit5"
+                maxlength="1"
+                (input)="onOtpInput($event, 'digit6')"
+                (keydown)="onOtpKeydown($event, 'digit4')"
+              />
+              <input
+                id="digit6"
+                type="text"
+                class="otp-input"
+                formControlName="digit6"
+                maxlength="1"
+                (keydown)="onOtpKeydown($event, 'digit5')"
+              />
+            </div>
+
+            <!-- Timer -->
+            <div class="timer-wrapper" *ngIf="!canResend">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span>{{ timer }}s</span>
+            </div>
+
+            <!-- Resend OTP -->
+            <div class="resend-wrapper">
+              <span>Didn't get the OTP?</span>
+              <button
+                type="button"
+                class="resend-link"
+                [disabled]="!canResend"
+                (click)="resendOTP()"
+              >
+                Resend OTP
+              </button>
+            </div>
+
+            <!-- Submit Button -->
+            <app-theme-button type="primary" [fullWidth]="true" [disabled]="isLoading || !otpForm.valid" (clicked)="onSubmit()">
+              <span *ngIf="!isLoading">Submit</span>
+              <span *ngIf="isLoading">Verifying...</span>
+            </app-theme-button>
+          </form>
+        </div>
+
+        <!-- Copyright -->
+        <div class="auth-copyright">
+          Copyrights © 2025 -  Retail E-commerce. All rights reserved.
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Section - Image -->
+    <div class="auth-image-section">
+      <img src="assets/images/auth-2fa.jpg" alt="2 Step Verification" />
+    </div>
+  </div>
+</div>

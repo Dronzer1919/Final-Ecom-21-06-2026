@@ -1,0 +1,355 @@
+<div class="qap-page">
+
+  <!-- Header -->
+  <div class="qap-header">
+    <button class="btn-back" (click)="cancel()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      B2B Products
+    </button>
+    <div>
+      <h1 class="qap-title">Add B2B Product</h1>
+      <p class="qap-subtitle">Select the hierarchy, then fill in the product details</p>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+    </svg>
+    {{ errorMessage }}
+  </div>
+
+  <div [formGroup]="form" class="qap-body">
+
+    <!-- ══════════════════════════════════════════════
+         SECTION 1: CATEGORY HIERARCHY CASCADE
+    ══════════════════════════════════════════════ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-icon">🗂️</span>
+        <div>
+          <h2 class="section-title">Step 1 — Select Category Hierarchy</h2>
+          <p class="section-desc">Choose where this product belongs in the catalog tree</p>
+        </div>
+      </div>
+
+      <!-- Hierarchy breadcrumb hint -->
+      <div class="hierarchy-hint">
+        <span class="h-node" [class.filled]="form.value.categoryId">
+          📂 {{ getCategoryLabel() }}
+        </span>
+        <span class="h-sep">→</span>
+        <span class="h-node" [class.filled]="form.value.subcategoryId">
+          📁 {{ getSubcategoryLabel() }}
+        </span>
+        <span class="h-sep">→</span>
+        <span class="h-node" [class.filled]="form.value.subSubCategoryId">
+          🗂️ {{ getSubSubCategoryLabel() }}
+        </span>
+        <span class="h-sep">→</span>
+        <span class="h-node product-node" [class.filled]="form.value.name">
+          📦 {{ form.value.name || 'Product Name' }}
+        </span>
+      </div>
+
+      <div class="cascade-grid">
+        <!-- Level 1: Category -->
+        <div class="form-group">
+          <label>Main Category <span class="req">*</span></label>
+          <select formControlName="categoryId" (change)="onCategoryChange()">
+            <option value="">— Select category —</option>
+            <option *ngFor="let c of categories" [value]="c._id">{{ c.name }}</option>
+          </select>
+          <span class="field-hint">e.g. Grocery</span>
+          <span class="field-error" *ngIf="form.get('categoryId')?.invalid && form.get('categoryId')?.touched">
+            Required
+          </span>
+        </div>
+
+        <!-- Level 2: Sub-Category -->
+        <div class="form-group">
+          <label>Sub-Category <span class="req">*</span></label>
+          <div class="select-loading" *ngIf="isLoadingSubcats">
+            <span class="spinner-sm"></span> Loading...
+          </div>
+          <select formControlName="subcategoryId" (change)="onSubcategoryChange()"
+                  *ngIf="!isLoadingSubcats"
+                  [attr.disabled]="!form.value.categoryId ? '' : null">
+            <option value="">— Select sub-category —</option>
+            <option *ngFor="let s of subcategories" [value]="s._id">{{ s.name }}</option>
+          </select>
+          <span class="field-hint" *ngIf="!form.value.categoryId">Select a category first</span>
+          <span class="field-hint" *ngIf="form.value.categoryId">e.g. Grocery &amp; Staples</span>
+          <span class="field-error" *ngIf="form.get('subcategoryId')?.invalid && form.get('subcategoryId')?.touched">
+            Required
+          </span>
+        </div>
+
+        <!-- Level 3: Sub-Sub Category -->
+        <div class="form-group">
+          <label>Sub-Sub Category <span class="opt-badge">Optional</span></label>
+          <div class="select-loading" *ngIf="isLoadingSSC">
+            <span class="spinner-sm"></span> Loading...
+          </div>
+          <select formControlName="subSubCategoryId" *ngIf="!isLoadingSSC"
+                  [attr.disabled]="!form.value.subcategoryId ? '' : null">
+            <option value="">— Select sub-sub category —</option>
+            <option *ngFor="let ssc of subSubCategories" [value]="ssc._id">{{ ssc.name }}</option>
+          </select>
+          <span class="field-hint" *ngIf="!form.value.subcategoryId">Select sub-category first</span>
+          <span class="field-hint" *ngIf="form.value.subcategoryId && subSubCategories.length === 0 && !isLoadingSSC">
+            No sub-sub categories found — product will be linked to the sub-category
+          </span>
+          <span class="field-hint" *ngIf="form.value.subcategoryId && subSubCategories.length > 0">
+            e.g. Rice, Dals
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         SECTION 2: PRODUCT DETAILS
+    ══════════════════════════════════════════════ -->
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-icon">📦</span>
+        <div>
+          <h2 class="section-title">Step 2 — Product Details</h2>
+          <p class="section-desc">
+            Enter details for each rice variety separately — e.g.
+            <strong>Indrayani Rice</strong>, <strong>Basmati Rice</strong>, <strong>Delhi Rice</strong>
+          </p>
+        </div>
+      </div>
+
+      <h3 class="sub-section-title">Basic Information</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Product Name <span class="req">*</span></label>
+          <input type="text" formControlName="name" placeholder="e.g. Indrayani Rice">
+          <span class="field-error" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Item Code <span class="req">*</span></label>
+          <input type="text" formControlName="itemCode" placeholder="e.g. RICE-INDR-001">
+          <span class="field-error" *ngIf="form.get('itemCode')?.invalid && form.get('itemCode')?.touched">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Store <span class="req">*</span></label>
+          <select formControlName="store">
+            <option value="">— Select store —</option>
+            <option *ngFor="let s of stores" [value]="s._id">{{ s.name }}</option>
+          </select>
+          <span class="field-error" *ngIf="form.get('store')?.invalid && form.get('store')?.touched">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Warehouse <span class="req">*</span></label>
+          <select formControlName="warehouse">
+            <option value="">— Select warehouse —</option>
+            <option *ngFor="let w of warehouses" [value]="w._id">{{ w.name }}</option>
+          </select>
+          <span class="field-error" *ngIf="form.get('warehouse')?.invalid && form.get('warehouse')?.touched">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Unit <span class="req">*</span></label>
+          <select formControlName="unit">
+            <option value="">— Select unit —</option>
+            <option *ngFor="let u of units" [value]="u._id">{{ u.name }} ({{ u.shortName }})</option>
+          </select>
+          <span class="field-error" *ngIf="form.get('unit')?.invalid && form.get('unit')?.touched">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Brand</label>
+          <select formControlName="brand">
+            <option value="">— No brand —</option>
+            <option *ngFor="let b of brands" [value]="b._id">{{ b.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Product Type</label>
+          <select formControlName="productType">
+            <option value="single">Single</option>
+            <option value="variant">Variant</option>
+            <option value="combo">Combo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Barcode Symbology</label>
+          <select formControlName="barcodeSymbology">
+            <option value="CODE128">Code 128</option>
+            <option value="EAN13">EAN-13</option>
+            <option value="QR">QR Code</option>
+            <option value="CODE39">Code 39</option>
+            <option value="UPC">UPC</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea formControlName="description" rows="2" placeholder="Product description..."></textarea>
+        </div>
+      </div>
+
+      <h3 class="sub-section-title">Pricing &amp; Stock</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Price (₹) <span class="req">*</span></label>
+          <input type="number" formControlName="price" placeholder="0.00" min="0" step="0.01">
+          <span class="field-error" *ngIf="form.get('price')?.invalid && form.get('price')?.touched">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Stock Quantity <span class="req">*</span></label>
+          <input type="number" formControlName="quantity" placeholder="0" min="0">
+          <span class="field-error" *ngIf="form.get('quantity')?.invalid && form.get('quantity')?.touched">Required</span>
+        </div>
+        <div class="form-group">
+          <label>Low Stock Alert</label>
+          <input type="number" formControlName="quantityAlert" placeholder="10" min="0">
+        </div>
+        <div class="form-group">
+          <label>Tax Type</label>
+          <select formControlName="taxType">
+            <option value="Exclusive">Exclusive</option>
+            <option value="Inclusive">Inclusive</option>
+            <option value="None">None</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Discount Type</label>
+          <select formControlName="discountType">
+            <option value="None">None</option>
+            <option value="Percentage">Percentage (%)</option>
+            <option value="Fixed">Fixed (₹)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Discount Value</label>
+          <input type="number" formControlName="discountValue" placeholder="0" min="0">
+        </div>
+      </div>
+
+      <h3 class="sub-section-title">Manufacturing &amp; Expiry</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Manufacturer</label>
+          <input type="text" formControlName="manufacturer" placeholder="Manufacturer name">
+        </div>
+        <div class="form-group">
+          <label>Manufactured Date</label>
+          <input type="date" formControlName="manufacturedDate">
+        </div>
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" formControlName="expiryOn">
+        </div>
+      </div>
+
+      <h3 class="sub-section-title b2b-heading">B2B Settings</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Variety / Grade</label>
+          <input type="text" formControlName="variety" placeholder="e.g. Premium, Grade A, 1121">
+        </div>
+        <div class="form-group">
+          <label>Min. Order Quantity</label>
+          <input type="number" formControlName="minOrderQuantity" placeholder="1" min="1">
+        </div>
+        <div class="form-group">
+          <label>Supplier Location</label>
+          <input type="text" formControlName="supplierLocation" placeholder="e.g. Market Yard, Pune">
+        </div>
+        <div class="form-group">
+          <label>Response Rate (%)</label>
+          <input type="number" formControlName="responseRate" placeholder="100" min="0" max="100">
+        </div>
+        <div class="form-group">
+          <label class="toggle-row">
+            <input type="checkbox" formControlName="hasGST">
+            <span>Has GST Registration</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- ─── Bulk Order Pricing ─────────────────────────────────────────── -->
+      <h3 class="sub-section-title b2b-heading">Bulk Order Pricing</h3>
+      <p class="section-hint">Set tiered prices for larger orders (e.g. 5 Kg → ₹87/Kg at 1% OFF). Leave empty if no bulk discounts.</p>
+
+      <div class="bulk-tiers" *ngIf="bulkPricingTiers.length > 0">
+        <div class="tier-header">
+          <span>Min Qty</span>
+          <span>Unit</span>
+          <span>Price / Unit (₹)</span>
+          <span>Discount (%)</span>
+          <span></span>
+        </div>
+        <div class="tier-row" *ngFor="let tier of bulkPricingTiers; let ti = index">
+          <input type="number" [(ngModel)]="tier.quantity" [ngModelOptions]="{standalone:true}"
+                 placeholder="e.g. 25" min="1" class="tier-input">
+          <select [(ngModel)]="tier.unit" [ngModelOptions]="{standalone:true}" class="tier-select">
+            <option value="Kg">Kg</option>
+            <option value="g">g</option>
+            <option value="L">L</option>
+            <option value="Pcs">Pcs</option>
+            <option value="Box">Box</option>
+            <option value="Bag">Bag</option>
+          </select>
+          <input type="number" [(ngModel)]="tier.price" [ngModelOptions]="{standalone:true}"
+                 placeholder="e.g. 87" min="0" step="0.01" class="tier-input"
+                 (ngModelChange)="updateTierDiscount(tier)">
+          <div class="tier-disc-wrap">
+            <input type="number" [(ngModel)]="tier.discount" [ngModelOptions]="{standalone:true}"
+                   placeholder="0" min="0" max="100" class="tier-input"
+                   (ngModelChange)="updateTierPrice(tier)">
+            <span class="disc-off" *ngIf="tier.discount > 0">{{ tier.discount }}% OFF</span>
+          </div>
+          <button type="button" class="btn-remove-tier" (click)="removeTier(ti)" title="Remove">✕</button>
+        </div>
+      </div>
+
+      <div class="tier-empty" *ngIf="bulkPricingTiers.length === 0">
+        No bulk pricing tiers yet. Click "Add Tier" to define quantity-based discounts.
+      </div>
+
+      <button type="button" class="btn-add-tier" (click)="addTier()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Tier
+      </button>
+
+      <h3 class="sub-section-title">Product Images</h3>
+      <div class="image-row">
+        <input type="file" accept="image/*" multiple (change)="onImageFile($event)" id="img-file" style="display:none">
+        <label for="img-file" class="btn-upload">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Upload Images
+        </label>
+        <div class="image-previews">
+          <div *ngFor="let img of productImages; let i = index" class="img-wrap">
+            <img [src]="img" alt="product">
+            <button type="button" (click)="removeImage(i)" class="btn-remove-img">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /qap-body -->
+
+  <!-- Footer -->
+  <div class="qap-footer">
+    <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
+    <button type="button" class="btn-save" (click)="onSubmit()" [disabled]="isSubmitting">
+      <svg *ngIf="!isSubmitting" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span class="spinner-btn" *ngIf="isSubmitting"></span>
+      {{ isSubmitting ? 'Saving...' : 'Add Product' }}
+    </button>
+  </div>
+
+</div>

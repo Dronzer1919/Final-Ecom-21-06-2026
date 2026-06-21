@@ -1,0 +1,89 @@
+<header class="header">
+  <div class="header-top">
+    <div class="container">
+      <div class="header-left">
+        <span class="brand-name">UNITED GOALS</span>
+      </div>
+      <div class="header-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Search for products...">
+          <button class="search-btn">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="header-right">
+        <!-- Theme Switcher Dropdown -->
+        <div class="theme-switcher">
+          <button class="icon-btn theme-btn" (click)="toggleThemeDropdown($event)" title="Change Theme">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 2a4.5 4.5 0 0 0 0 9 4.5 4.5 0 0 1 0 9 10 10 0 0 0 0-18z"></path>
+            </svg>
+            <span>Theme</span>
+            <svg class="chevron" [class.open]="themeDropdownOpen" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="theme-dropdown" [class.open]="themeDropdownOpen">
+            <div class="dropdown-header">Choose Theme</div>
+            <button
+              *ngFor="let theme of themes"
+              class="theme-option"
+              [class.active]="currentTheme === theme.name"
+              (click)="selectTheme(theme.name, $event)">
+              <span class="theme-swatch theme-swatch--{{ theme.name }}"></span>
+              <div class="theme-info">
+                <span class="theme-label">{{ theme.label }}</span>
+                <span class="theme-desc">{{ theme.description }}</span>
+              </div>
+              <svg *ngIf="currentTheme === theme.name" class="check-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button class="icon-btn" (click)="onAccountClick()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Account</span>
+        </button>
+        <button class="icon-btn" (click)="onWishlistClick()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+          <span>Wishlist</span>
+          <span class="badge" *ngIf="wishlistCount > 0">{{ wishlistCount }}</span>
+        </button>
+        <button class="icon-btn cart-btn" (click)="onCartClick()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span>Cart</span>
+          <span class="badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="header-bottom">
+    <div class="container">
+      <nav class="nav-menu">
+        <a (click)="navigateToUrl('/home')" class="nav-link" [class.active]="activeRoute === 'home'">Home</a>
+        <a (click)="navigateToUrl('/shop')" class="nav-link" [class.active]="activeRoute === 'shop'">Shop</a>
+        <a (click)="navigateToUrl('/categories')" class="nav-link" [class.active]="activeRoute === 'categories'">Categories</a>
+        <a (click)="navigateToUrl('/deals')" class="nav-link" [class.active]="activeRoute === 'deals'">Deals</a>
+        <a (click)="navigateToUrl('/contact')" class="nav-link" [class.active]="activeRoute === 'contact'">Contact</a>
+        <a (click)="navigateToUrl('/b2b-categories')" class="nav-link" [class.active]="activeRoute === 'b2b'">B2B</a>
+      </nav>
+    </div>
+  </div>
+</header>

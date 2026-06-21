@@ -1,0 +1,131 @@
+<div class="frequently-bought-page">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="container">
+      <button class="back-btn" (click)="navigateHome()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        Back to Home
+      </button>
+      <h1>Frequently Bought Together</h1>
+      <p class="subtitle">Customer favorites - {{ totalProducts }} products</p>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div class="container" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading products...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="container" *ngIf="error && !loading">
+    <div class="error-message">
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="loadProducts()">Retry</button>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="container" *ngIf="!loading && !error">
+    <div class="products-grid" *ngIf="products.length > 0">
+      <div class="product-card" *ngFor="let product of products" 
+           (click)="navigateToProduct(product._id!)">
+        <button class="wishlist-btn" 
+                [class.active]="isInWishlist(product._id!)"
+                (click)="toggleWishlist(product, $event)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" [attr.fill]="isInWishlist(product._id!) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+        <div class="product-badge" *ngIf="getDiscountPercentage(product) > 0">
+          {{ getDiscountPercentage(product) }}% OFF
+        </div>
+        <div class="product-image">
+          <img [src]="getProductImage(product)" 
+               [alt]="product.name"
+               loading="lazy">
+        </div>
+        <div class="product-info">
+          <h3>{{ product.name }}</h3>
+          <p class="product-description" *ngIf="product.description">{{ product.description }}</p>
+          <div class="product-price">
+            <span class="current-price">₹{{ getDiscountedPrice(product) | number:'1.2-2' }}</span>
+            <span class="original-price" *ngIf="product.discountValue">₹{{ product.price | number:'1.2-2' }}</span>
+          </div>
+          <div class="product-meta">
+            <span class="stock" [class.in-stock]="product.quantity && product.quantity > 0" 
+                  [class.out-stock]="!product.quantity || product.quantity === 0">
+              {{ product.quantity && product.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
+            </span>
+            <span class="category" *ngIf="product.category">{{ product.category }}</span>
+          </div>
+          <app-theme-button type="primary" (clicked)="addToCart(product, $event)">Add to Cart</app-theme-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="products.length === 0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <path d="M16 10a4 4 0 0 1-8 0"></path>
+      </svg>
+      <h3>No products found</h3>
+      <p>There are no products available at the moment.</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="pagination-btn" 
+              [disabled]="currentPage === 1"
+              (click)="previousPage()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"></path>
+        </svg>
+        Previous
+      </button>
+
+      <div class="page-numbers">
+        <button *ngIf="currentPage > 3" 
+                class="page-btn" 
+                (click)="goToPage(1)">
+          1
+        </button>
+        <span *ngIf="currentPage > 3" class="ellipsis">...</span>
+
+        <button *ngFor="let page of pages"
+                class="page-btn"
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)">
+          {{ page }}
+        </button>
+
+        <span *ngIf="currentPage < totalPages - 2" class="ellipsis">...</span>
+        <button *ngIf="currentPage < totalPages - 2" 
+                class="page-btn" 
+                (click)="goToPage(totalPages)">
+          {{ totalPages }}
+        </button>
+      </div>
+
+      <button class="pagination-btn" 
+              [disabled]="currentPage === totalPages"
+              (click)="nextPage()">
+        Next
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m9 18 6-6-6-6"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Page Info -->
+    <div class="page-info" *ngIf="products.length > 0">
+      Showing {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalProducts) }} of {{ totalProducts }} products
+    </div>
+  </div>
+</div>

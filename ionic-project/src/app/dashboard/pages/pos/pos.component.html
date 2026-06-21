@@ -1,0 +1,227 @@
+<div class="pos-container">
+  <!-- Header -->
+  <div class="pos-header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-icon">🌟</span>
+        <span class="logo-text">Annapurna</span>
+      </div>
+      <div class="time-badge">
+        <span class="time-icon">🕐</span>
+        <span>{{ currentTime }}</span>
+      </div>
+    </div>
+    <div class="header-center">
+      <span class="welcome-text">Welcome, Wesley Adrian</span>
+      <span class="date-text">Mon, 24 December 2025</span>
+    </div>
+    <div class="header-right">
+      <button class="btn-header btn-dashboard">📊 Dashboard</button>
+      <button class="btn-header btn-products">📦 Products</button>
+      <button class="btn-header btn-orange">🛍️</button>
+      <button class="btn-header">⛶</button>
+      <button class="btn-header">⚙️</button>
+      <button class="btn-header">🔔</button>
+      <button class="btn-header">↻</button>
+      <button class="btn-header">⭐</button>
+      <button class="btn-header">🎯</button>
+      <button class="btn-header profile">👤</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="pos-main">
+    <!-- Left Sidebar - Categories -->
+    <div class="categories-sidebar">
+      <button 
+        *ngFor="let category of categories"
+        class="category-btn"
+        [class.active]="selectedCategory === category.id"
+        (click)="selectCategory(category.id)"
+      >
+        <span class="category-icon">{{ category.icon }}</span>
+        <span class="category-name">{{ category.name }}</span>
+      </button>
+    </div>
+
+    <!-- Center - Products Grid -->
+    <div class="products-section">
+      <div class="products-header">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            placeholder="Search Product"
+            [(ngModel)]="searchQuery"
+          />
+        </div>
+        <button class="btn-view-brands">👁️ View All Brands</button>
+        <button class="btn-filter">🔧 Filters</button>
+      </div>
+
+      <div class="products-grid">
+        <div 
+          *ngFor="let product of filteredProducts"
+          class="product-card"
+          (click)="addToOrder(product)"
+        >
+          <div class="product-image">
+            <span class="product-emoji">{{ product.image }}</span>
+          </div>
+          <div class="product-info">
+            <div class="product-category">{{ product.category }}</div>
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-footer">
+              <span class="product-price">₹{{ product.price }}</span>
+              <div class="product-actions">
+                <button class="action-btn" (click)="addToOrder(product); $event.stopPropagation()">+</button>
+                <button class="action-btn">👁️</button>
+                <button class="action-btn">❤️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar - Order List -->
+    <div class="order-sidebar">
+      <div class="order-header">
+        <h3>Order List</h3>
+        <span class="badge">{{ orderItems.length }}</span>
+      </div>
+
+      <!-- Customer Information -->
+      <div class="customer-section">
+        <div class="section-title">Customer Information</div>
+        <button class="btn-walk-in" (click)="selectWalkInCustomer()">
+          <span>{{ selectedCustomer?.name || 'Walk In Customer' }}</span>
+          <span class="dropdown-icon">▼</span>
+        </button>
+        <div class="customer-actions">
+          <button class="btn-icon">🔍</button>
+          <button class="btn-icon">➕</button>
+        </div>
+      </div>
+
+      <!-- Order Details -->
+      <div class="order-details-section">
+        <div class="section-header">
+          <span class="section-title">Order Details</span>
+          <span class="items-count">Items: {{ orderItems.length }}</span>
+        </div>
+
+        <div class="order-items" *ngIf="orderItems.length > 0; else noProducts">
+          <div class="order-item" *ngFor="let item of orderItems; let i = index">
+            <div class="item-image">{{ item.product.image }}</div>
+            <div class="item-details">
+              <div class="item-name">{{ item.product.name }}</div>
+              <div class="item-price">₹{{ item.product.price }}</div>
+            </div>
+            <div class="item-quantity">
+              <button (click)="decrementQuantity(item)">-</button>
+              <span>{{ item.quantity }}</span>
+              <button (click)="incrementQuantity(item)">+</button>
+            </div>
+            <button class="btn-remove" (click)="removeFromOrder(i)">×</button>
+          </div>
+        </div>
+
+        <ng-template #noProducts>
+          <div class="no-products">
+            <div class="no-products-icon">🛒</div>
+            <div class="no-products-text">No Products Selected</div>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Payment Summary -->
+      <div class="payment-summary">
+        <div class="section-title">Payment Summary</div>
+        <div class="summary-row">
+          <span>Sub Total</span>
+          <span>₹{{ subtotal }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping <button class="btn-edit">✏️</button></span>
+          <span>₹{{ shipping }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax <button class="btn-edit">✏️</button></span>
+          <span>₹{{ tax }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Coupon <button class="btn-edit">✏️</button></span>
+          <span>₹{{ coupon }}</span>
+        </div>
+        <div class="summary-row discount">
+          <span>Discount <button class="btn-edit">✏️</button></span>
+          <span class="discount-value">₹{{ discount }}</span>
+        </div>
+        <div class="summary-row">
+          <label>
+            <input type="checkbox">
+            <span>Roundoff</span>
+          </label>
+          <span>0</span>
+        </div>
+        <div class="summary-total">
+          <span>Total Payable</span>
+          <span>₹{{ totalPayable }}</span>
+        </div>
+      </div>
+
+      <!-- Payment Methods -->
+      <div class="payment-methods">
+        <div class="section-title">Select Payment</div>
+        <div class="payment-grid">
+          <button *ngFor="let method of paymentMethods" class="payment-btn">
+            <span class="payment-icon">{{ method.icon }}</span>
+            <span class="payment-name">{{ method.name }}</span>
+          </button>
+          <button class="payment-btn">
+            <span class="payment-icon">💰</span>
+            <span class="payment-name">Split Bill</span>
+          </button>
+          <button class="payment-btn">
+            <span class="payment-icon">🖨️</span>
+            <span class="payment-name">Print Order</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Place Order Button -->
+      <button class="btn-place-order" (click)="placeOrder()">
+        🛒 Place Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom Action Buttons -->
+  <div class="action-buttons">
+    <button class="action-btn-bottom btn-hold" (click)="hold()">
+      <span class="btn-icon">⏸️</span>
+      Hold
+    </button>
+    <button class="action-btn-bottom btn-void" (click)="voidOrder()">
+      <span class="btn-icon">🗑️</span>
+      Void
+    </button>
+    <button class="action-btn-bottom btn-payment" (click)="payment()">
+      <span class="btn-icon">💳</span>
+      Payment
+    </button>
+    <button class="action-btn-bottom btn-orders" (click)="viewOrders()">
+      <span class="btn-icon">👁️</span>
+      View Orders
+    </button>
+    <button class="action-btn-bottom btn-reset" (click)="reset()">
+      <span class="btn-icon">🔄</span>
+      Reset
+    </button>
+    <button class="action-btn-bottom btn-transaction" (click)="transaction()">
+      <span class="btn-icon">📊</span>
+      Transaction
+    </button>
+  </div>
+</div>

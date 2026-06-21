@@ -1,0 +1,375 @@
+@use '../../../../styles/mixins' as m;
+
+.invoices-page {
+  background: var(--dash-bg-primary);
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--dash-border-primary);
+}
+
+.no-data {
+  text-align: center;
+  padding: 48px !important;
+  color: var(--dash-text-secondary);
+  font-size: 16px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--dash-border-primary);
+
+  @include m.respond-to('md') {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.header-left {
+  .page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dash-text-primary);
+    margin: 0 0 8px 0;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+
+  @include m.respond-to('sm') { width: 100%; }
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--dash-border-primary);
+  background: var(--dash-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { background: var(--dash-bg-secondary); border-color: var(--dash-border-secondary); }
+  svg { color: var(--dash-text-tertiary); }
+
+  &.btn-pdf:hover { background: rgba(239, 68, 68, 0.16); border-color: rgba(239, 68, 68, 0.36); svg { color: var(--dash-error); } }
+  &.btn-excel:hover { background: rgba(16, 185, 129, 0.16); border-color: rgba(16, 185, 129, 0.36); svg { color: var(--dash-success); } }
+  &.btn-refresh:hover svg { color: var(--dash-info); }
+}
+
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--dash-border-primary);
+
+  @include m.respond-to('md') { flex-direction: column; gap: 16px; }
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--dash-bg-secondary);
+  border: 1px solid var(--dash-border-primary);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+
+  @include m.respond-to('md') { max-width: 100%; }
+
+  svg { color: var(--dash-text-tertiary); flex-shrink: 0; }
+
+  input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 14px;
+    color: var(--dash-text-primary);
+    width: 100%;
+    &::placeholder { color: var(--dash-text-tertiary); }
+  }
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  @include m.respond-to('md') { width: 100%; }
+}
+
+.filter-select {
+  padding: 10px 16px;
+  border: 1px solid var(--dash-border-primary);
+  border-radius: 8px;
+  background: var(--dash-bg-primary);
+  font-size: 14px;
+  color: var(--dash-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 140px;
+
+  &:hover { border-color: var(--dash-border-secondary); }
+  &:focus { outline: none; border-color: var(--dash-primary); }
+  @include m.respond-to('md') { flex: 1; }
+}
+
+.table-container { overflow-x: auto; }
+
+.invoices-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: var(--dash-bg-secondary);
+    border-bottom: 1px solid var(--dash-border-primary);
+
+    tr th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dash-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+
+      &:first-child { padding-left: 32px; }
+      &:last-child { padding-right: 32px; }
+    }
+  }
+
+  tbody {
+    tr.invoice-row {
+      border-bottom: 1px solid var(--dash-border-primary);
+      transition: background 0.2s;
+
+      &:hover { background: var(--dash-row-hover); }
+
+      td {
+        padding: 18px 20px;
+        font-size: 14px;
+        color: var(--dash-text-primary);
+
+        &:first-child { padding-left: 32px; }
+        &:last-child { padding-right: 32px; }
+      }
+    }
+  }
+}
+
+.invoice-no-cell { font-weight: 700; color: var(--dash-primary); white-space: nowrap; }
+.date-cell { color: var(--dash-text-secondary); white-space: nowrap; }
+.customer-cell {
+  min-width: 190px;
+
+  .customer-name {
+    display: block;
+    font-weight: 600;
+    color: var(--dash-text-primary);
+    white-space: nowrap;
+  }
+
+  .customer-company {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--dash-text-tertiary);
+    white-space: nowrap;
+  }
+}
+
+.customer-type-cell {
+  white-space: nowrap;
+
+  .type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+
+    &.individual {
+      background: rgba(59, 130, 246, 0.16);
+      color: var(--dash-info);
+    }
+
+    &.business {
+      background: var(--dash-primary-subtle-bg);
+      color: var(--dash-primary);
+    }
+  }
+}
+
+.method-cell { color: var(--dash-text-secondary); white-space: nowrap; }
+
+.amount-cell {
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--dash-text-primary);
+  &.paid { color: var(--dash-success); }
+  &.due  { color: var(--dash-error); }
+}
+
+.payment-status-cell {
+  .payment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &.paid    { background: rgba(16, 185, 129, 0.16); color: var(--dash-success); }
+    &.unpaid  { background: rgba(239, 68, 68, 0.16); color: var(--dash-error); }
+    &.partial { background: rgba(245, 158, 11, 0.18); color: var(--dash-warning); }
+  }
+}
+
+.actions-cell {
+  text-align: right;
+  white-space: nowrap;
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    vertical-align: middle;
+
+    svg { color: var(--dash-text-tertiary); }
+    &:hover { background: var(--dash-bg-tertiary); svg { color: var(--dash-info); } }
+  }
+}
+
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  border-top: 1px solid var(--dash-border-primary);
+
+  @include m.respond-to('sm') { flex-direction: column; gap: 16px; }
+}
+
+.rows-per-page {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--dash-text-secondary);
+
+  select {
+    padding: 6px 12px;
+    border: 1px solid var(--dash-border-primary);
+    border-radius: 6px;
+    background: var(--dash-bg-primary);
+    font-size: 14px;
+    color: var(--dash-text-primary);
+    cursor: pointer;
+    &:focus { outline: none; border-color: var(--dash-primary); }
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  .page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--dash-border-primary);
+    background: var(--dash-bg-primary);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dash-text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(:disabled):not(.active) { background: var(--dash-bg-secondary); border-color: var(--dash-border-secondary); }
+    &.active { background: var(--dash-primary); border-color: var(--dash-primary); color: var(--dash-text-inverse); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+    svg { color: currentColor; }
+  }
+
+  .page-ellipsis { padding: 0 8px; color: var(--dash-text-secondary); font-size: 14px; }
+}
+
+// Visibility safety block: keep invoices readable even if inherited opacity/filter or weak overrides apply.
+.invoices-page {
+  opacity: 1 !important;
+  filter: none !important;
+  color: var(--dash-text-primary, #111827);
+}
+
+.invoices-page .page-header,
+.invoices-page .filters-bar,
+.invoices-page .table-container,
+.invoices-page .pagination-bar {
+  opacity: 1 !important;
+}
+
+.invoices-page .page-title,
+.invoices-page .invoices-table td,
+.invoices-page .customer-name,
+.invoices-page .invoice-no-cell,
+.invoices-page .amount-cell,
+.invoices-page .method-cell,
+.invoices-page .rows-per-page,
+.invoices-page .entries-info {
+  color: var(--dash-text-primary, #111827);
+}
+
+.invoices-page .invoices-table th,
+.invoices-page .date-cell,
+.invoices-page .customer-company,
+.invoices-page .page-ellipsis,
+.invoices-page .search-box svg,
+.invoices-page .action-btn svg,
+.invoices-page .btn-icon svg {
+  color: var(--dash-text-tertiary, #6B7280);
+}
+
+.invoices-page .search-box,
+.invoices-page .filter-select,
+.invoices-page .rows-per-page select,
+.invoices-page .pagination-controls .page-btn {
+  background: var(--dash-bg-primary, #ffffff);
+  border-color: var(--dash-border-primary, #E5E7EB);
+  color: var(--dash-text-primary, #111827);
+}
+
+.invoices-page .search-box input::placeholder {
+  color: var(--dash-text-tertiary, #9CA3AF);
+}
+
+.invoices-page .invoices-table thead {
+  background: var(--dash-bg-secondary, #F9FAFB);
+}

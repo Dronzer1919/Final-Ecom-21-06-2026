@@ -1,0 +1,193 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/**
+ * Custom Theme System
+ * -----------------------------------------------------
+ * Import custom theme variables, functions, mixins, and theme definitions
+ * NOTE: @use rules must come before @import rules
+ */
+
+@use './theme/variables.scss';
+@use './theme/mixins.scss' as *;
+@use './theme/themes.scss';
+@use './styles/dashboard-page';
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+
+/* Match reference project base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  color: var(--ion-text-color, #212529);
+  background-color: var(--ion-background-color, #ffffff);
+  line-height: 1.5;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Global Themed Styles
+ * -----------------------------------------------------
+ * Apply theming to all Ionic components
+ */
+
+// Apply themed buttons globally
+ion-button {
+  @include themed-button('primary', 'filled');
+  
+  &[fill="outline"] {
+    @include themed-button('primary', 'outline');
+  }
+  
+  &[fill="clear"] {
+    @include themed-button('primary', 'clear');
+  }
+  
+  &[color="secondary"] {
+    @include themed-button('secondary', 'filled');
+    
+    &[fill="outline"] {
+      @include themed-button('secondary', 'outline');
+    }
+    
+    &[fill="clear"] {
+      @include themed-button('secondary', 'clear');
+    }
+  }
+  
+  &[color="tertiary"] {
+    @include themed-button('tertiary', 'filled');
+    
+    &[fill="outline"] {
+      @include themed-button('tertiary', 'outline');
+    }
+    
+    &[fill="clear"] {
+      @include themed-button('tertiary', 'clear');
+    }
+  }
+  
+  &[color="success"] {
+    @include themed-button('success', 'filled');
+    
+    &[fill="outline"] {
+      @include themed-button('success', 'outline');
+    }
+    
+    &[fill="clear"] {
+      @include themed-button('success', 'clear');
+    }
+  }
+  
+  &[color="warning"] {
+    @include themed-button('warning', 'filled');
+    
+    &[fill="outline"] {
+      @include themed-button('warning', 'outline');
+    }
+    
+    &[fill="clear"] {
+      @include themed-button('warning', 'clear');
+    }
+  }
+  
+  &[color="danger"] {
+    @include themed-button('danger', 'filled');
+    
+    &[fill="outline"] {
+      @include themed-button('danger', 'outline');
+    }
+    
+    &[fill="clear"] {
+      @include themed-button('danger', 'clear');
+    }
+  }
+}
+
+// Apply themed cards
+ion-card {
+  @include themed-card(1);
+  
+  &.elevation-2 {
+    @include themed-card(2);
+  }
+  
+  &.elevation-3 {
+    @include themed-card(3);
+  }
+}
+
+// Apply themed inputs
+ion-input, ion-textarea, ion-searchbar {
+  @include themed-input();
+}
+
+// Apply themed lists
+ion-list {
+  @include themed-list();
+}
+
+ion-item {
+  @include themed-list-item();
+}
+
+// Apply themed toolbars
+ion-toolbar {
+  @include themed-toolbar('surface');
+  
+  &.toolbar-primary {
+    @include themed-toolbar('primary');
+  }
+  
+  &.toolbar-transparent {
+    @include themed-toolbar('transparent');
+  }
+}
+
+// Apply themed pages
+ion-content {
+  @include themed-page();
+}
+
+// Smooth transitions for theme changes
+:root {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+ion-button,
+ion-card,
+ion-item,
+ion-toolbar,
+ion-content {
+  transition: all 0.3s ease;
+}

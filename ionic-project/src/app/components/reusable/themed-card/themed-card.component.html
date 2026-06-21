@@ -1,0 +1,31 @@
+<div 
+  class="themed-card"
+  [class]="elevationClass"
+  [class.clickable]="clickable">
+  
+  <!-- Card Header -->
+  <div class="card-header" *ngIf="title || subtitle || headerIcon">
+    <div class="header-content">
+      <ion-icon 
+        *ngIf="headerIcon" 
+        [name]="headerIcon"
+        [color]="headerColor"
+        class="header-icon">
+      </ion-icon>
+      <div class="header-text">
+        <h3 *ngIf="title" class="card-title">{{ title }}</h3>
+        <p *ngIf="subtitle" class="card-subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Card Content -->
+  <div class="card-content">
+    <ng-content></ng-content>
+  </div>
+  
+  <!-- Card Footer -->
+  <div class="card-footer" *ngIf="footerText">
+    <p>{{ footerText }}</p>
+  </div>
+</div>

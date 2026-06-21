@@ -1,0 +1,146 @@
+<div class="order-details-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      Back to Orders
+    </button>
+    <h1 class="page-title">Order Details</h1>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading order details...</p>
+  </div>
+
+  <!-- Order Details Content -->
+  <div *ngIf="!loading && order" class="order-content">
+    <!-- Order Information Card -->
+    <div class="detail-card">
+      <div class="card-header">
+        <div class="header-left">
+          <span class="customer-name">{{ order.shippingAddress.fullName | titlecase}}</span>
+          <span class="order-id">#{{ order._id?.slice(-8)?.toUpperCase() || 'N/A' }}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Order Date:</span>
+            <span class="value">{{ formatDate(order.createdAt) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Payment Status:</span>
+            <span [class]="'badge badge-' + order.paymentStatus">
+              {{ order.paymentStatus }}
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="label">Order Status:</span>
+            <span [class]="'badge badge-' + order.orderStatus">
+              {{ order.orderStatus }}
+            </span>
+          </div>
+          <div class="info-item info-item-payment">
+            <span class="label">Payment Method:</span>
+            <span class="value">{{ order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Items Card -->
+    <div class="detail-card">
+      <div class="card-header">
+        <h2>Order Items</h2>
+        <span class="items-count">{{ order.items.length }} item(s)</span>
+      </div>
+      <div class="card-body">
+        <div class="items-table">
+          <div class="table-header">
+            <div class="col-item">Item</div>
+            <div class="col-price">Price</div>
+            <div class="col-qty">Quantity</div>
+            <div class="col-total">Total</div>
+          </div>
+          <div class="table-body">
+            <div *ngFor="let item of order.items" class="item-row">
+              <div class="col-item">
+                <span class="item-name">{{ item.name | titlecase}}</span>
+              </div>
+              <div class="col-price">₹{{ item.price }}</div>
+              <div class="col-qty">{{ item.quantity }}</div>
+              <div class="col-total">₹{{ item.price * item.quantity }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="order-summary">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>₹{{ order.subtotal }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Tax:</span>
+            <span>₹{{ order.tax }}</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total:</span>
+            <strong>₹{{ order.total }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shipping Address Card -->
+    <div class="detail-card">
+      <div class="card-header">
+        <h2>Shipping Address</h2>
+      </div>
+      <div class="card-body">
+        <div class="address-box">
+          <p><strong>{{ toTitleCase(order.shippingAddress.fullName) }}</strong></p>
+          <p>{{ order.shippingAddress.phone }}</p>
+          <p>{{ order.shippingAddress.address }}</p>
+          <p>{{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} - {{ order.shippingAddress.pincode }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-bar">
+      <app-theme-button type="outline" (clicked)="goBack()">Back to Orders</app-theme-button>
+      <div class="action-buttons-right">
+        <button class="btn-outline" (click)="downloadExcel()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Excel
+        </button>
+        <button class="btn-outline" (click)="downloadPDF()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          PDF
+        </button>
+        <button *ngIf="order.orderStatus === 'pending' || order.orderStatus === 'confirmed'" 
+                class="btn-danger" 
+                (click)="cancelOrder(order._id!)">
+          Cancel Order
+        </button>
+        <button *ngIf="order.orderStatus === 'pending'" 
+                class="btn-success" 
+                (click)="confirmOrder(order._id!)">
+          Confirm Order
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

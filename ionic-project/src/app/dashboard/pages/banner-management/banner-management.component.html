@@ -1,0 +1,204 @@
+<div class="banner-management">
+  <div class="page-header">
+    <h1>Banner Management</h1>
+    <app-theme-button type="primary" (clicked)="openAddModal()">
+      <span>➕</span> Add New Banner
+    </app-theme-button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      (input)="filterBanners()"
+      placeholder="Search banners by title or subtitle..."
+      class="search-input"
+    />
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error && !loading" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Banners Table -->
+  <div *ngIf="!loading && !error" class="table-container">
+    <table class="banners-table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Preview</th>
+          <th>Title</th>
+          <th>Subtitle</th>
+          <th>Button Text</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let banner of paginatedBanners">
+          <td>{{ banner.order }}</td>
+          <td>
+            <img [src]="banner.image" [alt]="banner.title" class="banner-preview">
+          </td>
+          <td>{{ banner.title }}</td>
+          <td>{{ banner.subtitle || '-' }}</td>
+          <td>{{ banner.buttonText || 'SHOP NOW' }}</td>
+          <td>
+            <span class="status-badge" [class.active]="banner.isActive" [class.inactive]="!banner.isActive">
+              {{ banner.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-icon edit" (click)="openEditModal(banner)" title="Edit">
+                ✏️
+              </button>
+              <button 
+                class="btn-icon toggle" 
+                (click)="toggleStatus(banner)" 
+                [title]="banner.isActive ? 'Deactivate' : 'Activate'"
+              >
+                {{ banner.isActive ? '👁️' : '🚫' }}
+              </button>
+              <button class="btn-icon delete" (click)="deleteBanner(banner)" title="Delete">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="paginatedBanners.length === 0">
+          <td colspan="7" class="no-data">No banners found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+    <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages">Next</button>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal" *ngIf="showModal">
+  <div class="modal-backdrop" (click)="closeModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>{{ modalMode === 'add' ? 'Add New Banner' : 'Edit Banner' }}</h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <form>
+        <div class="form-group">
+          <label for="title">Title *</label>
+          <input 
+            id="title"
+            type="text" 
+            [(ngModel)]="formData.title" 
+            name="title"
+            placeholder="e.g., LATEST NIKE SHOES"
+            maxlength="100"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="subtitle">Subtitle</label>
+          <input 
+            id="subtitle"
+            type="text" 
+            [(ngModel)]="formData.subtitle" 
+            name="subtitle"
+            placeholder="e.g., Get Best Deal on more wishes"
+            maxlength="200"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="image">Image URL *</label>
+          <input 
+            id="image"
+            type="url" 
+            [(ngModel)]="formData.image" 
+            name="image"
+            placeholder="https://example.com/image.jpg"
+            required
+          />
+          <small class="helper-text">Enter a valid image URL (recommended: 1200x400px)</small>
+        </div>
+
+        <div class="image-preview" *ngIf="formData.image">
+          <img [src]="formData.image" [alt]="formData.title" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="buttonText">Button Text</label>
+            <input 
+              id="buttonText"
+              type="text" 
+              [(ngModel)]="formData.buttonText" 
+              name="buttonText"
+              placeholder="SHOP NOW"
+              maxlength="50"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="buttonLink">Button Link</label>
+            <input 
+              id="buttonLink"
+              type="text" 
+              [(ngModel)]="formData.buttonLink" 
+              name="buttonLink"
+              placeholder="/shop"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="order">Display Order</label>
+            <input 
+              id="order"
+              type="number" 
+              [(ngModel)]="formData.order" 
+              name="order"
+              min="0"
+            />
+            <small class="helper-text">Lower numbers display first</small>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="formData.isActive" 
+                name="isActive"
+              />
+              Active
+            </label>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <app-theme-button type="outline" (clicked)="closeModal()">Cancel</app-theme-button>
+      <app-theme-button type="primary" (clicked)="saveBanner()">
+        {{ modalMode === 'add' ? 'Create Banner' : 'Update Banner' }}
+      </app-theme-button>
+    </div>
+  </div>
+</div>

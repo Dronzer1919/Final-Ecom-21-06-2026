@@ -1,0 +1,101 @@
+<app-header></app-header>
+<ion-content>
+<div class="list-page">
+
+  <!-- ── LEVEL 0: Categories ──────────────────────────────────────────────── -->
+  @if (view === 'sections') {
+    <div class="page-header">
+      <div class="header-left">
+        <div class="page-title-wrap">
+          <span class="page-badge">B2B</span>
+          <h1 class="page-title">B2B Marketplace</h1>
+        </div>
+        <p class="page-subtitle">Wholesale pricing · Bulk orders · Multiple vendors per product</p>
+      </div>
+    </div>
+
+    <div class="hierarchy-bar">
+      <span class="h-chip active">📂 Category</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip">📁 Sub-Category</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip">🗂️ Sub-Sub Category</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip">📦 Product</span>
+    </div>
+
+    <app-b2b-sections-grid
+      (sectionSelected)="onSectionSelected($event)">
+    </app-b2b-sections-grid>
+  }
+
+  <!-- ── LEVEL 1: Sub-Categories ──────────────────────────────────────────── -->
+  @if (view === 'subcategories') {
+    <div class="page-header">
+      <div class="header-left">
+        <button class="btn-back" (click)="goToSections()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          B2B Marketplace
+        </button>
+        <div class="page-title-wrap">
+          <span class="page-icon">{{ selectedSection?.icon }}</span>
+          <h1 class="page-title">{{ selectedSection?.name }}</h1>
+        </div>
+        <p class="page-subtitle">{{ selectedSection?.description }}</p>
+      </div>
+    </div>
+
+    <div class="hierarchy-bar">
+      <span class="h-chip done" (click)="goToSections()">📂 Category</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip active">📁 Sub-Category</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip">🗂️ Sub-Sub Category</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip">📦 Product</span>
+    </div>
+
+    <app-b2b-subcategories-grid
+      [sectionId]="selectedSection!.id"
+      (categorySelected)="onCategorySelected($event)">
+    </app-b2b-subcategories-grid>
+  }
+
+  <!-- ── LEVEL 2: Sub-Sub Categories ─────────────────────────────────────── -->
+  @if (view === 'subsubcategories') {
+    <div class="page-header">
+      <div class="header-left">
+        <button class="btn-back" (click)="goToSubcategories()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          {{ selectedSection?.name }}
+        </button>
+        <div class="page-title-wrap">
+          <span class="page-icon">{{ selectedCategory?.icon }}</span>
+          <h1 class="page-title">{{ selectedCategory?.name }}</h1>
+        </div>
+        <p class="page-subtitle">Under <strong>{{ selectedSection?.name }}</strong> · B2B Wholesale</p>
+      </div>
+    </div>
+
+    <div class="hierarchy-bar">
+      <span class="h-chip done" (click)="goToSections()">📂 Category</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip done" (click)="goToSubcategories()">📁 {{ selectedSection?.name }}</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip done" (click)="goToSubcategories()">🗂️ {{ selectedCategory?.name }}</span>
+      <span class="h-arrow">→</span>
+      <span class="h-chip active">📦 Product</span>
+    </div>
+
+    <app-b2b-subsubcategories-grid
+      [categoryId]="selectedCategory!.id"
+      (subSubCategorySelected)="onSubSubCategorySelected($event)">
+    </app-b2b-subsubcategories-grid>
+  }
+
+</div>
+</ion-content>

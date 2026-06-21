@@ -1,0 +1,34 @@
+<div class="themed-accordion">
+  <div 
+    *ngFor="let item of items; let i = index" 
+    class="accordion-item"
+    [class.expanded]="isExpanded(i)">
+    
+    <div 
+      class="accordion-header"
+      (click)="toggleItem(i)">
+      <div class="header-content">
+        <ion-icon 
+          *ngIf="item.icon" 
+          [name]="item.icon" 
+          [color]="color"
+          class="header-icon">
+        </ion-icon>
+        <span class="header-title">{{ item.title }}</span>
+      </div>
+      <ion-icon 
+        [name]="isExpanded(i) ? 'chevron-up' : 'chevron-down'"
+        [color]="color"
+        class="toggle-icon">
+      </ion-icon>
+    </div>
+    
+    <div 
+      class="accordion-content"
+      [class.expanded]="isExpanded(i)">
+      <div class="content-inner">
+        {{ item.content }}
+      </div>
+    </div>
+  </div>
+</div>

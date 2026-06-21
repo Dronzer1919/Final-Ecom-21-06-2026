@@ -1,0 +1,376 @@
+<div class="wizard-container">
+  <!-- Header -->
+  <div class="wizard-header">
+    <h1>Add Product - Step by Step</h1>
+    <button class="btn-cancel" (click)="cancel()">
+      <i class="fas fa-times"></i> Cancel
+    </button>
+  </div>
+
+  <!-- Step Indicator -->
+  <div class="step-indicator">
+    <div class="step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1" (click)="goToStep(1)">
+      <div class="step-number">
+        <i class="fas fa-check" *ngIf="currentStep > 1"></i>
+        <span *ngIf="currentStep <= 1">1</span>
+      </div>
+      <div class="step-label">Category</div>
+    </div>
+    <div class="step-line" [class.completed]="currentStep > 1"></div>
+    
+    <div class="step" [class.active]="currentStep === 2" [class.completed]="currentStep > 2" (click)="goToStep(2)">
+      <div class="step-number">
+        <i class="fas fa-check" *ngIf="currentStep > 2"></i>
+        <span *ngIf="currentStep <= 2">2</span>
+      </div>
+      <div class="step-label">Subcategory</div>
+    </div>
+    <div class="step-line" [class.completed]="currentStep > 2"></div>
+    
+    <div class="step" [class.active]="currentStep === 3" [class.completed]="currentStep > 3">
+      <div class="step-number">3</div>
+      <div class="step-label">Product Details</div>
+    </div>
+  </div>
+
+  <!-- Step Content -->
+  <div class="wizard-content">
+    <!-- Step 1: Category -->
+    <div class="step-content" *ngIf="currentStep === 1">
+      <h2>Step 1: Select or Create Category</h2>
+      
+      <div class="mode-selector">
+        <label class="radio-option">
+          <input type="radio" name="categoryMode" value="existing" [(ngModel)]="categoryMode" (change)="onCategoryModeChange()" />
+          <span>Select Existing Category</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="categoryMode" value="new" [(ngModel)]="categoryMode" (change)="onCategoryModeChange()" />
+          <span>Create New Category</span>
+        </label>
+      </div>
+
+      <div class="form-section" *ngIf="categoryMode === 'existing'">
+        <div class="form-group">
+          <label>Select Category *</label>
+          <select [(ngModel)]="selectedCategoryId" class="form-control">
+            <option value="">-- Select Category --</option>
+            <option *ngFor="let category of categories" [value]="category._id">
+              {{ category.name }} ({{ category.code }})
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section" *ngIf="categoryMode === 'new'">
+        <div class="form-group">
+          <label>Category Name *</label>
+          <input type="text" [(ngModel)]="newCategory.name" class="form-control" placeholder="Enter category name" />
+        </div>
+        <div class="form-group">
+          <label>Category Code *</label>
+          <input type="text" [(ngModel)]="newCategory.code" class="form-control" placeholder="Enter category code" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="newCategory.description" class="form-control" rows="3" placeholder="Enter description"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="newCategory.isActive" />
+            <span>Active</span>
+          </label>
+        </div>
+        <button class="btn-save-inline" (click)="saveCategory()" [disabled]="savingCategory">
+          <i class="fas fa-spinner fa-spin" *ngIf="savingCategory"></i>
+          <i class="fas fa-save" *ngIf="!savingCategory"></i>
+          {{ savingCategory ? 'Saving...' : 'Save Category' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Subcategory -->
+    <div class="step-content" *ngIf="currentStep === 2">
+      <h2>Step 2: Select or Create Subcategory</h2>
+      
+      <div class="mode-selector">
+        <label class="radio-option">
+          <input type="radio" name="subcategoryMode" value="existing" [(ngModel)]="subcategoryMode" (change)="onSubcategoryModeChange()" />
+          <span>Select Existing Subcategory</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="subcategoryMode" value="new" [(ngModel)]="subcategoryMode" (change)="onSubcategoryModeChange()" />
+          <span>Create New Subcategory</span>
+        </label>
+      </div>
+
+      <div class="form-section" *ngIf="subcategoryMode === 'existing'">
+        <div class="form-group">
+          <label>Select Subcategory *</label>
+          <select [(ngModel)]="selectedSubcategoryId" class="form-control">
+            <option value="">-- Select Subcategory --</option>
+            <option *ngFor="let subcategory of filteredSubcategories" [value]="subcategory._id">
+              {{ subcategory.name }} ({{ subcategory.code }})
+            </option>
+          </select>
+          <small class="helper-text" *ngIf="filteredSubcategories.length === 0">
+            No subcategories found for the selected category. Please create a new one.
+          </small>
+        </div>
+      </div>
+
+      <div class="form-section" *ngIf="subcategoryMode === 'new'">
+        <div class="form-group">
+          <label>Subcategory Name *</label>
+          <input type="text" [(ngModel)]="newSubcategory.name" class="form-control" placeholder="Enter subcategory name" />
+        </div>
+        <div class="form-group">
+          <label>Subcategory Code *</label>
+          <input type="text" [(ngModel)]="newSubcategory.code" class="form-control" placeholder="Enter subcategory code" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="newSubcategory.description" class="form-control" rows="3" placeholder="Enter description"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="newSubcategory.isActive" />
+            <span>Active</span>
+          </label>
+        </div>
+        <button class="btn-save-inline" (click)="saveSubcategory()" [disabled]="savingSubcategory">
+          <i class="fas fa-spinner fa-spin" *ngIf="savingSubcategory"></i>
+          <i class="fas fa-save" *ngIf="!savingSubcategory"></i>
+          {{ savingSubcategory ? 'Saving...' : 'Save Subcategory' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Product Details -->
+    <div class="step-content" *ngIf="currentStep === 3">
+      <h2>Step 3: Product Details</h2>
+      
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" [(ngModel)]="newProduct.name" class="form-control" placeholder="Enter product name" />
+          </div>
+          <div class="form-group">
+            <label>Item Code *</label>
+            <input type="text" [(ngModel)]="newProduct.itemCode" class="form-control" placeholder="Enter item code" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Store</label>
+            <select [(ngModel)]="newProduct.store" class="form-control">
+              <option value="">-- Select Store --</option>
+              <option *ngFor="let store of stores" [value]="store._id">{{ store.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Warehouse</label>
+            <select [(ngModel)]="newProduct.warehouse" class="form-control">
+              <option value="">-- Select Warehouse --</option>
+              <option *ngFor="let warehouse of warehouses" [value]="warehouse._id">{{ warehouse.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group-dropdown">
+            <label>Brand</label>
+            <app-searchable-dropdown
+              [(ngModel)]="newProduct.brand"
+              [options]="brandOptions"
+              [placeholder]="'Select Brand'"
+              [showAddNew]="true"
+              displayKey="name"
+              valueKey="id"
+              (addNewClick)="openBrandModal()"
+            ></app-searchable-dropdown>
+          </div>
+          <div class="form-group">
+            <label>Unit</label>
+            <select [(ngModel)]="newProduct.unit" class="form-control">
+              <option value="">-- Select Unit --</option>
+              <option *ngFor="let unit of units" [value]="unit._id">{{ unit.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Barcode Symbology</label>
+            <select [(ngModel)]="newProduct.barcodeSymbology" class="form-control">
+              <option value="">-- Select Barcode --</option>
+              <option *ngFor="let barcode of barcodes" [value]="barcode._id">{{ barcode.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Product Type</label>
+            <select [(ngModel)]="newProduct.productType" class="form-control">
+              <option value="Single">Single</option>
+              <option value="Variable">Variable</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="newProduct.description" class="form-control" rows="3" placeholder="Enter product description"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Quantity *</label>
+            <input type="number" [(ngModel)]="newProduct.quantity" class="form-control" placeholder="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Price *</label>
+            <input type="number" [(ngModel)]="newProduct.price" class="form-control" placeholder="0.00" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tax Type</label>
+            <select [(ngModel)]="newProduct.taxType" class="form-control">
+              <option value="Exclusive">Exclusive</option>
+              <option value="Inclusive">Inclusive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Discount Type</label>
+            <select [(ngModel)]="newProduct.discountType" class="form-control">
+              <option value="Percentage">Percentage</option>
+              <option value="Fixed">Fixed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Discount Value</label>
+            <input type="number" [(ngModel)]="newProduct.discountValue" class="form-control" placeholder="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Quantity Alert</label>
+            <input type="number" [(ngModel)]="newProduct.quantityAlert" class="form-control" placeholder="10" min="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Product Images</label>
+          <input type="file" (change)="onFileSelect($event)" class="form-control" accept="image/*" multiple />
+          <div class="image-preview" *ngIf="newProduct.images && newProduct.images.length > 0">
+            <div class="preview-item" *ngFor="let image of newProduct.images; let i = index">
+              <img [src]="image" alt="Product image" />
+              <button type="button" class="btn-remove-image" (click)="removeImage(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select [(ngModel)]="newProduct.status" class="form-control">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="wizard-footer">
+    <app-theme-button type="outline" [disabled]="currentStep === 1" (clicked)="previousStep()">
+      <i class="fas fa-arrow-left"></i> Previous
+    </app-theme-button>
+    
+    <div class="step-info">
+      Step {{ currentStep }} of {{ totalSteps }}
+    </div>
+
+    <app-theme-button type="primary" *ngIf="currentStep < totalSteps" (clicked)="nextStep()">
+      Next <i class="fas fa-arrow-right"></i>
+    </app-theme-button>
+
+    <button class="btn-success" *ngIf="currentStep === totalSteps" (click)="saveProduct()" [disabled]="savingProduct">
+      <i class="fas fa-spinner fa-spin" *ngIf="savingProduct"></i>
+      <i class="fas fa-check" *ngIf="!savingProduct"></i>
+      {{ savingProduct ? 'Saving...' : 'Save Product' }}
+    </button>
+  </div>
+</div>
+
+<!-- Brand Modal -->
+<div class="modal-overlay" *ngIf="showBrandModal" (click)="closeBrandModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Add New Brand</h3>
+      <button type="button" class="btn-close" (click)="closeBrandModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Brand Name <span class="required">*</span></label>
+        <input 
+          type="text" 
+          [(ngModel)]="newBrand.name" 
+          class="form-control" 
+          placeholder="Enter brand name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Brand Code <span class="required">*</span></label>
+        <input 
+          type="text" 
+          [(ngModel)]="newBrand.code" 
+          class="form-control" 
+          placeholder="Enter brand code"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea 
+          [(ngModel)]="newBrand.description" 
+          class="form-control" 
+          rows="3"
+          placeholder="Enter brand description (optional)"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="newBrand.isActive"
+          />
+          <span>Active</span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <app-theme-button type="outline" [disabled]="savingBrand" (clicked)="closeBrandModal()">
+        Cancel
+      </app-theme-button>
+      <app-theme-button type="primary" [disabled]="savingBrand || !newBrand.name || !newBrand.code" (clicked)="saveBrand()">
+        <i class="fas fa-spinner fa-spin" *ngIf="savingBrand"></i>
+        <i class="fas fa-save" *ngIf="!savingBrand"></i>
+        {{ savingBrand ? 'Saving...' : 'Save Brand' }}
+      </app-theme-button>
+    </div>
+  </div>
+</div>

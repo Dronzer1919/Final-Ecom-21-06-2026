@@ -1,0 +1,175 @@
+<div class="bulk-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/dashboard/b2b-management/categories" class="btn-back">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        B2B Categories
+      </a>
+      <h1 class="page-title">Bulk Category Upload</h1>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    {{ successMessage }}
+  </div>
+  <div class="alert alert-error" *ngIf="errorMessage">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Upload Results -->
+  <div class="results-section" *ngIf="uploadResults.length > 0">
+    <h2 class="section-title">Upload Results</h2>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Row</th><th>Category Name</th><th>Status</th><th>Error</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of uploadResults" [class.error-row]="!r.success">
+            <td>{{ r.row }}</td>
+            <td>{{ r.name }}</td>
+            <td><span class="status-badge" [class.ok]="r.success" [class.fail]="!r.success">{{ r.success ? '✓ Created' : '✗ Failed' }}</span></td>
+            <td class="error-cell">{{ r.error ?? '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="instructions-card">
+    <ol class="instr-list">
+      <li>Upload the file (.xlsx, .xls, .csv, .json) — review the preview, then submit</li>
+    </ol>
+    <div class="instr-columns">
+      <div class="column-list">
+        <div class="col-item required"><span class="col-name">Category Name</span><span class="req-badge">Required</span></div>
+        <div class="col-item required"><span class="col-name">Code</span><span class="req-badge">Required</span></div>
+        <div class="col-item"><span class="col-name">Description</span><span class="opt-badge">Optional</span></div>
+        <div class="col-item"><span class="col-name">Image URL</span><span class="opt-badge">Optional</span></div>
+        <div class="col-item"><span class="col-name">Is Active</span><span class="opt-badge">Yes / No</span></div>
+      </div>
+    </div>
+    <div class="download-btns">
+      <button class="btn-download" (click)="downloadSampleExcel()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Sample Excel
+      </button>
+      <button class="btn-download btn-json" (click)="downloadSampleJSON()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Sample JSON
+      </button>
+    </div>
+  </div>
+
+  <!-- Drop Zone -->
+  <div class="upload-section">
+    <div class="drop-zone"
+         [class.dragging]="isDragging"
+         [class.has-file]="uploadedFile"
+         (dragover)="onDragOver($event)"
+         (dragleave)="onDragLeave()"
+         (drop)="onDrop($event)">
+
+      <ng-container *ngIf="!uploadedFile">
+        <div class="drop-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <p class="drop-title">Drag &amp; drop your file here</p>
+        <p class="drop-or">or</p>
+        <label class="btn-browse">
+          Browse File
+          <input type="file" accept=".xlsx,.xls,.csv,.json" (change)="onFileSelect($event)" hidden>
+        </label>
+        <p class="drop-hint">Supported: .xlsx, .xls, .csv, .json — Max 10MB</p>
+      </ng-container>
+
+      <ng-container *ngIf="uploadedFile">
+        <div class="file-info">
+          <div class="file-icon-wrap">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="file-meta">
+            <p class="file-name">{{ uploadedFile.name }}</p>
+            <p class="file-size">{{ (uploadedFile.size / 1024).toFixed(1) }} KB · {{ parsedRows.length }} rows detected</p>
+          </div>
+          <button class="btn-remove" (click)="clearFile()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+    <p class="parse-error" *ngIf="parseError">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ parseError }}
+    </p>
+  </div>
+
+  <!-- Preview Table -->
+  <div class="preview-section" *ngIf="parsedRows.length > 0">
+    <div class="preview-header">
+      <h2 class="section-title">
+        Preview
+        <span class="count-badge valid">{{ validRows.length }} valid</span>
+        <span class="count-badge error" *ngIf="errorRows.length > 0">{{ errorRows.length }} error</span>
+      </h2>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>Category Name *</th>
+            <th>Code *</th>
+            <th>Description</th>
+            <th>Image URL</th>
+            <th>Is Active</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of parsedRows" [class.error-row]="row._hasError">
+            <td class="row-num">{{ row._rowIndex }}</td>
+            <td [class.missing]="!row.name">{{ row.name || '— missing —' }}</td>
+            <td [class.missing]="!row.code">{{ row.code || '— missing —' }}</td>
+            <td>{{ row.description || '—' }}</td>
+            <td class="url-cell">
+              <a *ngIf="row.imageUrl" [href]="row.imageUrl" target="_blank" rel="noopener">View</a>
+              <span *ngIf="!row.imageUrl">—</span>
+            </td>
+            <td>
+              <span class="status-badge" [class.ok]="['yes','true','1'].includes(row.isActive.toLowerCase())" [class.fail]="!['yes','true','1'].includes(row.isActive.toLowerCase())">
+                {{ ['yes','true','1'].includes(row.isActive.toLowerCase()) ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [class.ok]="!row._hasError" [class.fail]="row._hasError">
+                {{ row._hasError ? '✗ Error' : '✓ OK' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Submit Bar -->
+    <div class="submit-bar" *ngIf="validRows.length > 0">
+      <p class="submit-info">
+        Ready to import <strong>{{ validRows.length }}</strong> categor{{ validRows.length === 1 ? 'y' : 'ies' }}.
+        <span *ngIf="errorRows.length > 0" class="skip-info">{{ errorRows.length }} row(s) with errors will be skipped.</span>
+      </p>
+      <button class="btn-submit" [disabled]="isSubmitting" (click)="onSubmit()">
+        <span *ngIf="!isSubmitting">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Import {{ validRows.length }} Categor{{ validRows.length === 1 ? 'y' : 'ies' }}
+        </span>
+        <span *ngIf="isSubmitting" class="spinner"></span>
+        <span *ngIf="isSubmitting">Importing...</span>
+      </button>
+    </div>
+  </div>
+
+</div>

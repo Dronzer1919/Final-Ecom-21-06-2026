@@ -1,0 +1,125 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" color="light" routerLink="/home">
+        <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>My Orders</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" color="light" (click)="loadOrders()">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="orders-page">
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <ion-searchbar
+        placeholder="Search orders..."
+        (ionInput)="onSearchChange($event)"
+        class="filter-search">
+      </ion-searchbar>
+      <div class="filter-selects">
+        <ion-select
+          placeholder="Status"
+          interface="popover"
+          (ionChange)="onStatusChange($event)">
+          <ion-select-option value="">All Statuses</ion-select-option>
+          <ion-select-option *ngFor="let s of statusOptions" [value]="s">
+            {{ s | titlecase }}
+          </ion-select-option>
+        </ion-select>
+        <ion-select
+          placeholder="Payment"
+          interface="popover"
+          (ionChange)="onPaymentChange($event)">
+          <ion-select-option value="">All Payments</ion-select-option>
+          <ion-select-option *ngFor="let p of paymentOptions" [value]="p">
+            {{ p | titlecase }}
+          </ion-select-option>
+        </ion-select>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="center-state" *ngIf="loading()">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Loading orders...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="center-state error-state" *ngIf="!loading() && error()">
+      <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+      <p>{{ error() }}</p>
+      <ion-button size="small" (click)="loadOrders()">Retry</ion-button>
+    </div>
+
+    <!-- Empty -->
+    <div class="center-state" *ngIf="!loading() && !error() && filteredOrders().length === 0">
+      <ion-icon name="receipt-outline" color="medium"></ion-icon>
+      <p>No orders found</p>
+      <ion-button fill="outline" routerLink="/products">Shop Now</ion-button>
+    </div>
+
+    <!-- Orders List -->
+    <div class="orders-list" *ngIf="!loading() && !error() && filteredOrders().length > 0">
+      <ion-card class="order-card" *ngFor="let order of filteredOrders()">
+        <ion-card-content>
+          <div class="order-header">
+            <div class="order-id-block">
+              <span class="order-label">Order ID</span>
+              <span class="order-id">#{{ (order._id || '').slice(-8).toUpperCase() }}</span>
+            </div>
+            <div class="order-dates">
+              <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+            </div>
+          </div>
+
+          <div class="order-badges">
+            <ion-badge [color]="getStatusClass(getOrderStatus(order))">{{ getOrderStatus(order) | titlecase }}</ion-badge>
+            <ion-badge [color]="getPaymentClass(order.paymentStatus || 'pending')">
+              {{ (order.paymentStatus || 'pending') | titlecase }}
+            </ion-badge>
+            <ion-badge color="medium">{{ (order.paymentMethod || '-') | uppercase }}</ion-badge>
+          </div>
+
+          <div class="order-summary">
+            <div class="order-items-preview">
+              <span *ngFor="let item of (order.items || []).slice(0,2)" class="item-name-pill">
+                {{ getItemName(item) }} × {{ item.quantity }}
+              </span>
+              <span *ngIf="(order.items || []).length > 2" class="item-more">
+                +{{ order.items!.length - 2 }} more
+              </span>
+            </div>
+            <div class="order-total">₹{{ getOrderTotal(order) | number:'1.2-2' }}</div>
+          </div>
+
+          <div class="order-actions">
+            <ion-button size="small" fill="outline" color="primary" (click)="viewDetails(order._id!)">
+              <ion-icon name="eye-outline" slot="start"></ion-icon>
+              View Details
+            </ion-button>
+            <ion-button
+              size="small"
+              fill="outline"
+              color="danger"
+              *ngIf="canCancel(getOrderStatus(order))"
+              (click)="confirmCancel(order)">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Cancel
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

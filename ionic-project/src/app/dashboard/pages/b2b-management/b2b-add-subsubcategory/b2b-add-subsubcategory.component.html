@@ -1,0 +1,123 @@
+<div class="page-container">
+  <div class="page-header">
+    <button type="button" class="btn-back" (click)="onCancel()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back
+    </button>
+    <h1 class="page-title">Add Sub-Sub Category</h1>
+  </div>
+
+  <form [formGroup]="form" class="form-container">
+    <div class="form-section">
+      <h2 class="section-title">Sub-Sub Category Information</h2>
+
+      @if (errorMessage) {
+        <div class="alert alert-error">{{ errorMessage }}</div>
+      }
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Name <span class="req">*</span></label>
+          <input type="text" formControlName="name" placeholder="e.g. Rice and Dal" />
+          @if (form.get('name')?.invalid && form.get('name')?.touched) {
+            <span class="error-text">Name is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Code <span class="req">*</span></label>
+          <input type="text" formControlName="code" placeholder="e.g. RICE-DAL" style="text-transform:uppercase" />
+          @if (form.get('code')?.invalid && form.get('code')?.touched) {
+            <span class="error-text">Code is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Parent Category <span class="req">*</span></label>
+          <select formControlName="category" (change)="onCategoryChange()">
+            <option value="">Select Category</option>
+            @for (cat of categories; track cat._id) {
+              <option [value]="cat._id">{{ cat.name }}</option>
+            }
+          </select>
+          @if (form.get('category')?.invalid && form.get('category')?.touched) {
+            <span class="error-text">Category is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Parent Sub-Category <span class="req">*</span></label>
+          <select formControlName="parentSubcategory">
+            <option value="">{{ form.get('category')?.value ? 'Select Sub-Category' : 'Select a category first' }}</option>
+            @for (sub of subcategories; track sub._id) {
+              <option [value]="sub._id">{{ sub.name }}</option>
+            }
+          </select>
+          @if (form.get('parentSubcategory')?.invalid && form.get('parentSubcategory')?.touched) {
+            <span class="error-text">Parent sub-category is required</span>
+          }
+        </div>
+
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea formControlName="description" placeholder="Enter description" rows="3"></textarea>
+        </div>
+
+        <!-- Image -->
+        <div class="form-group full-width">
+          <label>Image</label>
+          <div class="image-mode-tabs">
+            <button type="button" class="mode-tab" [class.active]="imageMode === 'upload'" (click)="setImageMode('upload')">Upload File</button>
+            <button type="button" class="mode-tab" [class.active]="imageMode === 'url'" (click)="setImageMode('url')">Image URL</button>
+          </div>
+
+          @if (imageMode === 'upload') {
+            @if (!imagePreview) {
+              <div class="upload-zone"
+                [class.dragging]="isDragging"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave()"
+                (drop)="onDrop($event)"
+                (click)="fileInput.click()">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <p class="upload-hint">Click or drag an image here</p>
+                <p class="upload-sub">PNG, JPG, JPEG, WEBP up to 5MB</p>
+                <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)" />
+              </div>
+            } @else {
+              <div class="image-preview-wrap">
+                <img [src]="imagePreview" alt="Preview" class="image-preview" />
+                <button type="button" class="btn-remove-image" (click)="removeImage()">✕</button>
+              </div>
+            }
+          }
+
+          @if (imageMode === 'url') {
+            <input type="text" formControlName="image" placeholder="https://example.com/image.jpg"
+              (input)="onUrlChange(form.get('image')?.value)" />
+            @if (imagePreview) {
+              <div class="image-preview-wrap" style="margin-top:12px">
+                <img [src]="imagePreview" alt="Preview" class="image-preview" />
+              </div>
+            }
+          }
+        </div>
+
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">Cancel</button>
+      <button type="button" class="btn-submit" (click)="onSubmit()" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Saving...' : 'Add Sub-Sub Category' }}
+      </button>
+    </div>
+  </form>
+</div>

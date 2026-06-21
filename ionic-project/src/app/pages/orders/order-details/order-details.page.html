@@ -1,0 +1,139 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" color="light" (click)="router.navigate(['/orders'])">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Order Details</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" color="light" (click)="printOrder()">
+        <ion-icon name="print-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="details-page">
+
+    <!-- Loading -->
+    <div class="center-state" *ngIf="loading()">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Loading order details...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="center-state" *ngIf="!loading() && error()">
+      <p class="error-text">{{ error() }}</p>
+      <ion-button fill="outline" (click)="router.navigate(['/orders'])">Back to Orders</ion-button>
+    </div>
+
+    <ng-container *ngIf="!loading() && !error() && order() as o">
+      <!-- Order Header -->
+      <ion-card class="section-card">
+        <ion-card-content>
+          <div class="order-title-row">
+            <div>
+              <p class="small-label">Order ID</p>
+              <h2 class="order-id">{{ getShortId(o._id) }}</h2>
+            </div>
+            <div class="title-badges">
+              <ion-badge [color]="getStatusClass(getOrderStatus(o))">{{ getOrderStatus(o) | titlecase }}</ion-badge>
+              <ion-badge [color]="getPaymentClass(o.paymentStatus || 'pending')">
+                {{ (o.paymentStatus || 'pending') | titlecase }}
+              </ion-badge>
+            </div>
+          </div>
+          <div class="meta-row">
+            <span>{{ formatDate(o.createdAt) }}</span>
+            <span>{{ (o.paymentMethod || '-') | uppercase }}</span>
+          </div>
+
+          <div class="action-buttons" *ngIf="!actionLoading()">
+            <ion-button
+              size="small"
+              color="success"
+              *ngIf="canConfirm(getOrderStatus(o))"
+              (click)="confirmOrder()">
+              <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+              Confirm Order
+            </ion-button>
+            <ion-button
+              size="small"
+              color="danger"
+              fill="outline"
+              *ngIf="canCancel(getOrderStatus(o))"
+              (click)="confirmCancel()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Cancel Order
+            </ion-button>
+          </div>
+          <div *ngIf="actionLoading()" class="action-spinner">
+            <ion-spinner name="crescent" color="primary"></ion-spinner>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Shipping Address -->
+      <ion-card class="section-card" *ngIf="o.shippingAddress">
+        <ion-card-content>
+          <h3 class="section-title">
+            <ion-icon name="location-outline"></ion-icon>
+            Shipping Address
+          </h3>
+          <address class="address-block">
+            <strong>{{ o.shippingAddress.fullName }}</strong><br/>
+            {{ o.shippingAddress.address }},<br/>
+            {{ o.shippingAddress.city }}, {{ o.shippingAddress.state }} - {{ o.shippingAddress.pincode }}<br/>
+            <span *ngIf="o.shippingAddress.phone">Phone: {{ o.shippingAddress.phone }}</span>
+          </address>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Order Items -->
+      <ion-card class="section-card">
+        <ion-card-content>
+          <h3 class="section-title">
+            <ion-icon name="cube-outline"></ion-icon>
+            Items ({{ (o.items || []).length }})
+          </h3>
+          <div class="items-list">
+            <div class="detail-item" *ngFor="let item of (o.items || [])">
+              <img [src]="getItemImage(item)" [alt]="item.name" class="item-img" />
+              <div class="item-info">
+                <p class="item-name">{{ getItemName(item) }}</p>
+                <p class="item-qty">Qty: {{ item.quantity }}</p>
+              </div>
+              <p class="item-price">₹{{ item.price | number:'1.2-2' }}</p>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Payment Summary -->
+      <ion-card class="section-card">
+        <ion-card-content>
+          <h3 class="section-title">
+            <ion-icon name="card-outline"></ion-icon>
+            Payment Summary
+          </h3>
+          <div class="summary-rows">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span>₹{{ (getOrderTotal(o) / 1.18) | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Tax (18%)</span>
+              <span>₹{{ (getOrderTotal(o) - getOrderTotal(o) / 1.18) | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-row total">
+              <span>Total</span>
+              <span>₹{{ getOrderTotal(o) | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+  </div>
+</ion-content>

@@ -1,0 +1,171 @@
+<div class="bulk-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/dashboard/b2b-management/products" class="btn-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        B2B Products
+      </a>
+      <h1 class="page-title">Bulk Upload Products</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-outline" (click)="downloadSampleExcel()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Sample Excel
+      </button>
+      <button class="btn-outline" (click)="downloadSampleJSON()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Sample JSON
+      </button>
+    </div>
+  </div>
+
+  <!-- Info bar -->
+  <div class="info-bar">
+    <div class="col-section">
+      <span class="col-label required-label">Required:</span>
+      <span class="col-tag req" *ngFor="let h of REQUIRED">{{ h }}</span>
+    </div>
+    <div class="col-section">
+      <span class="col-label">Optional:</span>
+      <span class="col-tag opt">Vendor Name</span>
+      <span class="col-tag opt">Description</span>
+      <span class="col-tag opt">Variety</span>
+      <span class="col-tag opt">Min Order Qty</span>
+      <span class="col-tag opt">Has GST</span>
+      <span class="col-tag opt">Tax Type</span>
+      <span class="col-tag opt">Discount Type/Value</span>
+      <span class="col-tag opt">Qty Alert</span>
+    </div>
+  </div>
+
+  <!-- Hierarchy hint -->
+  <div class="hierarchy-hint">
+    <span class="h-label">Category hierarchy:</span>
+    <div class="h-tree">
+      <span class="h-node cat">Grocery</span>
+      <span class="h-arrow">→</span>
+      <span class="h-node sub">Grocery &amp; Staples <small>(Sub-Category Name)</small></span>
+      <span class="h-arrow">→</span>
+      <span class="h-node ssc">Rice <small>(Sub-Sub Category Name)</small></span>
+      <span class="h-arrow">→</span>
+      <span class="h-node prod">Indrayani Rice <small>(Product Name)</small></span>
+    </div>
+    <p class="h-note">Use the <strong>Sub-Sub Category Name</strong> column as the product's direct category link.</p>
+  </div>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" [class.dragging]="isDragging"
+       (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <p>Drag & drop your file here, or
+      <label class="file-link">browse
+        <input type="file" accept=".xlsx,.xls,.csv,.json" (change)="onFileSelect($event)" hidden>
+      </label>
+    </p>
+    <p class="file-hint">Supports .xlsx, .xls, .csv, .json</p>
+    <p class="file-name" *ngIf="uploadedFile">{{ uploadedFile.name }}</p>
+  </div>
+
+  <div class="alert alert-error" *ngIf="parseError">{{ parseError }}</div>
+
+  <!-- Preview -->
+  <div class="preview-section" *ngIf="parsedRows.length > 0">
+    <div class="preview-summary">
+      <span class="badge badge-success">{{ validRows.length }} valid</span>
+      <span class="badge badge-error" *ngIf="errorRows.length">{{ errorRows.length }} errors</span>
+      <span class="badge badge-neutral">{{ parsedRows.length }} total</span>
+      <button class="btn-clear" (click)="clearFile()">Clear</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="preview-table">
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>Status</th>
+            <th>Product Name</th>
+            <th>Item Code</th>
+            <th>Category</th>
+            <th>Sub-Sub Cat</th>
+            <th>Unit</th>
+            <th>Store</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Vendor</th>
+            <th>Variety</th>
+            <th>Min Qty</th>
+            <th>GST</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of parsedRows" [class.row-error]="row._hasError">
+            <td class="row-num">{{ row._rowIndex }}</td>
+            <td>
+              <span class="status-dot" [class.dot-ok]="!row._hasError"></span>
+              <span class="err-text" *ngIf="row._hasError" [title]="row._errorReason">{{ row._errorReason }}</span>
+            </td>
+            <td><strong>{{ row.productName || '—' }}</strong></td>
+            <td class="mono">{{ row.itemCode || '—' }}</td>
+            <td>{{ row.category || '—' }}</td>
+            <td>{{ row.subCategory || '—' }}</td>
+            <td>{{ row.unit || '—' }}</td>
+            <td>{{ row.store || '—' }}</td>
+            <td>₹{{ row.price }}</td>
+            <td>{{ row.quantity }}</td>
+            <td class="vendor-cell">{{ row.vendorName || '—' }}</td>
+            <td>{{ row.variety || '—' }}</td>
+            <td>{{ row.minOrderQuantity }}</td>
+            <td>{{ row.hasGST }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="alert alert-error"   *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <!-- Upload results -->
+    <div class="results-section" *ngIf="uploadResults.length > 0">
+      <p class="results-title">Upload Results</p>
+      <div class="table-wrapper">
+        <table class="preview-table results-table">
+          <thead>
+            <tr><th>Row</th><th>Product</th><th>Status</th><th>Detail</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of uploadResults" [class.row-error]="!r.success">
+              <td class="row-num">{{ r.row }}</td>
+              <td>{{ r.name }}</td>
+              <td><span class="badge" [class.badge-success]="r.success" [class.badge-error]="!r.success">{{ r.success ? 'Created' : 'Failed' }}</span></td>
+              <td class="err-text">{{ r.errors?.join(', ') }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-primary" (click)="onSubmit()"
+              [disabled]="validRows.length === 0 || isSubmitting">
+        <svg *ngIf="isSubmitting" class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        {{ isSubmitting ? 'Uploading…' : 'Upload ' + validRows.length + ' Product' + (validRows.length === 1 ? '' : 's') }}
+      </button>
+    </div>
+  </div>
+
+</div>

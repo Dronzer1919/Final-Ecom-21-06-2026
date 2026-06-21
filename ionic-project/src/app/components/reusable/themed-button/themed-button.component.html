@@ -1,0 +1,17 @@
+<ion-button
+  [color]="color"
+  [fill]="fill"
+  [size]="size"
+  [expand]="expand"
+  [disabled]="disabled"
+  [type]="type"
+  (click)="onClick($event)"
+  class="themed-button">
+  
+  <ion-icon *ngIf="icon && iconSlot === 'start'" [name]="icon" slot="start"></ion-icon>
+  <ion-icon *ngIf="icon && iconSlot === 'icon-only'" [name]="icon" slot="icon-only"></ion-icon>
+  
+  <ng-content *ngIf="iconSlot !== 'icon-only'"></ng-content>
+  
+  <ion-icon *ngIf="icon && iconSlot === 'end'" [name]="icon" slot="end"></ion-icon>
+</ion-button>

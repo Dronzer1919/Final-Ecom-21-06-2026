@@ -1,0 +1,188 @@
+<div class="list-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/dashboard/b2b-management" class="btn-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      <h1 class="page-title">Sub-Sub Categories</h1>
+
+      </a>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/dashboard/b2b-management/subsubcategories/bulk-upload" class="btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Bulk Upload
+      </a>
+      <a routerLink="/dashboard/b2b-management/subsubcategories/add" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Sub-Sub Category
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Search sub-sub categories..." [(ngModel)]="searchTerm" (input)="onSearch()">
+    </div>
+    <select class="filter-select" [(ngModel)]="selectedParentSubcat" (change)="onParentFilter()">
+      <option value="">All Sub-Categories</option>
+      <option *ngFor="let s of allSubcategories" [value]="s._id">{{ s.name }}</option>
+    </select>
+    <!-- <div class="total-badge">{{ totalItems }} total</div> -->
+  </div>
+
+  <!-- Bulk Action Bar -->
+  <div class="selection-bar" *ngIf="selectedCount > 0">
+    <span class="sel-count">{{ selectedCount }} selected</span>
+    <div class="sel-actions">
+      <ng-container *ngIf="!bulkDeleteConfirm">
+        <button class="btn-bulk-delete" (click)="confirmBulkDelete()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          </svg>
+          Delete Selected
+        </button>
+        <button class="btn-clear-sel" (click)="clearSelection()">Clear</button>
+      </ng-container>
+      <ng-container *ngIf="bulkDeleteConfirm">
+        <span class="confirm-text">Delete {{ selectedCount }} item{{ selectedCount === 1 ? '' : 's' }}?</span>
+        <button class="btn-confirm-yes" (click)="deleteSelected()" [disabled]="isBulkDeleting">
+          {{ isBulkDeleting ? 'Deleting...' : 'Confirm Delete' }}
+        </button>
+        <button class="btn-confirm-no" (click)="cancelBulkDelete()">Cancel</button>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Hierarchy Guide -->
+  <!-- <div class="hierarchy-bar">
+    <span class="h-chip cat">📂 Category</span>
+    <span class="h-arrow">→</span>
+    <span class="h-chip sub">📁 Sub-Category</span>
+    <span class="h-arrow">→</span>
+    <span class="h-chip ssc active">🗂️ Sub-Sub Category</span>
+    <span class="h-arrow">→</span>
+    <span class="h-chip prod">📦 Product</span>
+  </div> -->
+
+  <!-- Loading shimmer -->
+  <div class="shimmer-table" *ngIf="isLoading">
+    <div class="shimmer-row" *ngFor="let i of [1,2,3,4,5]">
+      <div class="shimmer-cell sm"></div>
+      <div class="shimmer-cell wide"></div>
+      <div class="shimmer-cell"></div>
+      <div class="shimmer-cell"></div>
+      <div class="shimmer-cell sm"></div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap" *ngIf="!isLoading">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="cb-col">
+            <input type="checkbox"
+                   [checked]="isAllSelected"
+                   [indeterminate]="isIndeterminate"
+                   (change)="toggleSelectAll()">
+          </th>
+          <th>Icon</th>
+          <th>Sub-Sub Category</th>
+          <th>Code</th>
+          <th>Parent Sub-Category</th>
+          <th>Main Category</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items" [class.row-selected]="isSelected(item._id!)">
+          <td class="cb-col">
+            <input type="checkbox" [checked]="isSelected(item._id!)" (change)="toggleSelect(item._id!)">
+          </td>
+          <td>
+            <div class="cat-icon" *ngIf="item.image">
+              <img [src]="item.image" alt="icon" style="width:32px;height:32px;border-radius:6px;object-fit:cover;">
+            </div>
+            <div class="cat-icon placeholder" *ngIf="!item.image">{{ item.icon || '🗂️' }}</div>
+          </td>
+          <td class="name-cell">{{ item.name }}</td>
+          <td><code>{{ item.code }}</code></td>
+          <td>
+            <span class="parent-chip sub">{{ getParentSubcatName(item) }}</span>
+          </td>
+          <td>
+            <span class="parent-chip cat">{{ getCategoryName(item) }}</span>
+          </td>
+          <td class="desc-cell">{{ item.description || '—' }}</td>
+          <td>
+            <span class="status-badge" [class.active]="item.isActive" [class.inactive]="!item.isActive">
+              {{ item.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="btn-action edit" (click)="editItem(item._id!)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Edit
+            </button>
+            <button class="btn-action delete" (click)="confirmDelete(item._id!)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+              Delete
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="items.length === 0">
+          <td colspan="9" class="empty-state">
+            <div class="empty-icon">🗂️</div>
+            <p>No sub-sub categories found.</p>
+            <a routerLink="/dashboard/b2b-management/subsubcategories/bulk-upload" class="btn-empty-action">
+              Bulk Upload Sub-Sub Categories
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button class="pg-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">«</button>
+    <button class="pg-btn" *ngFor="let p of pageNumbers"
+            [class.active]="p === currentPage"
+            (click)="goToPage(p)">{{ p }}</button>
+    <button class="pg-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">»</button>
+  </div>
+
+</div>
+
+@if (deleteConfirmId) {
+  <app-confirm-dialog
+    title="Delete Sub-Sub Category"
+    message="This sub-sub category will be permanently deleted. This action cannot be undone."
+    confirmLabel="Yes, Delete"
+    cancelLabel="Cancel"
+    (confirmed)="deleteItem(deleteConfirmId!)"
+    (cancelled)="cancelDelete()">
+  </app-confirm-dialog>
+}

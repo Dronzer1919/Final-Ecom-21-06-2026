@@ -1,0 +1,224 @@
+<div class="invoice-page">
+
+  <!-- Top Action Bar (hidden on print) -->
+  <div class="invoice-topbar no-print">
+    <button class="btn-back" (click)="goBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Back to Invoices
+    </button>
+    <div class="topbar-actions">
+      <button class="btn-print" (click)="printInvoice()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        Print Invoice
+      </button>
+      <button class="btn-download" (click)="downloadPDF()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Invoice Document -->
+  <div class="invoice-doc" *ngIf="invoice">
+
+    <!-- Header: Logo + Invoice Badge -->
+    <div class="doc-header">
+      <div class="doc-logo-area">
+        <div class="brand-icon">
+          <svg width="44" height="44" viewBox="0 0 100 100">
+            <rect width="100" height="100" rx="16" fill="#6366f1"/>
+            <text x="50" y="65" text-anchor="middle" font-size="58" fill="white" font-weight="bold" font-family="Arial, sans-serif">P</text>
+          </svg>
+        </div>
+        <p class="doc-company-addr">{{ invoice.sellerAddress }}, {{ invoice.sellerCity }}</p>
+      </div>
+      <div class="doc-inv-info">
+        <div class="inv-no-card">
+          <span class="inv-no-lbl">Invoice No</span>
+          <span class="inv-no-num">#{{ invoice.invoiceNo }}</span>
+        </div>
+        <div class="inv-dates">
+          <div class="inv-date-row">
+            <span class="date-lbl">Created Date :</span>
+            <span class="date-val">{{ invoice.invoiceDate }}</span>
+          </div>
+          <div class="inv-date-row">
+            <span class="date-lbl">Due Date :</span>
+            <span class="date-val">{{ invoice.dueDate }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- From / To Parties -->
+    <div class="parties-row">
+      <div class="party-card">
+        <p class="party-label">From</p>
+        <h3 class="party-name">{{ invoice.sellerName }}</h3>
+        <p class="party-line">{{ invoice.sellerAddress }}, {{ invoice.sellerCity }}</p>
+        <p class="party-line">Email : {{ invoice.sellerEmail }}</p>
+        <p class="party-line">Phone : {{ invoice.sellerPhone }}</p>
+      </div>
+      <div class="party-card">
+        <p class="party-label">To</p>
+        <h3 class="party-name">{{ invoice.billToName }}</h3>
+        <p class="customer-type-row">
+          <span class="customer-type-badge" [class.customer-type-business]="invoice.customerType === 'business'" [class.customer-type-individual]="invoice.customerType === 'individual'">
+            {{ invoice.customerType === 'business' ? 'Business Customer' : 'Individual Customer' }}
+          </span>
+        </p>
+        <p class="party-line" *ngIf="invoice.customerType === 'business' && invoice.billToCompany">
+          Company : {{ invoice.billToCompany }}
+        </p>
+        <p class="party-line" *ngIf="invoice.customerType === 'business' && invoice.billToTaxId">
+          Tax ID : {{ invoice.billToTaxId }}
+        </p>
+        <p class="party-line">{{ invoice.billToAddress }}, {{ invoice.billToCity }}</p>
+        <p class="party-line">Email : {{ invoice.billToEmail }}</p>
+        <p class="party-line">Phone : {{ invoice.billToPhone }}</p>
+        <div class="party-status-row">
+          <span class="status-badge"
+            [class.badge-paid]="invoice.balanceDue === 0"
+            [class.badge-partial]="invoice.balanceDue > 0 && invoice.amountPaid > 0"
+            [class.badge-unpaid]="invoice.amountPaid === 0 && invoice.balanceDue > 0">
+            {{ invoice.balanceDue === 0 ? 'Paid' : (invoice.amountPaid > 0 ? 'Partial' : 'Unpaid') }}
+          </span>
+          <svg class="qr-icon" width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <rect width="64" height="64" rx="4" fill="#f9fafb" stroke="#e5e7eb"/>
+            <rect x="6" y="6" width="22" height="22" rx="2" fill="none" stroke="#374151" stroke-width="2.5"/>
+            <rect x="11" y="11" width="12" height="12" fill="#374151"/>
+            <rect x="36" y="6" width="22" height="22" rx="2" fill="none" stroke="#374151" stroke-width="2.5"/>
+            <rect x="41" y="11" width="12" height="12" fill="#374151"/>
+            <rect x="6" y="36" width="22" height="22" rx="2" fill="none" stroke="#374151" stroke-width="2.5"/>
+            <rect x="11" y="41" width="12" height="12" fill="#374151"/>
+            <rect x="36" y="36" width="7" height="7" fill="#374151"/>
+            <rect x="51" y="36" width="7" height="7" fill="#374151"/>
+            <rect x="36" y="51" width="7" height="7" fill="#374151"/>
+            <rect x="51" y="51" width="7" height="7" fill="#374151"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice For -->
+    <div class="inv-for-bar">
+      <strong>Invoice For :</strong>&nbsp;
+      {{ invoice.customerType === 'business' ? 'Business Purchase' : 'Individual Purchase' }}
+      · {{ invoice.paymentTerms }}
+    </div>
+
+    <!-- Items Table -->
+    <div class="items-tbl-wrap">
+      <table class="items-tbl">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th class="col-center">Qty</th>
+            <th class="col-center">Tax %</th>
+            <th class="col-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of invoice.items">
+            <td>{{ item.description }}</td>
+            <td class="col-center">{{ item.quantity }}</td>
+            <td class="col-center">{{ invoice.taxRate }}%</td>
+            <td class="col-right">₹{{ item.total }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totals -->
+    <div class="totals-area">
+      <div class="totals-rows">
+        <div class="tot-row">
+          <span>Sub Total</span>
+          <span>₹{{ invoice.subtotal }}</span>
+        </div>
+        <div class="tot-row">
+          <span>Discount</span>
+          <span>₹{{ invoice.discount }}</span>
+        </div>
+        <div class="tot-row">
+          <span>VAT ({{ invoice.taxRate }}%)</span>
+          <span>₹{{ invoice.tax }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grand Total Banner -->
+    <div class="grand-total-banner">
+      <span class="gt-title">Total Amount</span>
+      <span class="gt-amount">₹{{ invoice.totalAmount }}</span>
+    </div>
+
+    <!-- Amount in Words -->
+    <p class="amount-in-words">
+      <strong>Amount in Words :</strong> Rupees {{ invoice.totalAmount }} Only
+    </p>
+
+    <!-- Terms + Signature -->
+    <div class="doc-footer-grid">
+      <div class="terms-col">
+        <h6 class="ftr-heading">Terms and Conditions</h6>
+        <p class="ftr-text">{{ invoice.termsConditions }}</p>
+        <h6 class="ftr-heading ftr-mt">Notes</h6>
+        <p class="ftr-text">Please quote invoice number when remitting funds.</p>
+      </div>
+      <div class="sig-col">
+        <div class="sig-area">
+          <div class="sig-line"></div>
+        </div>
+        <div class="sig-name">{{ invoice.sellerName }}</div>
+        <div class="sig-role">Authorized Signatory</div>
+      </div>
+    </div>
+
+    <!-- Payment Info Footer -->
+    <div class="payment-footer">
+      <div class="pf-logo">
+        <svg width="36" height="36" viewBox="0 0 100 100">
+          <rect width="100" height="100" rx="16" fill="#6366f1"/>
+          <text x="50" y="65" text-anchor="middle" font-size="58" fill="white" font-weight="bold" font-family="Arial, sans-serif">P</text>
+        </svg>
+      </div>
+      <div class="pf-content">
+        <p>Payment Made Via bank transfer / Cheque in the name of <strong>{{ invoice.sellerName }}</strong></p>
+        <p>Bank Name : {{ invoice.paymentInfo.bankName }}</p>
+        <p>Account Number : {{ invoice.paymentInfo.accountNumber }}</p>
+      </div>
+    </div>
+
+    <!-- Bottom Action Buttons (hidden on print) -->
+    <div class="doc-actions-bottom no-print">
+      <button class="doc-btn-print" (click)="printInvoice()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 6 2 18 2 18 9"/>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <rect x="6" y="14" width="12" height="8"/>
+        </svg>
+        Print Invoice
+      </button>
+      <button class="doc-btn-outline" (click)="downloadPDF()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download PDF
+      </button>
+    </div>
+
+  </div>
+</div>

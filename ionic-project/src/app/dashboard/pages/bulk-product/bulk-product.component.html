@@ -1,0 +1,309 @@
+<div class="bulk-product-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Bulk Product Upload</h1>
+      <p class="page-subtitle">Upload multiple products at once using a spreadsheet file</p>
+    </div>
+    <div class="header-actions">
+      <app-theme-button type="outline" (clicked)="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Back to Products
+      </app-theme-button>
+      <app-theme-button type="primary" routerLink="/dashboard/products/create">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add New Product
+      </app-theme-button>
+    </div>
+  </div>
+
+  <!-- Alert Messages -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-error">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Upload Results Table -->
+  <div class="results-section" *ngIf="uploadResults.length > 0">
+    <h2 class="preview-title">Upload Results</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>Product Name</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of uploadResults" [class.error-row]="!r.success">
+            <td class="row-num">{{ r.row }}</td>
+            <td class="product-name-cell">{{ r.productName }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="r.success ? 'active' : 'inactive'">
+                {{ r.success ? '✓ Created' : '✗ Failed' }}
+              </span>
+            </td>
+            <td class="desc-cell">{{ r.errors?.join(', ') || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Instructions Card -->
+  <div class="instructions-card">
+    <div class="instructions-header">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>How to upload products in bulk</span>
+    </div>
+    <ol class="instructions-list">
+      <li>Download the sample Excel or JSON file below</li>
+      <li>Fill in your product data following the column headers</li>
+      <li>Save and upload the file — supported formats: <strong>.xlsx, .xls, .csv, .json</strong></li>
+      <li>Review the preview table and fix any errors before submitting</li>
+    </ol>
+    <button type="button" class="btn-download-template" (click)="downloadSampleExcel()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Sample Excel
+    </button>
+    <button type="button" class="btn-download-template btn-download-json" (click)="downloadSampleJSON()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Sample JSON
+    </button>
+  </div>
+
+  <!-- Upload Zone -->
+  <div class="upload-section">
+    <div
+      class="drop-zone"
+      [class.dragging]="isDragging"
+      [class.has-file]="uploadedFile"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+    >
+      <ng-container *ngIf="!uploadedFile">
+        <div class="drop-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </div>
+        <p class="drop-title">Drag &amp; drop your file here</p>
+        <p class="drop-subtitle">or</p>
+        <label class="btn-browse">
+          Browse File
+          <input type="file" accept=".xlsx,.xls,.csv,.json" (change)="onFileSelect($event)" hidden>
+        </label>
+        <p class="drop-hint">Supported formats: .xlsx, .xls, .csv, .json — Max 10MB</p>
+      </ng-container>
+
+      <ng-container *ngIf="uploadedFile">
+        <div class="file-info">
+          <div class="file-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <div class="file-details">
+            <p class="file-name">{{ uploadedFile.name }}</p>
+            <p class="file-size">{{ (uploadedFile.size / 1024).toFixed(1) }} KB · {{ parsedRows.length }} rows detected</p>
+          </div>
+          <button type="button" class="btn-remove-file" (click)="clearFile()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+
+    <p *ngIf="parseError" class="parse-error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      {{ parseError }}
+    </p>
+  </div>
+
+  <!-- Preview Table -->
+  <div class="preview-section" *ngIf="parsedRows.length > 0">
+    <div class="preview-header">
+      <div class="preview-title-row">
+        <h2 class="preview-title">Preview</h2>
+        <div class="preview-stats">
+          <span class="stat-badge stat-valid">{{ validRows.length }} Valid</span>
+          <span class="stat-badge stat-error" *ngIf="errorRows.length > 0">{{ errorRows.length }} Error</span>
+        </div>
+      </div>
+      <p class="preview-subtitle" *ngIf="errorRows.length > 0">
+        Rows highlighted in red are missing required fields (Product Name, Item Code).
+      </p>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <!-- Product Information -->
+            <th>Store</th>
+            <th>Warehouse</th>
+            <th>Category</th>
+            <th>Sub Category</th>
+            <th>Brand</th>
+            <th>Unit</th>
+            <th>Item Code</th>
+            <th>Barcode</th>
+            <th>Product Name</th>
+            <th>Description</th>
+            <!-- Pricing & Stocks -->
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Tax Type</th>
+            <th>Discount Type</th>
+            <th>Discount Val</th>
+            <th>Qty Alert</th>
+            <!-- Image -->
+            <th>Image URL</th>
+            <!-- Custom Fields -->
+            <th>Warranty</th>
+            <th>Manufacturer</th>
+            <th>Mfg Date</th>
+            <th>Expiry On</th>
+            <!-- Status -->
+            <th>Status</th>
+            <!-- B2B Settings -->
+            <th>Is B2B</th>
+            <th>Variety</th>
+            <th>Min Order Qty</th>
+            <th>Supplier Location</th>
+            <th>Response Rate (%)</th>
+            <th>Has GST</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of parsedRows" [class.error-row]="row._hasError">
+            <td class="row-num">{{ row._rowIndex }}</td>
+            <!-- Product Information -->
+            <td>{{ row.store }}</td>
+            <td>{{ row.warehouse }}</td>
+            <td>{{ row.category }}</td>
+            <td>{{ row.subCategory }}</td>
+            <td>{{ row.brand }}</td>
+            <td>{{ row.unit }}</td>
+            <td>
+              <span *ngIf="!row.itemCode" class="missing-badge">Missing</span>
+              {{ row.itemCode }}
+            </td>
+            <td>{{ row.barcodeSymbology }}</td>
+            <td class="product-name-cell">
+              <span *ngIf="!row.productName" class="missing-badge">Missing</span>
+              {{ row.productName }}
+            </td>
+            <td class="desc-cell" [title]="row.description">{{ row.description | slice:0:40 }}{{ row.description.length > 40 ? '…' : '' }}</td>
+            <!-- Pricing & Stocks -->
+            <td>{{ row.quantity }}</td>
+            <td>{{ row.price }}</td>
+            <td>{{ row.taxType }}</td>
+            <td>{{ row.discountType }}</td>
+            <td>{{ row.discountValue }}</td>
+            <td>{{ row.quantityAlert }}</td>
+            <!-- Image -->
+            <td class="image-url-cell">
+              <img *ngIf="row.imageUrl" [src]="row.imageUrl.split(',')[0].trim()" class="img-thumb"
+                   (error)="$event.target.src='assets/images/product-placeholder.svg'"
+                   [title]="row.imageUrl" alt="preview">
+              <span *ngIf="row.imageUrl && row.imageUrl.split(',').length > 1" class="url-count">+{{ row.imageUrl.split(',').length - 1 }}</span>
+              <span *ngIf="!row.imageUrl" class="optional-badge">—</span>
+            </td>
+            <!-- Custom Fields -->
+            <td>{{ row.warranty }}</td>
+            <td>{{ row.manufacturer }}</td>
+            <td>{{ row.manufacturedDate }}</td>
+            <td>{{ row.expiryOn || '—' }}</td>
+            <!-- Status -->
+            <td>
+              <span class="status-badge" [ngClass]="row.status.toLowerCase() === 'active' ? 'active' : 'inactive'">
+                ● {{ row.status || 'Active' }}
+              </span>
+            </td>
+            <!-- B2B Settings -->
+            <td>
+              <span class="status-badge" [ngClass]="row.isB2B.toLowerCase() === 'yes' ? 'b2b-yes' : 'b2b-no'">
+                {{ row.isB2B.toLowerCase() === 'yes' ? 'B2B' : '—' }}
+              </span>
+            </td>
+            <td>{{ row.variety || '—' }}</td>
+            <td>{{ row.minOrderQuantity || '—' }}</td>
+            <td>{{ row.supplierLocation || '—' }}</td>
+            <td>{{ row.responseRate !== '' ? row.responseRate + '%' : '—' }}</td>
+            <td>
+              <span *ngIf="row.hasGST.toLowerCase() === 'yes'" class="status-badge active">GST</span>
+              <span *ngIf="row.hasGST.toLowerCase() !== 'yes'">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <app-theme-button type="outline" (clicked)="clearFile()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 .49-3.51"></path>
+        </svg>
+        Clear &amp; Re-upload
+      </app-theme-button>
+      <app-theme-button
+        type="primary"
+        (clicked)="onSubmit()"
+        [disabled]="validRows.length === 0 || isSubmitting"
+      >
+        <svg *ngIf="!isSubmitting" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        {{ isSubmitting ? 'Uploading...' : 'Upload ' + validRows.length + ' Product(s)' }}
+      </app-theme-button>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,134 @@
+// ============================================================
+// Dashboard CSS Custom Properties
+// Defines all --dash-* variables consumed by dashboard components
+// ============================================================
+
+:root {
+  // Primary action color
+  --dash-primary:           #FF8C42;
+  --dash-primary-hover:     #e07a30;
+  --dash-primary-hover-bg:  rgba(255, 140, 66, 0.08);
+  --dash-primary-active-bg: rgba(255, 140, 66, 0.14);
+  --dash-primary-subtle-bg: rgba(255, 140, 66, 0.1);
+  --dash-primary-focus-ring: 0 0 0 3px rgba(255, 140, 66, 0.2);
+
+  // Backgrounds
+  --dash-bg-primary:   #ffffff;
+  --dash-bg-secondary: #F9FAFB;
+  --dash-bg-tertiary:  #F3F4F6;
+
+  // Text
+  --dash-text-primary:   #111827;
+  --dash-text-secondary: #374151;
+  --dash-text-tertiary:  #9CA3AF;
+  --dash-text-inverse:   #ffffff;
+
+  // Borders
+  --dash-border-primary:   #E5E7EB;
+  --dash-border-secondary: #D1D5DB;
+
+  // Row hover
+  --dash-row-hover: #F3F4F6;
+
+  // Shadows
+  --dash-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --dash-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --dash-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  // Semantic
+  --dash-error:   #EF4444;
+  --dash-success: #10B981;
+  --dash-warning: #F59E0B;
+  --dash-info:    #3B82F6;
+}
+
+// ============================================================
+// Theme Overrides — sync --dash-* with active theme class
+// ============================================================
+
+.theme-dark {
+  --dash-bg-primary:      #1e1e1e;
+  --dash-bg-secondary:    #2a2a2a;
+  --dash-bg-tertiary:     #363636;
+  --dash-text-primary:    #ffffff;
+  --dash-text-secondary:  #d0d0d0;
+  --dash-text-tertiary:   #898989;
+  --dash-border-primary:  #3a3a3a;
+  --dash-border-secondary:#4a4a4a;
+  --dash-row-hover:        #2e2e2e;
+  --dash-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --dash-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --dash-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+}
+
+.theme-ocean {
+  --dash-primary:          #006994;
+  --dash-primary-hover:    #005d82;
+  --dash-primary-hover-bg: rgba(0, 105, 148, 0.08);
+  --dash-primary-active-bg:rgba(0, 105, 148, 0.14);
+  --dash-primary-subtle-bg:rgba(0, 105, 148, 0.1);
+  --dash-primary-focus-ring: 0 0 0 3px rgba(0, 105, 148, 0.2);
+  --dash-bg-primary:      #e0f7fa;
+  --dash-bg-secondary:    #b2ebf2;
+  --dash-bg-tertiary:     #80deea;
+  --dash-text-primary:    #004d61;
+  --dash-text-secondary:  #006994;
+  --dash-text-tertiary:   #0097aa;
+  --dash-border-primary:  #80deea;
+  --dash-border-secondary:#4dd0e1;
+  --dash-row-hover:        #b2ebf2;
+}
+
+.theme-forest {
+  --dash-primary:          #2e7d32;
+  --dash-primary-hover:    #286e2c;
+  --dash-primary-hover-bg: rgba(46, 125, 50, 0.08);
+  --dash-primary-active-bg:rgba(46, 125, 50, 0.14);
+  --dash-primary-subtle-bg:rgba(46, 125, 50, 0.1);
+  --dash-primary-focus-ring: 0 0 0 3px rgba(46, 125, 50, 0.2);
+  --dash-bg-primary:      #f1f8e9;
+  --dash-bg-secondary:    #dcedc8;
+  --dash-bg-tertiary:     #c5e1a5;
+  --dash-text-primary:    #1b5e20;
+  --dash-text-secondary:  #2e7d32;
+  --dash-text-tertiary:   #558b2f;
+  --dash-border-primary:  #a5d6a7;
+  --dash-border-secondary:#81c784;
+  --dash-row-hover:        #dcedc8;
+}
+
+.theme-sunset {
+  --dash-primary:          #e64a19;
+  --dash-primary-hover:    #bf360c;
+  --dash-primary-hover-bg: rgba(230, 74, 25, 0.08);
+  --dash-primary-active-bg:rgba(230, 74, 25, 0.14);
+  --dash-primary-subtle-bg:rgba(230, 74, 25, 0.1);
+  --dash-primary-focus-ring: 0 0 0 3px rgba(230, 74, 25, 0.2);
+  --dash-bg-primary:      #fff8f5;
+  --dash-bg-secondary:    #fce4d6;
+  --dash-bg-tertiary:     #ffccbc;
+  --dash-text-primary:    #bf360c;
+  --dash-text-secondary:  #d84315;
+  --dash-text-tertiary:   #ff7043;
+  --dash-border-primary:  #ffab91;
+  --dash-border-secondary:#ff8a65;
+  --dash-row-hover:        #fce4d6;
+}
+
+.theme-purple {
+  --dash-primary:          #7b1fa2;
+  --dash-primary-hover:    #6a1b9a;
+  --dash-primary-hover-bg: rgba(123, 31, 162, 0.08);
+  --dash-primary-active-bg:rgba(123, 31, 162, 0.14);
+  --dash-primary-subtle-bg:rgba(123, 31, 162, 0.1);
+  --dash-primary-focus-ring: 0 0 0 3px rgba(123, 31, 162, 0.2);
+  --dash-bg-primary:      #f9f0ff;
+  --dash-bg-secondary:    #ede7f6;
+  --dash-bg-tertiary:     #d1c4e9;
+  --dash-text-primary:    #4a148c;
+  --dash-text-secondary:  #6a1b9a;
+  --dash-text-tertiary:   #9c27b0;
+  --dash-border-primary:  #ce93d8;
+  --dash-border-secondary:#ba68c8;
+  --dash-row-hover:        #ede7f6;
+}

@@ -1,0 +1,309 @@
+<div class="home-container">
+  <!-- Header -->
+  <app-header 
+    [wishlistCount]="wishlistCount" 
+    [cartItemCount]="cartItemCount"
+    [activeRoute]="'home'"
+    (accountClick)="viewAccount()"
+    (wishlistClick)="viewWishlist()"
+    (cartClick)="viewCart()">
+  </app-header>
+
+  <!-- Hero Banner Section -->
+  <section class="hero-banner">
+    <div class="container">
+      @if (loading) {
+        <app-shimmer type="banner"></app-shimmer>
+      } @else {
+        <div class="banner-content">
+          <div class="banner-track"
+               [style.transform]="'translateX(-' + currentSlide() * 100 + '%)'" 
+               [class.no-transition]="!bannerTransition()"
+               (transitionend)="onBannerTransitionEnd()">
+            <div class="banner-slide" *ngFor="let slide of displayBannerSlides; let i = index">
+              <div class="banner-text">
+                <h1>{{ slide.title }}</h1>
+                <p>{{ slide.subtitle }}</p>
+                <app-theme-button type="primary" (clicked)="navigateToShop()">{{ slide.buttonText }}</app-theme-button>
+              </div>
+              <div class="banner-image">
+                <img [src]="slide.image" [alt]="slide.title">
+              </div>
+            </div>
+          </div>
+          
+          <div class="banner-indicators">
+            <span *ngFor="let slide of bannerSlides; let i = index" 
+                  [class.active]="i === currentSlide()"
+                  (click)="goToSlide(i)"></span>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Shop by Brands Section -->
+  <section class="section brands-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>SHOP BY BRANDS @if (!loading) { ({{ topBrands.length }} brands) }</h2>
+        <a routerLink="/brands" class="view-all">View all</a>
+      </div>
+      
+      @if (loading) {
+        <app-shimmer type="brand" [count]="6"></app-shimmer>
+      } @else if (topBrands.length > 0) {
+        <div class="brands-viewport">
+          <div class="brands-track">
+            @for (brand of displayBrands; track $index) {
+              <div class="brand-item" 
+                   (click)="navigateToBrand(brand._id!)"
+                   [title]="brand.name">
+                <div class="brand-logo">
+                  <img [src]="brand.logo || 'assets/images/brand-placeholder.jpg'" 
+                       [alt]="brand.name"
+                       loading="lazy">
+                </div>
+                <p class="brand-name">{{ brand.name }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <p>No brands available</p>
+      }
+    </div>
+  </section>
+
+  <!-- Today's Deals Section -->
+  <section class="section deals-section" *ngIf="loading || todaysDeals.length > 0">
+    <div class="container">
+      <div class="section-header">
+        <h2>TODAY'S DEALS OF THE DAY</h2>
+        <a (click)="navigateToDeals()" class="view-all">View all</a>
+      </div>
+      
+      @if (loading) {
+        <app-shimmer type="product" [count]="8"></app-shimmer>
+      } @else {
+        <div class="products-grid" #dealsGrid [class.animate]="dealsVisible()">
+          <div class="product-card" *ngFor="let product of todaysDeals" 
+               (click)="navigateToProduct(product._id!)">
+            <button class="wishlist-btn" 
+                    [class.active]="isInWishlist(product._id!)"
+                    (click)="toggleWishlist(product, $event)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" [attr.fill]="isInWishlist(product._id!) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+            <div class="product-badge" *ngIf="getDiscountPercentage(product) > 0">
+              {{ getDiscountPercentage(product) }}% OFF
+            </div>
+            <div class="product-image">
+              <img [src]="getProductImage(product)" [alt]="product.name">
+            </div>
+            <div class="product-info">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <div class="product-price">
+                <span class="current-price">₹{{ getDiscountedPrice(product) | number:'1.2-2' }}</span>
+                <span class="original-price" *ngIf="product.discountValue">₹{{ product.price | number:'1.2-2' }}</span>
+              </div>
+              <div class="product-actions">
+                <button class="btn-buy-now" (click)="navigateToProduct(product._id!); $event.stopPropagation()">Buy Now</button>
+                <button class="btn-cart-icon" (click)="addToCart(product, $event)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Shop from Categories Section -->
+  <section class="section categories-section" *ngIf="loading || featuredCategories.length > 0">
+    <div class="container">
+      <div class="section-header">
+        <h2>SHOP FROM TOP CATEGORIES</h2>
+      </div>
+      
+      @if (loading) {
+        <app-shimmer type="category" [count]="8" [layout]="'horizontal'"></app-shimmer>
+      } @else {
+        <div class="categories-viewport">
+          <div class="categories-track">
+            <div class="category-card" *ngFor="let category of displayCategories"
+                 (click)="navigateToCategory(category._id!)">
+              <div class="category-image">
+                <img [src]="getCategoryImage(category)" [alt]="category.name">
+              </div>
+              <h3 class="category-name">{{ category.name }}</h3>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Top Products Section -->
+  <section class="section top-products-section" *ngIf="loading || topProducts.length > 0">
+    <div class="container">
+      <div class="section-header">
+        <h2>TOP ELECTRONIC BRANDS</h2>
+        <a routerLink="/products" class="view-all">View all</a>
+      </div>
+      
+      @if (loading) {
+        <app-shimmer type="product" [count]="4"></app-shimmer>
+      } @else {
+        <div class="products-grid" #topProductsGrid [class.animate]="topProductsVisible()">
+          <div class="product-card" *ngFor="let product of topProducts.slice(0, 4)"
+               (click)="navigateToProduct(product._id!)">
+              <button class="wishlist-btn" 
+                      [class.active]="isInWishlist(product._id!)"
+                      (click)="toggleWishlist(product, $event)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" [attr.fill]="isInWishlist(product._id!) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+              </button>
+              <div class="product-badge discount" *ngIf="getDiscountPercentage(product) > 0">
+                UP to {{ getDiscountPercentage(product) }}% OFF
+              </div>
+              <div class="product-image">
+                <img [src]="getProductImage(product)" [alt]="product.name">
+              </div>
+              <div class="product-info">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <div class="product-price">
+                  <span class="current-price">₹{{ getDiscountedPrice(product) | number:'1.2-2' }}</span>
+                  <span class="original-price" *ngIf="product.discountValue">₹{{ product.price | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+    </div>
+  </section>
+
+  <!-- Frequently Bought Together Section -->
+  <section class="section frequently-bought-section" *ngIf="loading || frequentlyBought.length > 0">
+    <div class="container">
+      <div class="section-header">
+        <h2>FREQUENTLY BOUGHT TOGETHER</h2>
+        <a routerLink="/frequently-bought" class="view-all">View all</a>
+      </div>
+      
+      @if (loading) {
+        <app-shimmer type="product" [count]="6"></app-shimmer>
+      } @else {
+        <div class="products-grid large-grid" #frequentlyBoughtGrid [class.animate]="frequentlyBoughtVisible()">
+          <div class="product-card large" *ngFor="let product of frequentlyBought.slice(0, 6)"
+               (click)="navigateToProduct(product._id!)">
+            <button class="wishlist-btn" 
+                    [class.active]="isInWishlist(product._id!)"
+                    (click)="toggleWishlist(product, $event)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" [attr.fill]="isInWishlist(product._id!) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+            <div class="product-image">
+              <img [src]="getProductImage(product)" [alt]="product.name">
+            </div>
+            <div class="product-info">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <div class="product-rating">
+                ⭐⭐⭐⭐⭐ (4.5)
+              </div>
+              <div class="product-price">
+                <span class="current-price">₹{{ getDiscountedPrice(product) | number:'1.2-2' }}</span>
+                <span class="original-price" *ngIf="product.discountValue">₹{{ product.price | number:'1.2-2' }}</span>
+              </div>
+              <div class="product-actions">
+                <button class="btn-buy-now" (click)="navigateToProduct(product._id!); $event.stopPropagation()">Buy Now</button>
+                <button class="btn-cart-icon" (click)="addToCart(product, $event)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Footer -->
+  @if (loading) {
+    <div class="footer-shimmer-wrapper">
+      <div class="container">
+        <app-shimmer type="footer"></app-shimmer>
+      </div>
+    </div>
+  } @else {
+  <footer class="footer" #footerEl [class.animate]="footerVisible()">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>UNITED GOALS</h3>
+          <p>Your one-stop shop for all your needs</p>
+          <div class="social-links">
+            <a href="#" class="social-link">📘</a>
+            <a href="#" class="social-link">🐦</a>
+            <a href="#" class="social-link">📷</a>
+            <a href="#" class="social-link">▶️</a>
+          </div>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Categories</h4>
+          <ul>
+            <li *ngFor="let category of featuredCategories.slice(0, 5)">
+              <a (click)="navigateToCategory(category._id!)">{{ category.name }}</a>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Customer Service</h4>
+          <ul>
+            <li><a routerLink="/about">About Us</a></li>
+            <li><a routerLink="/contact">Contact Us</a></li>
+            <li><a routerLink="/shipping">Shipping Policy</a></li>
+            <li><a routerLink="/returns">Returns & Exchanges</a></li>
+            <li><a routerLink="/faq">FAQ</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>My Account</h4>
+          <ul>
+            <li><a routerLink="/account">My Account</a></li>
+            <li><a routerLink="/orders/userorders">Order History</a></li>
+            <li><a routerLink="/wishlist">Wishlist</a></li>
+            <li><a routerLink="/cart">Shopping Cart</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2026 United Goals. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  }
+
+  <!-- Error Message -->
+  <div *ngIf="error && !loading" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 10000; text-align: center;">
+    <h3 style="color: #dc3545; margin-bottom: 10px;">⚠️ Connection Error</h3>
+    <p style="color: #333;">{{ error }}</p>
+    <button (click)="loadData()" style="margin-top: 15px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Retry</button>
+  </div>
+</div>

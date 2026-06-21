@@ -1,0 +1,402 @@
+@use '../../../../styles/mixins' as m;
+
+.sales-return-page {
+  background: var(--dash-bg-primary);
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--dash-border-primary);
+}
+
+.no-data {
+  text-align: center;
+  padding: 48px !important;
+  color: var(--dash-text-secondary);
+  font-size: 16px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--dash-border-primary);
+
+  @include m.respond-to('md') {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.header-left {
+  .page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dash-text-primary);
+    margin: 0 0 8px 0;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+
+  @include m.respond-to('sm') { width: 100%; }
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--dash-border-primary);
+  background: var(--dash-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { background: var(--dash-bg-secondary); border-color: var(--dash-border-secondary); }
+  svg { color: var(--dash-text-tertiary); }
+
+  &.btn-pdf:hover { background: rgba(239, 68, 68, 0.16); border-color: rgba(239, 68, 68, 0.36); svg { color: var(--dash-error); } }
+  &.btn-excel:hover { background: rgba(16, 185, 129, 0.16); border-color: rgba(16, 185, 129, 0.36); svg { color: var(--dash-success); } }
+  &.btn-refresh:hover svg { color: var(--dash-info); }
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--dash-primary);
+  color: var(--dash-text-inverse);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  svg { width: 16px; height: 16px; }
+
+  &:hover {
+    background: var(--dash-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--dash-primary-btn-shadow);
+  }
+}
+
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--dash-border-primary);
+
+  @include m.respond-to('md') { flex-direction: column; gap: 16px; }
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--dash-bg-secondary);
+  border: 1px solid var(--dash-border-primary);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+
+  @include m.respond-to('md') { max-width: 100%; }
+
+  svg { color: var(--dash-text-tertiary); flex-shrink: 0; }
+
+  input {
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 14px;
+    color: var(--dash-text-primary);
+    width: 100%;
+    &::placeholder { color: var(--dash-text-tertiary); }
+  }
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  @include m.respond-to('md') { width: 100%; }
+}
+
+.filter-select {
+  padding: 10px 16px;
+  border: 1px solid var(--dash-border-primary);
+  border-radius: 8px;
+  background: var(--dash-bg-primary);
+  font-size: 14px;
+  color: var(--dash-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 140px;
+
+  &:hover { border-color: var(--dash-border-secondary); }
+  &:focus { outline: none; border-color: var(--dash-primary); }
+  @include m.respond-to('md') { flex: 1; }
+}
+
+.table-container { overflow-x: auto; }
+
+.sales-return-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: var(--dash-bg-secondary);
+    border-bottom: 1px solid var(--dash-border-primary);
+
+    tr th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dash-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+
+      &:first-child { padding-left: 32px; }
+      &:last-child { padding-right: 32px; }
+    }
+  }
+
+  tbody {
+    tr.return-row {
+      border-bottom: 1px solid var(--dash-border-primary);
+      transition: background 0.2s;
+
+      &:hover { background: var(--dash-row-hover); }
+
+      td {
+        padding: 18px 20px;
+        font-size: 14px;
+        color: var(--dash-text-primary);
+
+        &:first-child { padding-left: 32px; }
+        &:last-child { padding-right: 32px; }
+      }
+    }
+  }
+}
+
+.date-cell { color: var(--dash-text-secondary); white-space: nowrap; }
+.ref-cell { font-weight: 600; color: var(--dash-primary); white-space: nowrap; }
+.customer-cell { white-space: nowrap; }
+.warehouse-cell { color: var(--dash-text-secondary); white-space: nowrap; }
+.amount-cell { font-weight: 600; white-space: nowrap; }
+.reason-cell { color: var(--dash-text-secondary); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.status-cell {
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &.completed  { background: rgba(16, 185, 129, 0.16); color: var(--dash-success); }
+    &.pending    { background: rgba(245, 158, 11, 0.18); color: var(--dash-warning); }
+    &.processing { background: rgba(59, 130, 246, 0.16); color: var(--dash-info); }
+  }
+}
+
+.actions-cell {
+  text-align: right;
+  white-space: nowrap;
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    vertical-align: middle;
+
+    svg { color: var(--dash-text-tertiary); }
+
+    &:hover { background: var(--dash-bg-tertiary); svg { color: var(--dash-info); } }
+  }
+}
+
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  border-top: 1px solid var(--dash-border-primary);
+
+  @include m.respond-to('sm') { flex-direction: column; gap: 16px; }
+}
+
+.rows-per-page {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--dash-text-secondary);
+
+  select {
+    padding: 6px 12px;
+    border: 1px solid var(--dash-border-primary);
+    border-radius: 6px;
+    background: var(--dash-bg-primary);
+    font-size: 14px;
+    color: var(--dash-text-primary);
+    cursor: pointer;
+    &:focus { outline: none; border-color: var(--dash-primary); }
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+
+  .page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--dash-border-primary);
+    background: var(--dash-bg-primary);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dash-text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(:disabled):not(.active) { background: var(--dash-bg-secondary); border-color: var(--dash-border-secondary); }
+    &.active { background: var(--dash-primary); border-color: var(--dash-primary); color: var(--dash-text-inverse); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+    svg { color: currentColor; }
+  }
+
+  .page-ellipsis { padding: 0 8px; color: var(--dash-text-secondary); font-size: 14px; }
+}
+
+// Visibility safety block: keep sales-return readable even if inherited opacity/filter or weak overrides apply.
+.sales-return-page {
+  opacity: 1 !important;
+  filter: none !important;
+  color: var(--dash-text-primary, #111827);
+}
+
+.sales-return-page .page-header,
+.sales-return-page .filters-bar,
+.sales-return-page .table-container,
+.sales-return-page .pagination-bar {
+  opacity: 1 !important;
+}
+
+.sales-return-page .page-title,
+.sales-return-page .sales-return-table td,
+.sales-return-page .ref-cell,
+.sales-return-page .amount-cell,
+.sales-return-page .warehouse-cell,
+.sales-return-page .reason-cell,
+.sales-return-page .rows-per-page,
+.sales-return-page .entries-info {
+  color: var(--dash-text-primary, #111827);
+}
+
+.sales-return-page .sales-return-table th,
+.sales-return-page .date-cell,
+.sales-return-page .page-ellipsis,
+.sales-return-page .search-box svg,
+.sales-return-page .action-btn svg,
+.sales-return-page .btn-icon svg {
+  color: var(--dash-text-tertiary, #6B7280);
+}
+
+.sales-return-page .search-box,
+.sales-return-page .filter-select,
+.sales-return-page .rows-per-page select,
+.sales-return-page .pagination-controls .page-btn {
+  background: var(--dash-bg-primary, #ffffff);
+  border-color: var(--dash-border-primary, #E5E7EB);
+  color: var(--dash-text-primary, #111827);
+}
+
+.sales-return-page .search-box input::placeholder {
+  color: var(--dash-text-tertiary, #9CA3AF);
+}
+
+.sales-return-page .sales-return-table thead {
+  background: var(--dash-bg-secondary, #F9FAFB);
+}
+
+// Strict contrast fallback for this page only (prevents inherited dim styling from muting table content).
+.sales-return-page .sales-return-table th {
+  color: var(--dash-text-primary, #111827) !important;
+}
+
+.sales-return-page .sales-return-table td {
+  color: var(--dash-text-primary, #111827) !important;
+  opacity: 1 !important;
+}
+
+.sales-return-page .date-cell,
+.sales-return-page .warehouse-cell,
+.sales-return-page .reason-cell,
+.sales-return-page .customer-cell,
+.sales-return-page .ref-cell,
+.sales-return-page .amount-cell {
+  color: var(--dash-text-primary, #111827) !important;
+}
+
+.sales-return-page .sales-return-table,
+.sales-return-page .sales-return-table tbody tr,
+.sales-return-page .sales-return-table thead,
+.sales-return-page .filters-bar,
+.sales-return-page .pagination-bar {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.sales-return-page .search-box,
+.sales-return-page .filter-select,
+.sales-return-page .rows-per-page select,
+.sales-return-page .pagination-controls .page-btn {
+  background: var(--dash-bg-primary, #ffffff) !important;
+  color: var(--dash-text-primary, #111827) !important;
+  border-color: var(--dash-border-primary, #E5E7EB) !important;
+}
+
+.sales-return-page .status-badge.completed {
+  background: rgba(16, 185, 129, 0.16) !important;
+  color: var(--dash-success) !important;
+}
+
+.sales-return-page .status-badge.pending {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: var(--dash-warning) !important;
+}
+
+.sales-return-page .status-badge.processing {
+  background: rgba(59, 130, 246, 0.16) !important;
+  color: var(--dash-info) !important;
+}

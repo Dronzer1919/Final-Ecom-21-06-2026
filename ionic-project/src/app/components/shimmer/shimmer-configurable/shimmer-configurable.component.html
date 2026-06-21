@@ -1,0 +1,31 @@
+<div class="shimmer-container" [ngStyle]="getContainerStyle()">
+  <div class="shimmer-grid" [ngStyle]="getGridStyle()">
+    <div class="shimmer-card" *ngFor="let item of items" [ngStyle]="getCardStyle()">
+      <!-- Image Section -->
+      <div class="shimmer-image" *ngIf="config.card.imageHeight" [ngStyle]="getImageStyle()">
+        <app-shimmer-base></app-shimmer-base>
+      </div>
+
+      <!-- Content Section -->
+      <div class="shimmer-content" [ngStyle]="getCardContentStyle()">
+        <!-- Lines -->
+        <div class="shimmer-line" 
+             *ngFor="let line of config.card.lines"
+             [ngStyle]="getLineStyle(line)">
+          <app-shimmer-base></app-shimmer-base>
+        </div>
+
+        <!-- Buttons -->
+        <div class="shimmer-buttons" 
+             *ngIf="config.card.buttons && config.card.buttons.length > 0"
+             [ngStyle]="getButtonsContainerStyle()">
+          <div class="shimmer-button" 
+               *ngFor="let button of config.card.buttons"
+               [ngStyle]="getButtonStyle(button)">
+            <app-shimmer-base></app-shimmer-base>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

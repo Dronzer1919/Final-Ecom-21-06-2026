@@ -1,0 +1,312 @@
+<div class="profile-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">My Profile</h1>
+      <p class="page-subtitle">Manage your account information and settings</p>
+    </div>
+  </div>
+
+  <!-- Shimmer Loading State -->
+  @if (isPageLoading()) {
+    <app-shimmer-profile></app-shimmer-profile>
+  }
+
+  <!-- Main Content -->
+  @if (!isPageLoading()) {
+  @if (successMessage()) {
+    <div class="alert alert-success">
+      <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+      </svg>
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+      </svg>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="profile-content">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <!-- Avatar Section -->
+      <div class="avatar-section">
+        @if (currentUser()?.avatar) {
+          <img [src]="currentUser()?.avatar" [alt]="userFullName" class="avatar-image" />
+        } @else {
+          <div class="avatar-placeholder">
+            {{ userInitials }}
+          </div>
+        }
+        <div class="avatar-info">
+          <h2 class="user-name">{{ userFullName }}</h2>
+          <p class="user-email">{{ currentUser()?.email }}</p>
+        </div>
+      </div>
+
+      <!-- Profile Form -->
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+        <div class="form-header">
+          <h3 class="form-title">Personal Information</h3>
+          @if (!isEditing()) {
+            <app-theme-button type="outline" (clicked)="toggleEdit()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="btn-icon">
+                <path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" />
+                <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" />
+              </svg>
+              Edit Profile
+            </app-theme-button>
+          }
+        </div>
+
+        <div class="form-grid">
+          <!-- Full Name -->
+          <div class="form-group">
+            <label for="fullName" class="form-label">Full Name *</label>
+            <input
+              type="text"
+              id="fullName"
+              formControlName="fullName"
+              [readonly]="!isEditing()"
+              class="form-input"
+              [class.input-error]="isFieldInvalid('profile', 'fullName')"
+              [class.readonly-input]="!isEditing()"
+            />
+            @if (isFieldInvalid('profile', 'fullName')) {
+              <span class="error-message">{{ getErrorMessage('profile', 'fullName') }}</span>
+            }
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              readonly
+              class="form-input readonly-input"
+            />
+            <span class="field-hint">Email cannot be changed</span>
+          </div>
+
+          <!-- Phone -->
+          <div class="form-group">
+            <label for="phone" class="form-label">Phone</label>
+            <input
+              type="tel"
+              id="phone"
+              formControlName="phone"
+              [readonly]="!isEditing()"
+              placeholder="+1 (555) 123-4567"
+              class="form-input"
+              [class.input-error]="isFieldInvalid('profile', 'phone')"
+              [class.readonly-input]="!isEditing()"
+            />
+            @if (isFieldInvalid('profile', 'phone')) {
+              <span class="error-message">{{ getErrorMessage('profile', 'phone') }}</span>
+            }
+          </div>
+
+          <!-- Avatar Upload/URL -->
+          <div class="form-group">
+            <label class="form-label">Profile Photo</label>
+            
+            <!-- File Upload Section (Always exists, just hidden when not editing) -->
+            <input
+              type="file"
+              id="avatarFile"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              class="file-input"
+              [style.display]="'none'"
+            />
+            
+            @if (isEditing()) {
+              <!-- File Upload Button -->
+              <div class="upload-section">
+                <button type="button" class="btn btn-upload" (click)="triggerFileInput()">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="btn-icon">
+                    <path d="M9.25 13.25a.75.75 0 001.5 0V4.636l2.955 3.129a.75.75 0 001.09-1.03l-4.25-4.5a.75.75 0 00-1.09 0l-4.25 4.5a.75.75 0 101.09 1.03L9.25 4.636v8.614z" />
+                    <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+                  </svg>
+                  Upload Image
+                </button>
+                @if (selectedFile()) {
+                  <span class="file-name">{{ selectedFile()?.name }}</span>
+                  <button type="button" class="btn-remove" (click)="removeSelectedFile()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                    </svg>
+                  </button>
+                }
+              </div>
+              
+              <!-- Divider -->
+              <div class="upload-divider">
+                <span>OR</span>
+              </div>
+            }
+            
+            <!-- URL Input -->
+            <input
+              type="url"
+              id="avatar"
+              formControlName="avatar"
+              [readonly]="!isEditing()"
+              placeholder="https://example.com/avatar.jpg"
+              class="form-input"
+              [class.readonly-input]="!isEditing()"
+            />
+            @if (isEditing()) {
+              <span class="field-hint">Upload an image or enter a URL to your profile picture</span>
+            }
+            
+            <!-- Preview -->
+            @if (profileForm.get('avatar')?.value && isEditing()) {
+              <div class="avatar-preview">
+                <img [src]="profileForm.get('avatar')?.value" alt="Preview" class="preview-image" />
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        @if (isEditing()) {
+          <div class="form-actions">
+            <app-theme-button type="outline" (clicked)="toggleEdit()" [disabled]="isLoading()">
+              Cancel
+            </app-theme-button>
+            <app-theme-button type="primary" [disabled]="isLoading()" (clicked)="onSubmit()">
+              @if (isLoading()) {
+                <span class="spinner"></span>
+                Saving...
+              } @else {
+                Save Changes
+              }
+            </app-theme-button>
+          </div>
+        }
+      </form>
+
+      <!-- Password Change Section -->
+      <div class="password-section">
+        <div class="section-header">
+          <div>
+            <h3 class="section-title">Security</h3>
+            <p class="section-subtitle">Update your password to keep your account secure</p>
+          </div>
+          @if (!showChangePassword()) {
+            <app-theme-button type="outline" (clicked)="toggleChangePassword()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="btn-icon">
+                <path fill-rule="evenodd" d="M8 7a5 5 0 113.61 4.804l-1.903 1.903A1 1 0 019 14H8v1a1 1 0 01-1 1H6v1a1 1 0 01-1 1H3a1 1 0 01-1-1v-2a1 1 0 01.293-.707L8.196 8.39A5.002 5.002 0 018 7zm5-3a.75.75 0 000 1.5A1.5 1.5 0 0114.5 7 .75.75 0 0016 7a3 3 0 00-3-3z" clip-rule="evenodd" />
+              </svg>
+              Change Password
+            </app-theme-button>
+          }
+        </div>
+
+        @if (showChangePassword()) {
+          <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="password-form">
+            <!-- Current Password -->
+            <div class="form-group">
+              <label for="currentPassword" class="form-label">Current Password *</label>
+              <input
+                type="password"
+                id="currentPassword"
+                formControlName="currentPassword"
+                class="form-input"
+                [class.input-error]="isFieldInvalid('password', 'currentPassword')"
+              />
+              @if (isFieldInvalid('password', 'currentPassword')) {
+                <span class="error-message">{{ getErrorMessage('password', 'currentPassword') }}</span>
+              }
+            </div>
+
+            <!-- New Password -->
+            <div class="form-group">
+              <label for="newPassword" class="form-label">New Password *</label>
+              <input
+                type="password"
+                id="newPassword"
+                formControlName="newPassword"
+                class="form-input"
+                [class.input-error]="isFieldInvalid('password', 'newPassword')"
+              />
+              @if (isFieldInvalid('password', 'newPassword')) {
+                <span class="error-message">{{ getErrorMessage('password', 'newPassword') }}</span>
+              }
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label">Confirm New Password *</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                class="form-input"
+                [class.input-error]="isFieldInvalid('password', 'confirmPassword') || passwordMismatch"
+              />
+              @if (isFieldInvalid('password', 'confirmPassword')) {
+                <span class="error-message">{{ getErrorMessage('password', 'confirmPassword') }}</span>
+              }
+              @if (passwordMismatch) {
+                <span class="error-message">Passwords do not match</span>
+              }
+            </div>
+
+            <!-- Password Actions -->
+            <div class="form-actions">
+              <app-theme-button type="outline" (clicked)="toggleChangePassword()" [disabled]="isLoading()">
+                Cancel
+              </app-theme-button>
+              <app-theme-button type="primary" [disabled]="isLoading()" (clicked)="onChangePassword()">
+                @if (isLoading()) {
+                  <span class="spinner"></span>
+                  Updating...
+                } @else {
+                  Update Password
+                }
+              </app-theme-button>
+            </div>
+          </form>
+        }
+      </div>
+
+      <!-- Account Info -->
+      <div class="account-info">
+        <h3 class="section-title">Account Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">User ID</span>
+            <span class="info-value">{{ currentUser()?.id }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email Address</span>
+            <span class="info-value">{{ currentUser()?.email }}</span>
+          </div>
+          @if (currentUser()?.phone) {
+            <div class="info-item">
+              <span class="info-label">Phone Number</span>
+              <span class="info-value">{{ currentUser()?.phone }}</span>
+            </div>
+          }
+          @if (currentUser()?.createdAt) {
+            <div class="info-item">
+              <span class="info-label">Member Since</span>
+              <span class="info-value">{{ currentUser()?.createdAt | date: 'longDate' }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  } <!-- end @if (!isPageLoading()) -->
+</div>

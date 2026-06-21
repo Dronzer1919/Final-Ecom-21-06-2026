@@ -1,0 +1,138 @@
+<div class="user-orders-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">User Orders</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon btn-refresh" (click)="loadOrders()" title="Refresh">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+      </button>
+      <button class="btn-icon btn-sort" title="Sort">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="21" x2="4" y2="14"></line>
+          <line x1="4" y1="10" x2="4" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12" y2="3"></line>
+          <line x1="20" y1="21" x2="20" y2="16"></line>
+          <line x1="20" y1="12" x2="20" y2="3"></line>
+          <line x1="1" y1="14" x2="7" y2="14"></line>
+          <line x1="9" y1="8" x2="15" y2="8"></line>
+          <line x1="17" y1="16" x2="23" y2="16"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="search-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <input type="text" placeholder="Search by order ID or customer" [(ngModel)]="searchTerm" (ngModelChange)="onFilterChange()" />
+    </div>
+    <div class="filter-actions">
+      <select class="filter-select" [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+        <option value="">All Status</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s | titlecase }}</option>
+      </select>
+      <select class="filter-select" [(ngModel)]="paymentFilter" (ngModelChange)="onFilterChange()">
+        <option value="">Payment Status</option>
+        <option *ngFor="let p of paymentOptions" [value]="p">{{ p | titlecase }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-state">
+    <p>Loading orders...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error() && !loading()" class="error-state">
+    <p>{{ error() }}</p>
+    <app-theme-button type="primary" (clicked)="loadOrders()">Retry</app-theme-button>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-container" *ngIf="!loading() && !error()">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date &#x21C5;</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Payment</th>
+          <th>Order Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="paginatedOrders.length === 0">
+          <td colspan="8" class="no-data">No orders found</td>
+        </tr>
+        <tr *ngFor="let order of paginatedOrders" class="order-row">
+          <td class="id-cell">#{{ (order._id || '').slice(-6).toUpperCase() }}</td>
+          <td class="date-cell">{{ formatDate(order.createdAt) }}</td>
+          <td class="customer-cell">{{ order.shippingAddress.fullName || '-' }}</td>
+          <td class="items-cell">{{ order.items.length }} item{{ order.items.length !== 1 ? 's' : '' }}</td>
+          <td class="amount-cell">&#8377;{{ getOrderTotal(order).toFixed(2) }}</td>
+          <td class="payment-status-cell">
+            <span class="payment-badge" [ngClass]="order.paymentStatus">
+              &#9679; {{ order.paymentStatus | titlecase }}
+            </span>
+          </td>
+          <td class="status-cell">
+            <span class="status-badge" [ngClass]="getOrderStatus(order)">
+              &#9679; {{ getOrderStatus(order) | titlecase }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn" (click)="viewDetails(order._id!)" title="View Details">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-bar" *ngIf="!loading() && !error()">
+    <div class="rows-per-page">
+      <span>Row Per Page</span>
+      <select [(ngModel)]="rowsPerPage" (ngModelChange)="goToPage(1)">
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+      </select>
+      <span class="entries-info">Entries</span>
+    </div>
+    <div class="pagination-controls">
+      <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button *ngFor="let page of pageNumbers" class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
+      <span *ngIf="totalPages > 5 && currentPage < totalPages - 2" class="page-ellipsis">...</span>
+      <button *ngIf="totalPages > 5" class="page-btn" [class.active]="currentPage === totalPages" (click)="goToPage(totalPages)">{{ totalPages }}</button>
+      <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,317 @@
+<div class="b2b-container">
+  <!-- Header -->
+  <app-header 
+    [wishlistCount]="wishlistCount" 
+    [cartItemCount]="cartItemCount"
+    [activeRoute]="'b2b'"
+    (accountClick)="viewAccount()"
+    (wishlistClick)="viewWishlist()"
+    (cartClick)="viewCart()">
+  </app-header>
+
+  <!-- Page Title Section
+  <div class="page-title-section" *ngIf="selectedProductId && filteredProducts.length > 0">
+    <div class="container">
+      <h1>{{filteredProducts[0].productName}} - Compare Vendors</h1>
+      <p>Compare {{filteredProducts.length}} vendors offering this product</p>
+    </div>
+  </div> -->
+
+  <!-- Search Section
+  <div class="search-section">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="Search for products..." 
+        [(ngModel)]="searchText"
+        class="search-input">
+    </div>
+  </div> -->
+
+  <!-- City Tags -->
+  <div class="city-tags">
+    <button 
+      *ngFor="let city of cities" 
+      class="city-tag"
+      [class.active]="selectedCity === city"
+      (click)="selectCity(city)">
+      {{city}}
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <!-- Sidebar Filters -->
+    <aside class="filters-sidebar">
+      <div class="filter-header">
+        <h3>Filters</h3>
+        <button class="clear-filters" (click)="clearFilters()">Clear All</button>
+      </div>
+
+      <!-- Price Range Filter -->
+      <div class="filter-section">
+        <h4>Price</h4>
+        <div class="filter-options">
+          <label *ngFor="let range of priceRanges" class="filter-option">
+            <input 
+              type="radio" 
+              name="price"
+              [value]="range"
+              [(ngModel)]="selectedPriceRange">
+            <span>{{range}}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Variety Filter -->
+      <div class="filter-section">
+        <h4>Variety</h4>
+        <div class="filter-options">
+          <label *ngFor="let variety of varieties" class="filter-option">
+            <input 
+              type="checkbox" 
+              [checked]="selectedVariety === variety"
+              (change)="selectedVariety = selectedVariety === variety ? '' : variety">
+            <span>{{variety}}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Popular Localities Filter -->
+      <div class="filter-section">
+        <h4>Popular Localities</h4>
+        <div class="filter-options">
+          <label *ngFor="let locality of localities" class="filter-option">
+            <input 
+              type="checkbox" 
+              [checked]="selectedLocality === locality"
+              (change)="selectedLocality = selectedLocality === locality ? '' : locality">
+            <span>{{locality}}</span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Products Grid -->
+    <main class="products-grid">
+      <div class="results-header">
+        <div class="results-info">
+          <img *ngIf="selectedProductId && filteredProducts.length > 0" 
+               [src]="filteredProducts[0].image" 
+               [alt]="filteredProducts[0].productName"
+               class="product-thumb">
+          <span *ngIf="!selectedProductId">{{filteredProducts.length}} Results Found</span>
+          <span *ngIf="selectedProductId && filteredProducts.length > 0">{{filteredProducts[0].productName}}</span>
+        </div>
+        
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <button 
+            class="view-btn"
+            [class.active]="viewMode === 'grid'"
+            (click)="toggleView('grid')"
+            title="Grid View">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Grid</span>
+          </button>
+          <button 
+            class="view-btn"
+            [class.active]="viewMode === 'list'"
+            (click)="toggleView('list')"
+            title="List View">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            <span>List</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid View -->
+      <div class="product-cards" *ngIf="viewMode === 'grid'">
+        <div *ngFor="let product of filteredProducts" class="product-card">
+          <!-- Product Image -->
+          <div class="product-image">
+            <img [src]="product.image" [alt]="product.productName">
+          </div>
+
+          <!-- Product Content -->
+          <div class="product-content">
+            <!-- Price -->
+            <div class="price-section" *ngIf="product.supplier.price > 0">
+              <span class="price">₹{{product.supplier.price}}</span>
+              <span class="unit" *ngIf="product.supplier.unit"> / {{product.supplier.unit}}</span>
+            </div>
+
+            <!-- Supplier Name with Expand Button -->
+            <div class="supplier-header">
+              <button 
+                class="expand-btn-card" 
+                (click)="toggleRow(product.supplier.supplierId); $event.stopPropagation()"
+                [class.expanded]="isRowExpanded(product.supplier.supplierId)"
+                title="View bulk pricing">
+                <span class="arrow">&gt;</span>
+              </button>
+              <h4 class="supplier-name">{{product.supplier.supplierName}}</h4>
+            </div>
+            
+            <!-- Rating -->
+            <div class="rating">
+              <span 
+                *ngFor="let filled of getStarArray(product.supplier.rating)" 
+                class="star"
+                [class.filled]="filled">★</span>
+              <span class="rating-count">({{product.supplier.reviewCount}})</span>
+            </div>
+
+            <!-- Location -->
+            <div class="location">
+              <span class="location-icon">📍</span>
+              <span>{{product.supplier.location}}</span>
+            </div>
+
+            <!-- Credentials -->
+            <div class="credentials">
+              <span class="badge" *ngIf="product.supplier.hasGST">
+                <span class="badge-icon">✓</span> GST
+              </span>
+              <span class="badge" *ngIf="product.supplier.hasEmail">
+                <span class="badge-icon">✉</span> Email
+              </span>
+              <span class="badge" *ngIf="product.supplier.hasMobile">
+                <span class="badge-icon">📱</span> Mobile
+              </span>
+            </div>
+
+            <!-- Member Since -->
+            <div class="member-since">
+              Member since {{product.supplier.memberSince}}
+            </div>
+
+            <!-- Bulk Pricing Accordion -->
+            <div *ngIf="isRowExpanded(product.supplier.supplierId) && product.supplier.bulkPricing" class="bulk-pricing-card">
+              <h4 class="bulk-title">Bulk Order Pricing:</h4>
+              <div class="bulk-list-card">
+                <div *ngFor="let bulk of product.supplier.bulkPricing" class="bulk-item-card">
+                  <span class="bulk-qty">{{bulk.quantity}} {{bulk.unit}}</span>
+                  <span class="bulk-separator">→</span>
+                  <span class="bulk-price">₹{{bulk.price}}/{{bulk.unit}}</span>
+                  <button class="btn-bulk-add-card" (click)="addToCart(product)">🛒</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="product-actions">
+            <button class="btn-add-cart" (click)="addToCart(product, $event)">
+              🛒 Add to Cart
+            </button>
+            <button class="btn-contact" (click)="contactSupplier(product)">
+              Contact Supplier
+            </button>
+            <button class="btn-view-number" (click)="viewNumber(product)">
+              <span class="phone-icon">📞</span> View Mobile Number
+              <span class="response-rate">{{product.supplier.responseRate}}% Response</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- List/Table View -->
+      <div class="table-view" *ngIf="viewMode === 'list'">
+        <table class="vendors-table">
+          <thead>
+            <tr>
+              <th>Supplier Name</th>
+              <th>Location</th>
+              <th>Price</th>
+              <th>Rating</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let product of filteredProducts">
+              <!-- Main Row -->
+              <tr class="vendor-row" [class.expanded]="isRowExpanded(product.supplier.supplierId)">
+                <td class="supplier-cell">
+                  <div class="supplier-info">
+                    <button 
+                      class="expand-btn" 
+                      (click)="toggleRow(product.supplier.supplierId); $event.stopPropagation()"
+                      [class.expanded]="isRowExpanded(product.supplier.supplierId)"
+                      title="View bulk pricing">
+                      <span class="arrow">&gt;</span>
+                    </button>
+                    <span class="supplier-name">{{product.supplier.supplierName}}</span>
+                  </div>
+                </td>
+                <td class="location-cell">
+                  <span class="location">📍 {{product.supplier.location}}</span>
+                </td>
+                <td class="price-cell">
+                  <div class="price-info">
+                    <span class="price">₹{{product.supplier.price}}</span>
+                    <span class="unit">/ {{product.supplier.unit}}</span>
+                  </div>
+                </td>
+                <td class="rating-cell">
+                  <div class="rating-info">
+                    <span class="rating-value">{{product.supplier.rating}}</span>
+                    <span class="stars">
+                      <span *ngFor="let filled of getStarArray(product.supplier.rating)" 
+                            class="star" 
+                            [class.filled]="filled">★</span>
+                    </span>
+                    <span class="review-count">({{product.supplier.reviewCount}})</span>
+                  </div>
+                </td>
+                <td class="actions-cell">
+                  <div class="table-actions">
+                    <button class="btn-table-cart" (click)="addToCart(product)" title="Add to Cart">🛒</button>
+                    <button class="btn-table-contact" (click)="contactSupplier(product)" title="Contact">📧</button>
+                    <button class="btn-table-phone" (click)="viewNumber(product)" title="View Number">📞</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Expanded Bulk Pricing Row -->
+              <tr *ngIf="isRowExpanded(product.supplier.supplierId) && product.supplier.bulkPricing" class="bulk-pricing-row">
+                <td colspan="5">
+                  <div class="bulk-pricing-container">
+                    <h4 class="bulk-title">Bulk Order Pricing:</h4>
+                    <div class="bulk-list">
+                      <div *ngFor="let bulk of product.supplier.bulkPricing" class="bulk-item">
+                        <span class="bulk-qty">{{bulk.quantity}} {{bulk.unit}}</span>
+                        <span class="bulk-separator">→</span>
+                        <span class="bulk-price">₹{{bulk.price}}/{{bulk.unit}}</span>
+                        <span class="bulk-discount">({{bulk.discount}}% OFF)</span>
+                        <button class="btn-bulk-add" (click)="addToCart(product)">🛒 Add</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredProducts.length === 0" class="empty-state">
+        <p>No products found matching your criteria</p>
+        <button class="btn-clear" (click)="clearFilters()">Clear Filters</button>
+      </div>
+    </main>
+  </div>
+</div>

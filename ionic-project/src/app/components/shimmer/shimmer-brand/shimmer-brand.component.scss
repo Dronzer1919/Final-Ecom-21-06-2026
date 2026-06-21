@@ -1,0 +1,63 @@
+.brands-grid-shimmer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+  padding: 10px 0;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+.brand-item-shimmer {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    padding: 15px;
+    gap: 10px;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px;
+    gap: 8px;
+  }
+}
+
+.shimmer-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+
+  @media (max-width: 768px) {
+    width: 80px;
+    height: 80px;
+  }
+
+  @media (max-width: 480px) {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+.shimmer-name {
+  height: 16px;
+  width: 80%;
+
+  @media (max-width: 768px) {
+    height: 14px;
+  }
+}

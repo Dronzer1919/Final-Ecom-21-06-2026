@@ -1,0 +1,12 @@
+node_modules/
+dist/
+www/
+backend/node_modules/
+ionic-project/node_modules/
+
+.env
+backend/.env
+ionic-project/.env
+
+.DS_Store
+Thumbs.db

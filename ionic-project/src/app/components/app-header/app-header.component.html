@@ -1,0 +1,73 @@
+<header class="app-header">
+  <div class="header-top">
+    <div class="container">
+      <div class="header-left">
+        <a class="brand-name" routerLink="/home">{{ title || 'UNITED GOALS' }}</a>
+      </div>
+
+      <div class="header-center" *ngIf="showSearch">
+        <div class="search-bar">
+          <input
+            type="text"
+            [value]="searchQuery"
+            placeholder="Search for products..."
+            (input)="handleSearchInput($event)"
+            (keyup.enter)="submitSearch()"
+          />
+          <button class="search-btn" type="button" (click)="submitSearch()" aria-label="Search products">
+            <ion-icon name="search-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button
+          *ngIf="showThemeToggle"
+          class="icon-btn"
+          type="button"
+          (click)="toggleTheme()"
+          aria-label="Toggle theme"
+        >
+          <ion-icon name="color-palette-outline"></ion-icon>
+          <span>Theme</span>
+        </button>
+
+        <a class="icon-btn" routerLink="/auth/sign-in">
+          <ion-icon name="person-circle-outline"></ion-icon>
+          <span>Account</span>
+        </a>
+
+        <a class="icon-btn" routerLink="/wishlist" aria-label="Wishlist">
+          <ion-icon name="heart-outline"></ion-icon>
+          <span>Wishlist</span>
+          <span class="badge" *ngIf="wishlistService.wishlistCount() > 0">
+            {{ wishlistService.wishlistCount() }}
+          </span>
+        </a>
+
+        <a class="icon-btn" routerLink="/cart" aria-label="Cart">
+          <ion-icon name="cart-outline"></ion-icon>
+          <span>Cart</span>
+          <span class="badge" *ngIf="cartService.cartCount() > 0">
+            {{ cartService.cartCount() }}
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-bottom">
+    <div class="container">
+      <nav class="nav-menu" aria-label="Primary navigation">
+        <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+        <a class="nav-link" routerLink="/components-demo" routerLinkActive="active">Components</a>
+        <a class="nav-link" routerLink="/products" routerLinkActive="active">Products</a>
+        <a class="nav-link" routerLink="/wishlist" routerLinkActive="active">Wishlist</a>
+        <a class="nav-link" routerLink="/cart" routerLinkActive="active">Cart</a>
+        <a class="nav-link" routerLink="/orders" routerLinkActive="active">Orders</a>
+        <a class="nav-link" routerLink="/auth/sign-in" routerLinkActive="active">Sign In</a>
+        <a class="nav-link" routerLink="/auth/sign-up" routerLinkActive="active">Sign Up</a>
+      </nav>
+    </div>
+  </div>
+</header>

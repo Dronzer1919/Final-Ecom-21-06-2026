@@ -1,0 +1,415 @@
+<div class="create-product-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">{{ isEditMode ? 'Edit Product' : 'Create Product' }}</h1>
+    </div>
+    <div class="header-actions">
+      <app-theme-button type="outline" routerLink="/dashboard/products">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Back to Products
+      </app-theme-button>
+    </div>
+  </div>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+    <!-- Alert Messages -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+    
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+
+    <!-- Product Information Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2 class="section-title">Product Information</h2>
+        <button type="button" class="section-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="section-content">
+        <div class="form-grid">
+          <div class="form-group">
+            <app-searchable-dropdown
+              formControlName="store"
+              [options]="storeOptions"
+              [label]="'Store'"
+              [placeholder]="'Select Store'"
+              [required]="true"
+              [addNewRoute]="'/dashboard/stores/add'"
+              displayKey="name"
+              valueKey="id"
+            ></app-searchable-dropdown>
+          </div>
+          <div class="form-group">
+            <app-searchable-dropdown
+              formControlName="warehouse"
+              [options]="warehouseOptions"
+              [label]="'Warehouse'"
+              [placeholder]="'Select Warehouse'"
+              [required]="true"
+              [addNewRoute]="'/dashboard/warehouses/add'"
+              displayKey="name"
+              valueKey="id"
+            ></app-searchable-dropdown>
+          </div>
+
+          <!-- <div class="form-group">
+            <label>Slug *</label>
+            <input type="text" formControlName="slug" placeholder="Enter slug">
+          </div> -->
+          <!-- <div class="form-group">
+            <label>SKU *</label>
+            <input type="text" formControlName="sku" placeholder="Enter SKU">
+            <button type="button" class="input-addon-btn">Generate</button>
+          </div> -->
+          <!-- <div class="form-group">
+            <label>Selling Type *</label>
+            <select formControlName="sellingType">
+              <option value="">Select</option>
+              <option value="retail">Retail</option>
+              <option value="wholesale">Wholesale</option>
+            </select>
+          </div> -->
+          <div class="form-group">
+            <app-searchable-dropdown
+              formControlName="category"
+              [options]="categoryOptions"
+              [label]="'Category'"
+              [placeholder]="'Select Category'"
+              [required]="true"
+              [addNewRoute]="'/dashboard/category/add'"
+              displayKey="name"
+              valueKey="id"
+              (selectionChange)="onCategoryChange($event?.id)"
+            ></app-searchable-dropdown>
+          </div>
+          <div class="form-group">
+            <app-searchable-dropdown
+              formControlName="subCategory"
+              [options]="subcategoryOptions"
+              [label]="'Sub Category'"
+              [placeholder]="'Select Subcategory'"
+              [required]="true"
+              [addNewRoute]="'/dashboard/sub-category/add'"
+              displayKey="name"
+              valueKey="id"
+            ></app-searchable-dropdown>
+          </div>
+          <div class="form-group">
+            <app-searchable-dropdown
+              formControlName="brand"
+              [options]="brandOptions"
+              [label]="'Brand'"
+              [placeholder]="'Select Brand'"
+              [required]="false"
+              [addNewRoute]="'/dashboard/brands/add'"
+              displayKey="name"
+              valueKey="id"
+            ></app-searchable-dropdown>
+          </div>
+          <div class="form-group">
+            <app-searchable-dropdown
+              formControlName="unit"
+              [options]="unitOptions"
+              [label]="'Unit'"
+              [placeholder]="'Select Unit'"
+              [required]="true"
+              [addNewRoute]="'/dashboard/units/add'"
+              displayKey="displayName"
+              valueKey="id"
+            ></app-searchable-dropdown>
+          </div>
+          <div class="form-group">
+            <label>Item Code *</label>
+            <input type="text" formControlName="itemCode" placeholder="Enter item code">
+          </div>
+          <div class="form-group">
+            <app-searchable-dropdown
+              formControlName="barcodeSymbology"
+              [options]="barcodeOptions"
+              [label]="'Barcode Symbology'"
+              [placeholder]="'Select Barcode Type'"
+              [required]="true"
+              [addNewRoute]="'/dashboard/barcode/add'"
+              displayKey="name"
+              valueKey="id"
+            ></app-searchable-dropdown>
+          </div>
+          <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" formControlName="productName" placeholder="Enter product name">
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label>Description</label>
+          <div class="editor-toolbar">
+            <button type="button" class="toolbar-btn"><strong>B</strong></button>
+            <button type="button" class="toolbar-btn"><em>I</em></button>
+            <button type="button" class="toolbar-btn"><u>U</u></button>
+            <button type="button" class="toolbar-btn">🔗</button>
+            <button type="button" class="toolbar-btn">📎</button>
+            <button type="button" class="toolbar-btn">📊</button>
+            <button type="button" class="toolbar-btn">📷</button>
+            <button type="button" class="toolbar-btn">📹</button>
+          </div>
+          <textarea formControlName="description" rows="5" placeholder="Type your message"></textarea>
+          <div class="editor-footer">
+            <span class="char-count">Maximum 60 Words</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing & Stocks Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2 class="section-title">Pricing & Stocks</h2>
+        <button type="button" class="section-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="section-content">
+        <!-- <div class="product-type-selector">
+          <label class="radio-card">
+            <input type="radio" name="productType" value="single" [checked]="productType === 'single'" (change)="selectProductType('single')">
+            <div class="radio-card-content">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              </svg>
+              <span>Single Product</span>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="productType" value="variant" [checked]="productType === 'variant'" (change)="selectProductType('variant')">
+            <div class="radio-card-content">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Variants Product</span>
+            </div>
+          </label>
+        </div> -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Quantity *</label>
+            <input type="number" formControlName="quantity" placeholder="Enter quantity">
+          </div>
+          <div class="form-group">
+            <label>Price *</label>
+            <input type="number" formControlName="price" placeholder="Enter price">
+          </div>
+          <div class="form-group">
+            <label>Tax Type *</label>
+            <select formControlName="taxType">
+              <option value="">Select</option>
+              <option value="inclusive">Inclusive</option>
+              <option value="exclusive">Exclusive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Discount Type *</label>
+            <select formControlName="discountType">
+              <option value="">Select</option>
+              <option value="percentage">Percentage</option>
+              <option value="fixed">Fixed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Discount Value</label>
+            <input type="number" formControlName="discountValue" placeholder="Enter discount">
+          </div>
+          <div class="form-group">
+            <label>Quantity Alert *</label>
+            <input type="number" formControlName="quantityAlert" placeholder="Enter alert quantity">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Images Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2 class="section-title">Images</h2>
+        <button type="button" class="section-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="section-content">
+        <div class="image-upload-area">
+          <input type="file" id="imageUpload" multiple accept="image/*" (change)="onFileSelect($event)" style="display: none;">
+          <label for="imageUpload" class="upload-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <p>Add Image</p>
+          </label>
+          <div class="image-preview-grid" *ngIf="selectedImages.length > 0">
+            <div class="image-preview-item" *ngFor="let image of selectedImages; let i = index">
+              <img [src]="image" alt="Preview">
+              <button type="button" class="remove-image-btn" (click)="removeImage(i)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Fields Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2 class="section-title">Custom Fields</h2>
+        <button type="button" class="section-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="section-content">
+        <div class="custom-field-tabs">
+          <button 
+            type="button"
+            class="tab-btn" 
+            [class.active]="activeWarrantyTab === 'warranties'"
+            (click)="setActiveWarrantyTab('warranties')"
+          >
+            Warranties
+          </button>
+          <button 
+            type="button"
+            class="tab-btn" 
+            [class.active]="activeWarrantyTab === 'manufacturer'"
+            (click)="setActiveWarrantyTab('manufacturer')"
+          >
+            Manufacturer
+          </button>
+          <button 
+            type="button"
+            class="tab-btn" 
+            [class.active]="activeWarrantyTab === 'expiry'"
+            (click)="setActiveWarrantyTab('expiry')"
+          >
+            Expiry
+          </button>
+        </div>
+        <div class="tab-content" *ngIf="activeWarrantyTab === 'warranties'">
+          <div class="form-group">
+            <label>Warranty</label>
+            <select formControlName="warranty">
+              <option value="">Select</option>
+              <option value="1year">1 Year</option>
+              <option value="2year">2 Years</option>
+            </select>
+          </div>
+        </div>
+        <div class="tab-content" *ngIf="activeWarrantyTab === 'manufacturer'">
+          <div class="form-group">
+            <label>Manufacturer</label>
+            <input type="text" formControlName="manufacturer" placeholder="Enter manufacturer">
+          </div>
+        </div>
+        <div class="tab-content" *ngIf="activeWarrantyTab === 'expiry'">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Manufactured Date</label>
+              <input type="date" formControlName="manufacturedDate">
+            </div>
+            <div class="form-group">
+              <label>Expiry On</label>
+              <input type="date" formControlName="expiryOn">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B2B Settings Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2 class="section-title">B2B Settings</h2>
+        <button type="button" class="section-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="section-content">
+        <!-- Enable B2B toggle -->
+        <div class="form-group b2b-toggle-row">
+          <label class="toggle-label">
+            <span>Enable B2B Listing</span>
+            <span class="toggle-hint">Allows buyers to place bulk orders for this product</span>
+          </label>
+          <label class="toggle-switch">
+            <input type="checkbox" formControlName="isB2B" (change)="onB2BToggle()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <!-- B2B fields — shown only when B2B is enabled -->
+        <div class="b2b-fields" *ngIf="isB2BEnabled">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Variety / Grade</label>
+              <input type="text" formControlName="variety" placeholder="e.g. 1121 Extra Long, Premium Grade">
+            </div>
+            <div class="form-group">
+              <label>Min Order Quantity</label>
+              <input type="number" formControlName="minOrderQuantity" placeholder="e.g. 100" min="1">
+            </div>
+            <div class="form-group">
+              <label>Supplier Location</label>
+              <input type="text" formControlName="supplierLocation" placeholder="e.g. Delhi, India">
+            </div>
+            <div class="form-group">
+              <label>Response Rate (%)</label>
+              <input type="number" formControlName="responseRate" placeholder="e.g. 95" min="0" max="100">
+            </div>
+          </div>
+
+          <!-- Has GST toggle -->
+          <div class="form-group b2b-toggle-row">
+            <label class="toggle-label">
+              <span>GST Invoice Available</span>
+              <span class="toggle-hint">Supplier can provide GST invoice</span>
+            </label>
+            <label class="toggle-switch">
+              <input type="checkbox" formControlName="hasGST">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">Cancel</button>
+      <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Submitting...') : (isEditMode ? 'Update Product' : 'Submit') }}
+      </button>
+    </div>
+  </form>
+</div>

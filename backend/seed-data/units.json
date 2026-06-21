@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Piece",
+    "code": "PC",
+    "shortName": "pc",
+    "isActive": true
+  },
+  {
+    "name": "Kilogram",
+    "code": "KG",
+    "shortName": "kg",
+    "isActive": true
+  },
+  {
+    "name": "Liter",
+    "code": "LTR",
+    "shortName": "ltr",
+    "isActive": true
+  },
+  {
+    "name": "Meter",
+    "code": "MTR",
+    "shortName": "mtr",
+    "isActive": true
+  },
+  {
+    "name": "Box",
+    "code": "BOX",
+    "shortName": "box",
+    "isActive": true
+  },
+  {
+    "name": "Pair",
+    "code": "PAIR",
+    "shortName": "pair",
+    "isActive": true
+  },
+  {
+    "name": "Set",
+    "code": "SET",
+    "shortName": "set",
+    "isActive": true
+  },
+  {
+    "name": "Dozen",
+    "code": "DOZ",
+    "shortName": "doz",
+    "isActive": true
+  },
+  {
+    "name": "Bag",
+    "code": "BAG",
+    "shortName": "bag",
+    "isActive": true
+  },
+  {
+    "name": "Carton",
+    "code": "CTN",
+    "shortName": "ctn",
+    "isActive": true
+  }
+]

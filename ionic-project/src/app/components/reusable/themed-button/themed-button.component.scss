@@ -1,0 +1,18 @@
+@use 'src/theme/mixins.scss' as *;
+
+.themed-button {
+  // Button already themed globally in global.scss
+  // Add component-specific overrides here if needed
+  
+  &[size="small"] {
+    font-size: 0.875rem;
+    --padding-top: 6px;
+    --padding-bottom: 6px;
+  }
+  
+  &[size="large"] {
+    font-size: 1.125rem;
+    --padding-top: 14px;
+    --padding-bottom: 14px;
+  }
+}

@@ -1,0 +1,114 @@
+<div class="bulk-upload-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/dashboard/b2b-management/vendors" class="btn-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Vendors
+      </a>
+      <h1 class="page-title">Bulk Upload Vendors</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-outline" (click)="downloadSampleExcel()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Sample Excel
+      </button>
+      <button class="btn-outline" (click)="downloadSampleJSON()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Sample JSON
+      </button>
+    </div>
+  </div>
+
+  <!-- Columns reference -->
+  <div class="columns-info">
+    <span class="columns-label">Expected columns:</span>
+    <span class="col-tag" *ngFor="let h of templateHeaders">{{ h }}</span>
+  </div>
+
+  <!-- Drop zone -->
+  <div class="drop-zone" [class.dragging]="isDragging"
+       (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <p>Drag & drop your file here, or <label class="file-link">browse<input type="file" accept=".xlsx,.xls,.csv,.json" (change)="onFileSelect($event)" hidden></label></p>
+    <p class="file-hint">Supports .xlsx, .xls, .csv, .json</p>
+    <p class="file-name" *ngIf="uploadedFile">{{ uploadedFile.name }}</p>
+  </div>
+
+  <!-- Parse error -->
+  <div class="alert alert-error" *ngIf="parseError">{{ parseError }}</div>
+
+  <!-- Preview table -->
+  <div class="preview-section" *ngIf="parsedRows.length > 0">
+    <div class="preview-summary">
+      <span class="badge badge-success">{{ validRows.length }} valid</span>
+      <span class="badge badge-error" *ngIf="errorRows.length">{{ errorRows.length }} errors</span>
+      <span class="badge badge-total">{{ parsedRows.length }} total rows</span>
+      <button class="btn-clear" (click)="clearFile()">Clear</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="preview-table">
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>Status</th>
+            <th>Vendor Name</th>
+            <th>Code</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>City</th>
+            <th>Has GST</th>
+            <th>Rating</th>
+            <th>Min Qty</th>
+            <th>Active</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of parsedRows" [class.row-error]="row._hasError">
+            <td>{{ row._rowIndex }}</td>
+            <td>
+              <span class="status-dot" [class.dot-ok]="!row._hasError" [title]="row._errorReason || 'Valid'"></span>
+              <span class="error-text" *ngIf="row._hasError" [title]="row._errorReason">{{ row._errorReason }}</span>
+            </td>
+            <td>{{ row.name || '—' }}</td>
+            <td>{{ row.supplierCode || '—' }}</td>
+            <td>{{ row.email || '—' }}</td>
+            <td>{{ row.phone || '—' }}</td>
+            <td>{{ row.city || '—' }}</td>
+            <td>{{ row.hasGST }}</td>
+            <td>{{ row.rating }}</td>
+            <td>{{ row.minOrderQty }}</td>
+            <td>{{ row.isActive }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="alert alert-error"   *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <!-- Submit -->
+    <div class="submit-row">
+      <button class="btn-primary" (click)="onSubmit()"
+              [disabled]="validRows.length === 0 || isSubmitting">
+        <svg *ngIf="isSubmitting" class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        {{ isSubmitting ? 'Uploading…' : 'Upload ' + validRows.length + ' Vendor' + (validRows.length === 1 ? '' : 's') }}
+      </button>
+    </div>
+  </div>
+
+</div>

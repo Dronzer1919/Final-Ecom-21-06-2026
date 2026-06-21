@@ -1,0 +1,265 @@
+<div class="rm-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="page-title-wrap">
+        <span class="page-badge">Access</span>
+        <h1 class="page-title">Role Management</h1>
+      </div>
+      <p class="page-subtitle">Control what each user can see and do across the entire dashboard</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#6366f118; color:#6366f1;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <p class="stat-label">Total Users</p>
+        <p class="stat-value">{{ stats.totalUsers }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#10b98118; color:#10b981;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <p class="stat-label">Active Users</p>
+        <p class="stat-value">{{ stats.activeUsers }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#f59e0b18; color:#f59e0b;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <p class="stat-label">Total Permissions</p>
+        <p class="stat-value">{{ stats.totalPermissions }}</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#8b5cf618; color:#8b5cf6;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <p class="stat-label">Sections</p>
+        <p class="stat-value">8</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search + Table -->
+  <div class="table-card">
+    <!-- Error Banner -->
+    <div class="load-error" *ngIf="loadError">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ loadError }}
+      <button class="btn-retry" (click)="loadUsers()">Retry</button>
+    </div>
+
+    <!-- Add User Inline Form -->
+    <div class="add-user-form" *ngIf="showAddForm">
+      <div class="add-form-grid">
+        <div class="add-field">
+          <label class="field-label">First Name *</label>
+          <input type="text" class="field-input" placeholder="e.g. Rahul"
+            [(ngModel)]="newUser.firstName">
+        </div>
+        <div class="add-field">
+          <label class="field-label">Last Name</label>
+          <input type="text" class="field-input" placeholder="e.g. Sharma"
+            [(ngModel)]="newUser.lastName">
+        </div>
+        <div class="add-field">
+          <label class="field-label">Email *</label>
+          <input type="email" class="field-input" placeholder="user@company.com"
+            [(ngModel)]="newUser.email">
+        </div>
+        <div class="add-field">
+          <label class="field-label">Phone</label>
+          <input type="text" class="field-input" placeholder="+91 99999 00000"
+            [(ngModel)]="newUser.phone">
+        </div>
+        <div class="add-field">
+          <label class="field-label">Role *</label>
+          <select class="field-input" [(ngModel)]="newUser.role">
+            <option value="superadmin">Superadmin</option>
+            <option value="admin">Admin</option>
+            <option value="vendor">Vendor</option>
+            <option value="enduser">End User</option>
+          </select>
+        </div>
+        <div class="add-field">
+          <label class="field-label">Password *</label>
+          <input type="password" class="field-input" placeholder="Min 8 characters"
+            [(ngModel)]="newUser.password">
+        </div>
+      </div>
+      <div class="add-form-footer">
+        <span class="add-error" *ngIf="addError">{{ addError }}</span>
+        <div class="add-form-actions">
+          <button class="btn-cancel-add" (click)="cancelAddForm()">Cancel</button>
+          <button class="btn-submit-add" (click)="submitAddUser()" [disabled]="isAdding">
+            <svg *ngIf="!isAdding" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            {{ isAdding ? 'Adding…' : 'Add User' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-header">
+      <h2 class="table-title">
+        Users
+        <span class="user-count" *ngIf="!isLoading">{{ filteredUsers.length }}</span>
+      </h2>
+      <div class="header-right">
+        <button class="btn-add-user" (click)="openAddForm()" *ngIf="!showAddForm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add User
+        </button>
+        <!-- Role Filters -->
+        <div class="role-filters">
+          <button class="role-filter-btn" [class.active]="activeRole === ''"       (click)="filterByRole('')">All</button>
+          <button class="role-filter-btn superadmin" [class.active]="activeRole === 'superadmin'" (click)="filterByRole('superadmin')">Super Admin</button>
+          <button class="role-filter-btn admin"      [class.active]="activeRole === 'admin'"      (click)="filterByRole('admin')">Admin</button>
+          <button class="role-filter-btn vendor"     [class.active]="activeRole === 'vendor'"     (click)="filterByRole('vendor')">Vendor</button>
+          <button class="role-filter-btn enduser"    [class.active]="activeRole === 'enduser'"    (click)="filterByRole('enduser')">End User</button>
+        </div>
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" placeholder="Search users..." (input)="onSearch($event)" class="search-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Access</th>
+            <th>Last Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Loading skeleton -->
+          <tr *ngFor="let s of [1,2,3,4]" class="skeleton-row" [style.display]="isLoading ? '' : 'none'">
+            <td><div class="sk-cell"><div class="sk-avatar"></div><div class="sk-lines"><div class="sk-line w60"></div><div class="sk-line w80"></div></div></div></td>
+            <td><div class="sk-line w40"></div></td>
+            <td><div class="sk-line w40"></div></td>
+            <td><div class="sk-line w60"></div></td>
+            <td><div class="sk-line w40"></div></td>
+            <td><div class="sk-line w80"></div></td>
+          </tr>
+          <tr *ngFor="let user of filteredUsers" [class.row-inactive]="!user.isActive">
+            <td>
+              <div class="user-cell">
+                <div class="avatar" [style.background]="getAvatarColor(user.fullName)">
+                  {{ getInitials(user.fullName) }}
+                </div>
+                <div class="user-info">
+                  <span class="user-name">{{ user.fullName }}</span>
+                  <span class="user-email">{{ user.email }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span [class]="getRoleBadgeClass(user.role)">{{ user.role }}</span>
+            </td>
+            <td>
+              <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
+                {{ user.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <ng-container *ngIf="getPermStats(user.id) as ps">
+                <span class="access-chip" *ngIf="ps.granted > 0; else noAccess">
+                  {{ ps.granted }}/{{ ps.total }} permissions
+                  <span class="access-sections">({{ ps.sections }} sections)</span>
+                </span>
+                <ng-template #noAccess>
+                  <span class="access-none">No access set</span>
+                </ng-template>
+              </ng-container>
+            </td>
+            <td class="last-active">{{ formatDate(user.lastActive) }}</td>
+            <td>
+              <div class="row-actions">
+                <!-- Edit Access -->
+                <a [routerLink]="['/dashboard/role-management/edit', user.id]" class="btn-action edit"
+                   title="Edit Access">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Edit
+                </a>
+
+                <!-- Enable / Disable -->
+                <button class="btn-action" [class.enable]="!user.isActive" [class.disable]="user.isActive"
+                        (click)="toggleStatus(user)"
+                        [title]="user.isActive ? 'Disable user' : 'Enable user'">
+                  <svg *ngIf="user.isActive" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                  </svg>
+                  <svg *ngIf="!user.isActive" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  {{ user.isActive ? 'Disable' : 'Enable' }}
+                </button>
+
+                <!-- Delete — normal / confirm state -->
+                <ng-container *ngIf="deleteConfirmId !== user.id; else confirmTpl">
+                  <button class="btn-action delete" (click)="confirmDelete(user.id)" title="Delete user">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                      <path d="M10 11v6M14 11v6"/>
+                      <path d="M9 6V4h6v2"/>
+                    </svg>
+                    Delete
+                  </button>
+                </ng-container>
+                <ng-template #confirmTpl>
+                  <div class="confirm-inline">
+                    <span class="confirm-text">Sure?</span>
+                    <button class="btn-confirm-yes" (click)="executeDelete(user.id)">Yes</button>
+                    <button class="btn-confirm-no"  (click)="cancelDelete()">No</button>
+                  </div>
+                </ng-template>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredUsers.length === 0">
+            <td colspan="6" class="empty-row">No users found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

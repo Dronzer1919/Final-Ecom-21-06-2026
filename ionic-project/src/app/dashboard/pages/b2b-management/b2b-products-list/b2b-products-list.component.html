@@ -1,0 +1,251 @@
+<div class="list-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/dashboard/b2b-management" class="btn-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        B2B Management
+      </a>
+      <h1 class="page-title">B2B Product Inventory</h1>
+    </div>
+    <div class="header-actions">
+      <div class="view-toggle">
+        <button [class.active]="viewMode === 'table'" (click)="viewMode = 'table'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          Table
+        </button>
+        <button [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+          Cards
+        </button>
+      </div>
+      <a routerLink="/dashboard/b2b-management/products/bulk-upload" class="btn-secondary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Bulk Upload
+      </a>
+      <a routerLink="/dashboard/b2b-management/step-form" class="btn-secondary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        </svg>
+        Wizard
+      </a>
+      <button class="btn-primary" (click)="addProduct()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Product
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="onSearch()">
+    </div>
+    <select class="filter-select" [(ngModel)]="selectedCategory" (change)="onCategoryFilter()">
+      <option value="">All Categories</option>
+      <option *ngFor="let cat of categories" [value]="cat._id">{{ cat.name }}</option>
+    </select>
+    <div class="total-badge">{{ totalItems }} total</div>
+  </div>
+
+  <!-- Bulk Action Bar -->
+  <div class="selection-bar" *ngIf="selectedCount > 0">
+    <span class="sel-count">{{ selectedCount }} selected</span>
+    <div class="sel-actions">
+      <ng-container *ngIf="!bulkDeleteConfirm">
+        <button class="btn-bulk-delete" (click)="confirmBulkDelete()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+          </svg>
+          Delete Selected
+        </button>
+        <button class="btn-clear-sel" (click)="clearSelection()">Clear</button>
+      </ng-container>
+      <ng-container *ngIf="bulkDeleteConfirm">
+        <span class="confirm-text">Delete {{ selectedCount }} product{{ selectedCount === 1 ? '' : 's' }}?</span>
+        <button class="btn-confirm-yes" (click)="deleteSelected()" [disabled]="isBulkDeleting">
+          {{ isBulkDeleting ? 'Deleting...' : 'Confirm Delete' }}
+        </button>
+        <button class="btn-confirm-no" (click)="cancelBulkDelete()">Cancel</button>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Loading Shimmer -->
+  <div class="shimmer-table" *ngIf="isLoading">
+    <div class="shimmer-row" *ngFor="let i of [1,2,3,4,5]">
+      <div class="shimmer-cell sm"></div>
+      <div class="shimmer-cell wide"></div>
+      <div class="shimmer-cell"></div>
+      <div class="shimmer-cell"></div>
+      <div class="shimmer-cell sm"></div>
+    </div>
+  </div>
+
+  <!-- ── TABLE VIEW ─────────────────────────────────────────── -->
+  <div class="table-wrap" *ngIf="!isLoading && viewMode === 'table'">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="cb-col">
+            <input type="checkbox"
+                   [checked]="isAllSelected"
+                   [indeterminate]="isIndeterminate"
+                   (change)="toggleSelectAll()">
+          </th>
+          <th>Image</th>
+          <th>Product Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>B2B</th>
+          <th>MOQ</th>
+          <th>Vendors</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products" [class.row-selected]="isSelected(p._id!)">
+          <td class="cb-col">
+            <input type="checkbox" [checked]="isSelected(p._id!)" (change)="toggleSelect(p._id!)">
+          </td>
+          <td>
+            <div class="prod-img-cell">
+              <img *ngIf="p.images?.length" [src]="p.images![0]" alt="product" class="prod-thumb">
+              <div *ngIf="!p.images?.length" class="prod-thumb-placeholder">📦</div>
+            </div>
+          </td>
+          <td class="name-cell">
+            <div>{{ getProductName(p) }}</div>
+            <div class="item-code">{{ p.itemCode }}</div>
+          </td>
+          <td>
+            <span class="cat-chip">{{ getCategoryName(p) }}</span>
+          </td>
+          <td class="price-cell">
+            ₹{{ p.price | number:'1.2-2' }}
+            <span class="unit-label" *ngIf="getUnitName(p)">/ {{ getUnitName(p) }}</span>
+          </td>
+          <td class="stock-cell">
+            <span class="stock-badge" [class]="getStockStatus(p)">
+              {{ p.quantity }}
+              <ng-container *ngIf="getStockStatus(p) === 'low'"> — Low</ng-container>
+              <ng-container *ngIf="getStockStatus(p) === 'out'"> — Out</ng-container>
+            </span>
+          </td>
+          <td>
+            <span class="status-badge" [class.active]="p.status === 'Active'" [class.inactive]="p.status !== 'Active'">
+              {{ p.status ?? 'Active' }}
+            </span>
+          </td>
+          <td>
+            <span class="b2b-pill" *ngIf="p.isB2B">✔ B2B</span>
+            <span class="b2b-pill inactive" *ngIf="!p.isB2B">—</span>
+          </td>
+          <td>{{ p.minOrderQuantity ?? '—' }}</td>
+          <td>
+            <span class="vendor-count-badge" *ngIf="getVendorCount(p) > 0">
+              {{ getVendorCount(p) }}
+            </span>
+            <span *ngIf="getVendorCount(p) === 0" class="text-muted">—</span>
+          </td>
+          <td class="actions-cell">
+            <button class="btn-action edit" (click)="editProduct(p._id!)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Edit
+            </button>
+            <button class="btn-action delete" (click)="confirmDelete(p._id!)"
+                    *ngIf="deleteConfirmId !== p._id">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              </svg>
+              Delete
+            </button>
+            <div class="confirm-delete" *ngIf="deleteConfirmId === p._id">
+              <span>Confirm?</span>
+              <button class="btn-confirm-yes" (click)="deleteProduct(p._id!)">Yes</button>
+              <button class="btn-confirm-no" (click)="cancelDelete()">No</button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="products.length === 0">
+          <td colspan="11" class="empty-state">
+            <div class="empty-icon">📦</div>
+            <span>No B2B products found.</span>
+            <button class="btn-link" (click)="addProduct()">Add your first B2B product</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── GRID CARD VIEW ─────────────────────────────────────── -->
+  <div class="products-grid" *ngIf="!isLoading && viewMode === 'grid'">
+    <div class="product-card" *ngFor="let p of products" [class.card-selected]="isSelected(p._id!)">
+      <label class="card-checkbox">
+        <input type="checkbox" [checked]="isSelected(p._id!)" (change)="toggleSelect(p._id!)">
+      </label>
+      <div class="card-img">
+        <img *ngIf="p.images?.length" [src]="p.images![0]" alt="product">
+        <div *ngIf="!p.images?.length" class="card-img-placeholder">📦</div>
+        <span class="card-b2b-badge" *ngIf="p.isB2B">B2B</span>
+      </div>
+      <div class="card-body">
+        <p class="card-name">{{ getProductName(p) }}</p>
+        <p class="card-category">{{ getCategoryName(p) }}</p>
+        <div class="card-meta">
+          <span class="card-price">₹{{ p.price | number:'1.0-0' }}</span>
+          <span class="card-stock" [class]="getStockStatus(p)">
+            Stock: {{ p.quantity }}
+          </span>
+        </div>
+        <div class="card-actions">
+          <button class="btn-action edit" (click)="editProduct(p._id!)">Edit</button>
+          <button class="btn-action delete" (click)="confirmDelete(p._id!)"
+                  *ngIf="deleteConfirmId !== p._id">Delete</button>
+          <div class="confirm-delete" *ngIf="deleteConfirmId === p._id">
+            <button class="btn-confirm-yes" (click)="deleteProduct(p._id!)">Yes</button>
+            <button class="btn-confirm-no" (click)="cancelDelete()">No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="empty-state-card" *ngIf="products.length === 0">
+      <div class="empty-icon">📦</div>
+      <p>No B2B products found</p>
+      <button class="btn-primary" (click)="addProduct()">Add Product</button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button class="pg-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)">«</button>
+    <button class="pg-btn" *ngFor="let p of pageNumbers"
+            [class.active]="p === currentPage"
+            (click)="goToPage(p)">{{ p }}</button>
+    <button class="pg-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)">»</button>
+  </div>
+</div>

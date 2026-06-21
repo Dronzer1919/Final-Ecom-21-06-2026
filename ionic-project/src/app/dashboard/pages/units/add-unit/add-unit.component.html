@@ -1,0 +1,112 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Add Unit</h1>
+    <div class="header-actions">
+      <button type="button" class="btn-bulk-upload" (click)="openBulkModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Bulk Upload
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="unitForm" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="form-section">
+      <h2 class="section-title">Unit Information</h2>
+      <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Unit Name *</label>
+          <input type="text" formControlName="name" placeholder="e.g., Kilogram, Piece" />
+          <span class="error-text" *ngIf="unitForm.get('name')?.invalid && unitForm.get('name')?.touched">Unit name is required</span>
+        </div>
+
+        <div class="form-group">
+          <label>Short Name *</label>
+          <input type="text" formControlName="shortName" placeholder="e.g., KG, PC" style="text-transform: uppercase;" />
+          <span class="error-text" *ngIf="unitForm.get('shortName')?.invalid && unitForm.get('shortName')?.touched">Short name is required</span>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea formControlName="description" placeholder="Enter description" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="onCancel()" [disabled]="isSubmitting">Cancel</button>
+      <button type="submit" class="btn-primary" [disabled]="isSubmitting">{{ isSubmitting ? 'Saving...' : 'Save Unit' }}</button>
+    </div>
+  </form>
+</div>
+
+<!-- Bulk Upload Modal -->
+<div class="bulk-modal-overlay" *ngIf="showBulkModal" (click)="closeBulkModal()">
+  <div class="bulk-modal" (click)="$event.stopPropagation()">
+    <div class="bulk-modal-header">
+      <div class="bulk-modal-title-row">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <h2>Bulk Upload Units</h2>
+      </div>
+      <button class="bulk-modal-close" (click)="closeBulkModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="bulk-modal-body">
+      <div class="bulk-sample-row">
+        <span class="bulk-sample-label">Download sample file:</span>
+        <button type="button" class="btn-sample btn-sample-json" (click)="downloadSampleJSON()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Sample JSON
+        </button>
+        <button type="button" class="btn-sample btn-sample-excel" (click)="downloadSampleExcel()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Sample Excel
+        </button>
+      </div>
+      <div class="bulk-hint">
+        <strong>Required:</strong> <code>name</code>, <code>shortName</code> &nbsp;|&nbsp;
+        <strong>Optional:</strong> <code>description</code>
+      </div>
+      <div class="bulk-file-drop" (click)="fileBulkInput.click()">
+        <input #fileBulkInput type="file" [accept]="bulkAcceptedFormats" style="display:none" (change)="onBulkFileChange($event)" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <p *ngIf="!bulkFile">Click to choose a <strong>.json</strong>, <strong>.xlsx</strong> or <strong>.xls</strong> file</p>
+        <p *ngIf="bulkFile" class="file-chosen">{{ bulkFile.name }}</p>
+      </div>
+      <div class="bulk-alert bulk-alert-error" *ngIf="bulkParseError">{{ bulkParseError }}</div>
+      <div class="bulk-preview" *ngIf="bulkParsedData.length > 0 && !bulkResultMessage">
+        <p class="bulk-preview-count">{{ bulkParsedData.length }} unit(s) ready to import:</p>
+        <div class="bulk-table-wrap">
+          <table class="bulk-table">
+            <thead><tr><th>#</th><th>Name</th><th>Short Name</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let row of bulkParsedData; let i = index">
+                <td>{{ i + 1 }}</td><td>{{ row.name }}</td><td>{{ row.shortName }}</td>
+                <td>{{ row.description || '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="bulk-alert bulk-alert-success" *ngIf="bulkResultMessage">{{ bulkResultMessage }}</div>
+      <div class="bulk-alert bulk-alert-error" *ngIf="bulkResultError">{{ bulkResultError }}</div>
+    </div>
+    <div class="bulk-modal-footer">
+      <button type="button" class="btn-bulk-cancel" (click)="closeBulkModal()">Close</button>
+      <button type="button" class="btn-bulk-submit"
+        [disabled]="bulkParsedData.length === 0 || isBulkSubmitting || !!bulkResultMessage"
+        (click)="submitBulkUpload()">
+        {{ isBulkSubmitting ? 'Uploading...' : 'Upload ' + bulkParsedData.length + ' Unit(s)' }}
+      </button>
+    </div>
+  </div>
+</div>

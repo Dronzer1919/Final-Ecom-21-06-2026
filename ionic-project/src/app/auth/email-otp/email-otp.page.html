@@ -1,0 +1,52 @@
+<div class="auth-container">
+  <div class="auth-content">
+    <div class="auth-form-section">
+      <div class="auth-form-wrapper">
+        <div class="auth-form-content">
+          <div class="title-with-back">
+            <button type="button" class="back-button" routerLink="/auth/sign-in">
+              <ion-icon name="arrow-back"></ion-icon>
+            </button>
+            <h1 class="auth-title">Verify Email</h1>
+          </div>
+          <p class="auth-subtitle">
+            Enter the 4-digit OTP sent to <strong>{{ email || 'your email' }}</strong>
+          </p>
+
+          <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+          <div class="success-message" *ngIf="successMessage">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            {{ successMessage }}
+          </div>
+
+          <div class="otp-row" (paste)="onOtpPaste($event)">
+            <input *ngFor="let digit of otp; let i = index"
+              [id]="'otp-' + i"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              class="otp-input"
+              [value]="digit"
+              (input)="onOtpInput(i, $event)"
+              (keydown)="onOtpKeydown(i, $event)"
+            />
+          </div>
+
+          <app-theme-button type="primary" [fullWidth]="true" [disabled]="isLoading || fullOtp.length !== 4" (clicked)="onSubmit()">
+            <ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
+            <span *ngIf="!isLoading">Verify</span>
+          </app-theme-button>
+
+          <div class="resend-row">
+            <span *ngIf="!canResend" class="countdown-text">Resend OTP in {{ countdown }}s</span>
+            <button *ngIf="canResend" class="resend-btn" [disabled]="isResending" (click)="resendOtp()">
+              <ion-spinner *ngIf="isResending" name="crescent" style="width:16px;height:16px"></ion-spinner>
+              <ion-icon *ngIf="!isResending" name="refresh-outline"></ion-icon>
+              Resend OTP
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+<div class="sp-page">
+
+  <!-- ── Page Header ────────────────────────────────────────────────────────── -->
+  <div class="sp-header">
+    <div class="sh-block sp-page-title"></div>
+    <div class="sh-block sp-page-sub"></div>
+  </div>
+
+  <!-- ── Profile Card ───────────────────────────────────────────────────────── -->
+  <div class="sp-card">
+
+    <!-- Avatar section -->
+    <div class="sp-avatar-section">
+      <div class="sh-block sp-avatar"></div>
+      <div class="sp-avatar-info">
+        <div class="sh-block sp-user-name"></div>
+        <div class="sh-block sp-user-email"></div>
+      </div>
+    </div>
+
+    <div class="sp-divider"></div>
+
+    <!-- Form section header -->
+    <div class="sp-form-header">
+      <div class="sh-block sp-section-title"></div>
+      <div class="sh-block sp-edit-btn"></div>
+    </div>
+
+    <!-- Form fields -->
+    <div class="sp-form-fields">
+      <div class="sp-field" *ngFor="let f of formFields">
+        <div class="sh-block sp-label"></div>
+        <div class="sh-block sp-input"></div>
+      </div>
+    </div>
+
+    <!-- Save/Cancel buttons -->
+    <div class="sp-form-actions">
+      <div class="sh-block sp-save-btn"></div>
+      <div class="sh-block sp-cancel-btn"></div>
+    </div>
+
+    <div class="sp-divider"></div>
+
+    <!-- Security section -->
+    <div class="sp-form-header">
+      <div class="sh-block sp-section-title sp-section-title-sm"></div>
+    </div>
+
+    <!-- Account info grid -->
+    <div class="sp-info-grid">
+      <div class="sp-info-row" *ngFor="let r of infoRows">
+        <div class="sh-block sp-info-label"></div>
+        <div class="sh-block sp-info-value"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

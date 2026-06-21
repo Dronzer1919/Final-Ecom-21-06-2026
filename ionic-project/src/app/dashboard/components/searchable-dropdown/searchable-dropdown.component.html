@@ -1,0 +1,106 @@
+<div class="searchable-dropdown" (clickOutside)="onClickOutside($event)">
+  <label *ngIf="label" class="dropdown-label">
+    {{ label }}
+    <span *ngIf="required" class="required">*</span>
+  </label>
+  
+  <div class="dropdown-wrapper">
+    <div 
+      class="dropdown-trigger" 
+      [class.disabled]="disabled"
+      [class.open]="isOpen"
+      (click)="toggleDropdown()"
+    >
+      <span class="selected-value" [class.placeholder]="!selectedOption">
+        {{ selectedOption ? selectedOption[displayKey] : placeholder }}
+      </span>
+      
+      <div class="dropdown-actions">
+        <button 
+          *ngIf="selectedOption && !disabled" 
+          type="button"
+          class="clear-btn"
+          (click)="clearSelection($event)"
+          aria-label="Clear selection"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        
+        <svg 
+          class="dropdown-arrow" 
+          [class.open]="isOpen"
+          xmlns="http://www.w3.org/2000/svg" 
+          width="16" 
+          height="16" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2"
+        >
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </div>
+
+    <div class="dropdown-menu" *ngIf="isOpen">
+      <div class="dropdown-search-wrapper">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input 
+          type="text" 
+          class="dropdown-search"
+          [value]="searchTerm"
+          (input)="onSearchChange($any($event.target).value)"
+          [placeholder]="'Search ' + (label || placeholder)"
+          (click)="$event.stopPropagation()"
+        />
+      </div>
+
+      <div class="dropdown-options">
+        <div 
+          *ngFor="let option of filteredOptions"
+          class="dropdown-option"
+          [class.selected]="selectedOption && selectedOption[valueKey] === option[valueKey]"
+          (click)="selectOption(option)"
+        >
+          <span>{{ option[displayKey] }}</span>
+          <svg 
+            *ngIf="selectedOption && selectedOption[valueKey] === option[valueKey]"
+            class="check-icon"
+            xmlns="http://www.w3.org/2000/svg" 
+            width="16" 
+            height="16" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            stroke-width="2"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+
+        <div *ngIf="filteredOptions.length === 0" class="no-options">
+          No options found
+        </div>
+      </div>
+
+      <button 
+        *ngIf="addNewRoute || showAddNew"
+        type="button"
+        class="add-new-option"
+        (click)="onAddNew($event)"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Add New {{ label }}
+      </button>
+    </div>
+  </div>
+</div>

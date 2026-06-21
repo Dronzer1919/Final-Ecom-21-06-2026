@@ -1,0 +1,220 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Reusable Components Demo</ion-title>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/home">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Components Demo</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="demo-container">
+    
+    <!-- Themed Buttons Section -->
+    <section class="demo-section">
+      <h2 class="section-title">Themed Buttons</h2>
+      <p class="section-description">Customizable buttons with different colors, fills, and sizes</p>
+      
+      <div class="demo-grid">
+        <div class="demo-item">
+          <h3>Filled Buttons</h3>
+          <div class="button-group">
+            <app-themed-button 
+              color="primary" 
+              (buttonClick)="onButtonClick('Primary clicked')">
+              Primary
+            </app-themed-button>
+            <app-themed-button 
+              color="secondary" 
+              (buttonClick)="onButtonClick('Secondary clicked')">
+              Secondary
+            </app-themed-button>
+            <app-themed-button 
+              color="success" 
+              (buttonClick)="onButtonClick('Success clicked')">
+              Success
+            </app-themed-button>
+            <app-themed-button 
+              color="warning" 
+              (buttonClick)="onButtonClick('Warning clicked')">
+              Warning
+            </app-themed-button>
+            <app-themed-button 
+              color="danger" 
+              (buttonClick)="onButtonClick('Danger clicked')">
+              Danger
+            </app-themed-button>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <h3>Outline Buttons</h3>
+          <div class="button-group">
+            <app-themed-button color="primary" fill="outline">Outline Primary</app-themed-button>
+            <app-themed-button color="secondary" fill="outline">Outline Secondary</app-themed-button>
+            <app-themed-button color="tertiary" fill="outline">Outline Tertiary</app-themed-button>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <h3>Clear Buttons</h3>
+          <div class="button-group">
+            <app-themed-button color="primary" fill="clear">Clear Primary</app-themed-button>
+            <app-themed-button color="secondary" fill="clear">Clear Secondary</app-themed-button>
+            <app-themed-button color="tertiary" fill="clear">Clear Tertiary</app-themed-button>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <h3>Buttons with Icons</h3>
+          <div class="button-group">
+            <app-themed-button color="primary" icon="heart" iconSlot="start">Like</app-themed-button>
+            <app-themed-button color="secondary" icon="share-social" iconSlot="end">Share</app-themed-button>
+            <app-themed-button color="success" icon="add-circle" iconSlot="icon-only"></app-themed-button>
+            <app-themed-button color="danger" icon="trash" iconSlot="icon-only"></app-themed-button>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <h3>Button Sizes & Expand</h3>
+          <div class="button-group">
+            <app-themed-button color="primary" size="small">Small</app-themed-button>
+            <app-themed-button color="primary" size="default">Default</app-themed-button>
+            <app-themed-button color="primary" size="large">Large</app-themed-button>
+            <app-themed-button color="primary" expand="block">Block Button</app-themed-button>
+          </div>
+        </div>
+
+        <div class="demo-item">
+          <h3>Disabled State</h3>
+          <div class="button-group">
+            <app-themed-button color="primary" [disabled]="true">Disabled</app-themed-button>
+            <app-themed-button color="secondary" fill="outline" [disabled]="true">Disabled Outline</app-themed-button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Themed Cards Section -->
+    <section class="demo-section">
+      <h2 class="section-title">Themed Cards</h2>
+      <p class="section-description">Flexible cards with headers, content, and footers</p>
+      
+      <div class="cards-grid">
+        <app-themed-card 
+          title="Basic Card"
+          subtitle="Simple card with title and subtitle"
+          [elevation]="1">
+          This is a basic themed card with minimal styling. It adapts to the current theme automatically.
+        </app-themed-card>
+
+        <app-themed-card 
+          title="Card with Icon"
+          subtitle="Includes header icon"
+          headerIcon="rocket"
+          headerColor="primary"
+          [elevation]="2">
+          This card has an icon in the header and medium elevation for better visibility.
+        </app-themed-card>
+
+        <app-themed-card 
+          title="Card with Footer"
+          subtitle="Complete card example"
+          headerIcon="star"
+          headerColor="warning"
+          footerText="Last updated: Today"
+          [elevation]="3">
+          This card demonstrates all available features including header, content, footer, and high elevation.
+        </app-themed-card>
+
+        <app-themed-card 
+          title="Clickable Card"
+          subtitle="Interactive card"
+          headerIcon="hand-left"
+          headerColor="success"
+          [clickable]="true"
+          [elevation]="1">
+          This card is clickable and will show hover effects when you mouse over it.
+        </app-themed-card>
+      </div>
+    </section>
+
+    <!-- Accordion Section -->
+    <section class="demo-section">
+      <h2 class="section-title">Themed Accordion</h2>
+      <p class="section-description">Expandable sections for organizing content</p>
+      
+      <div class="accordion-container">
+        <app-themed-accordion 
+          [items]="accordionItems"
+          [multiple]="false"
+          color="primary">
+        </app-themed-accordion>
+      </div>
+    </section>
+
+    <!-- Table Section -->
+    <section class="demo-section">
+      <h2 class="section-title">Themed Table with Pagination</h2>
+      <p class="section-description">Data table with sorting and pagination features</p>
+      
+      <app-themed-table
+        [columns]="tableColumns"
+        [data]="tableData"
+        [pagination]="tablePagination"
+        [loading]="tableLoading"
+        [striped]="true"
+        [hoverable]="true"
+        (pageChange)="onTablePageChange($event)"
+        (sortChange)="onTableSort($event)"
+        (rowClick)="onTableRowClick($event)">
+      </app-themed-table>
+    </section>
+
+    <!-- Code Examples Section -->
+    <section class="demo-section">
+      <app-themed-card 
+        title="How to Use These Components"
+        subtitle="Import and use in your pages"
+        headerIcon="code-slash"
+        headerColor="tertiary"
+        [elevation]="2">
+        
+        <h4>1. Import Components</h4>
+        <pre><code>import {{ '{' }}
+  ThemedButtonComponent,
+  ThemedCardComponent,
+  ThemedAccordionComponent,
+  ThemedTableComponent
+{{ '}' }} from './components/reusable';</code></pre>
+
+        <h4>2. Add to Component Imports</h4>
+        <pre><code>@Component({{ '{' }}
+  imports: [
+    ThemedButtonComponent,
+    ThemedCardComponent,
+    // ... other imports
+  ]
+{{ '}' }})</code></pre>
+
+        <h4>3. Use in Templates</h4>
+        <pre><code>&lt;app-themed-button color="primary"&gt;
+  Click Me
+&lt;/app-themed-button&gt;
+
+&lt;app-themed-card title="My Card"&gt;
+  Card content here
+&lt;/app-themed-card&gt;</code></pre>
+      </app-themed-card>
+    </section>
+
+  </div>
+</ion-content>

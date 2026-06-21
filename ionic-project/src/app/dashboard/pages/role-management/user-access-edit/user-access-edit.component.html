@@ -1,0 +1,340 @@
+<div class="edit-page" *ngIf="user">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <a routerLink="/dashboard/role-management" class="btn-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Back to Users
+      </a>
+      <div class="page-title-wrap">
+        <span class="page-badge">Access</span>
+        <h1 class="page-title">Edit User Access</h1>
+      </div>
+    </div>
+    <div class="header-actions">
+      <!-- Status Toggle -->
+      <button class="btn-status"
+              [class.btn-status-active]="user?.isActive"
+              [class.btn-status-inactive]="!user?.isActive"
+              (click)="toggleStatus()"
+              [title]="user?.isActive ? 'Click to disable user' : 'Click to enable user'">
+        <span class="status-led" [class.led-on]="user?.isActive"></span>
+        {{ user?.isActive ? 'Active' : 'Inactive' }}
+      </button>
+
+      <!-- Delete with inline confirm -->
+      <ng-container *ngIf="!deleteConfirm">
+        <button class="btn-danger-outline" (click)="requestDelete()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+          Delete
+        </button>
+      </ng-container>
+      <ng-container *ngIf="deleteConfirm">
+        <div class="confirm-bar">
+          <span class="confirm-text">Delete this user?</span>
+          <button class="btn-confirm-yes" (click)="executeDelete()">Yes, Delete</button>
+          <button class="btn-confirm-no"  (click)="cancelDelete()">Cancel</button>
+        </div>
+      </ng-container>
+
+      <button class="btn-revoke" (click)="revokeAll()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        Revoke All
+      </button>
+      <button class="btn-grant" (click)="grantAll()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Grant All
+      </button>
+
+      <!-- Clone Permission -->
+      <div class="clone-wrap">
+        <button class="btn-clone" [class.active]="cloneOpen" (click)="toggleClone()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Clone
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        <!-- Dropdown Panel -->
+        <div class="clone-dropdown" *ngIf="cloneOpen">
+
+          <!-- Role Templates -->
+          <div class="clone-section-label">Apply Role Template</div>
+          <button *ngFor="let t of roleTemplates"
+                  class="clone-option"
+                  [class]="'clone-option role-opt-' + t.role"
+                  (click)="applyTemplate(t.role)">
+            <span class="clone-role-icon">{{ t.icon }}</span>
+            <div class="clone-option-body">
+              <span class="clone-option-name">{{ t.label }}</span>
+              <span class="clone-option-desc">{{ t.desc }}</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 class="clone-arrow">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+
+          <!-- Clone from User -->
+          <div class="clone-divider"></div>
+          <div class="clone-section-label">Clone from User</div>
+          <select class="clone-user-select"
+                  [value]="cloneUserId"
+                  (change)="onCloneUserChange($event)">
+            <option value="">Select a user…</option>
+            <option *ngFor="let u of otherUsers" [value]="u.id">
+              {{ u.fullName }} · {{ u.role }}
+            </option>
+          </select>
+          <button class="btn-apply-clone"
+                  [disabled]="!cloneUserId"
+                  (click)="applyCloneFromUser()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy permissions{{ cloneUserId ? ' from ' + getCloneUserName() : '' }}
+          </button>
+        </div>
+
+        <!-- Backdrop to close -->
+        <div class="clone-backdrop" *ngIf="cloneOpen" (click)="closeClone()"></div>
+      </div>
+
+      <button class="btn-save" (click)="save()" [disabled]="isSaving">
+        <svg *ngIf="!isSaving && !saveSuccess" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+        </svg>
+        <svg *ngIf="saveSuccess" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span *ngIf="isSaving">Saving…</span>
+        <span *ngIf="!isSaving && !saveSuccess">Save Access</span>
+        <span *ngIf="saveSuccess">Saved!</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- User + Role Change + Progress -->
+  <div class="user-stats-row">
+
+    <!-- User Info -->
+    <div class="user-card">
+      <div class="user-avatar" [style.background]="getAvatarColor(user.fullName)">
+        {{ getInitials(user.fullName) }}
+      </div>
+      <div class="user-details">
+        <div class="user-name-row">
+          <span class="user-name">{{ user.fullName }}</span>
+          <span class="status-dot" [class.active]="user.isActive"></span>
+        </div>
+        <span class="user-email">{{ user.email }}</span>
+      </div>
+    </div>
+
+    <!-- Role Switcher -->
+    <div class="role-change-wrap">
+      <span class="role-change-label">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Change Role
+      </span>
+      <div class="role-pills">
+        <button *ngFor="let r of availableRoles"
+                class="role-pill"
+                [class]="'role-pill rp-' + r.value + (user.role === r.value ? ' rp-active' : '')"
+                [disabled]="isChangingRole"
+                (click)="changeRole(r.value)"
+                [title]="r.desc">
+          <span class="rp-icon">{{ r.icon }}</span>
+          <span class="rp-label">{{ r.label }}</span>
+          <svg *ngIf="user.role === r.value" class="rp-check"
+               width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="role-status">
+        <span class="role-saving" *ngIf="isChangingRole">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon">
+            <path d="M21 12a9 9 0 1 1-6.22-8.56"/>
+          </svg>
+          Updating role…
+        </span>
+        <span class="role-error" *ngIf="roleChangeError && !isChangingRole">{{ roleChangeError }}</span>
+      </div>
+    </div>
+
+    <div class="perm-counter">
+      <span class="counter-value">{{ getTotalGranted() }}</span>
+      <span class="counter-sep">/</span>
+      <span class="counter-total">{{ getTotalCount() }}</span>
+      <span class="counter-label">permissions granted</span>
+    </div>
+    <div class="perm-progress-wrap">
+      <div class="perm-progress">
+        <div class="perm-progress-fill"
+          [style.width]="(getTotalCount() > 0 ? (getTotalGranted() / getTotalCount() * 100) : 0) + '%'">
+        </div>
+      </div>
+      <span class="perm-pct">
+        {{ getTotalCount() > 0 ? (getTotalGranted() / getTotalCount() * 100 | number:'1.0-0') : 0 }}%
+      </span>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-success" *ngIf="saveSuccess">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    Access permissions saved for <strong>&nbsp;{{ user.fullName }}</strong>
+  </div>
+
+  <!-- Permission Tree -->
+  <div class="perm-tree">
+    <div *ngFor="let section of permissionTree"
+         class="section-block"
+         [style.border-left-color]="section.color">
+
+      <!-- Section Header -->
+      <div class="section-header" (click)="toggleSectionExpand(section)">
+        <div class="section-left">
+          <input type="checkbox" class="perm-checkbox"
+            [checked]="section.checked"
+            [appIndeterminate]="section.indeterminate"
+            (click)="$event.stopPropagation()"
+            (change)="onSectionToggle(section, $any($event.target).checked)">
+          <span class="section-icon">{{ section.icon }}</span>
+          <span class="section-label">{{ section.label }}</span>
+          <span class="section-page-count">{{ section.pages.length }} pages</span>
+        </div>
+        <div class="section-right">
+          <span class="section-perm-count"
+            [style.color]="getSectionGranted(section) > 0 ? section.color : '#9ca3af'">
+            {{ getSectionGranted(section) }} / {{ getSectionTotal(section) }}
+          </span>
+          <svg class="expand-icon" [class.rotated]="section.expanded"
+            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Pages -->
+      <div class="section-pages" *ngIf="section.expanded">
+        <div *ngFor="let page of section.pages" class="page-block">
+
+          <!-- Page Row (no route shown) -->
+          <div class="page-row" (click)="togglePageExpand(page)">
+            <div class="page-left">
+              <input type="checkbox" class="perm-checkbox"
+                [checked]="page.checked"
+                [appIndeterminate]="page.indeterminate"
+                (click)="$event.stopPropagation()"
+                (change)="onPageToggle(section, page, $any($event.target).checked)">
+              <svg class="page-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <line x1="3" y1="9" x2="21" y2="9"/>
+                <line x1="9" y1="21" x2="9" y2="9"/>
+              </svg>
+              <span class="page-label">{{ page.label }}</span>
+            </div>
+            <div class="page-right">
+              <span class="page-perm-count">{{ getPageGranted(page) }}/{{ page.ctas.length }}</span>
+              <svg class="expand-icon" [class.rotated]="page.expanded"
+                width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Permissions: two groups side by side -->
+          <div class="ctas-block" *ngIf="page.expanded">
+
+            <!-- Actions (CTA) group -->
+            <div class="perm-group" *ngIf="getCtas(page, 'cta').length > 0">
+              <div class="group-header">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+                Actions
+              </div>
+              <div class="perm-chips">
+                <div *ngFor="let item of getCtas(page, 'cta'); trackBy: trackByCta"
+                     class="perm-chip"
+                     [class.is-checked]="item.cta.checked"
+                     (click)="onCtaToggle(section, page, item.index, !item.cta.checked)">
+                  <span class="chip-indicator">
+                    <svg *ngIf="item.cta.checked" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </span>
+                  {{ item.cta.label }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Nested Routes group -->
+            <div class="perm-group route-group" *ngIf="getCtas(page, 'nested').length > 0">
+              <div class="group-header route-header">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                Nested Routes
+              </div>
+              <div class="perm-chips">
+                <div *ngFor="let item of getCtas(page, 'nested'); trackBy: trackByCta"
+                     class="perm-chip route-chip"
+                     [class.is-checked]="item.cta.checked"
+                     (click)="onCtaToggle(section, page, item.index, !item.cta.checked)">
+                  <span class="chip-indicator">
+                    <svg *ngIf="item.cta.checked" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </span>
+                  {{ item.cta.label }}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Save -->
+  <div class="bottom-bar">
+    <a routerLink="/dashboard/role-management" class="btn-cancel">Cancel</a>
+    <button class="btn-save-lg" (click)="save()" [disabled]="isSaving">
+      {{ isSaving ? 'Saving…' : 'Save Access Permissions' }}
+    </button>
+  </div>
+
+</div>
+
+<div class="not-found" *ngIf="!user">
+  <p>User not found.</p>
+  <a routerLink="/dashboard/role-management" class="btn-back">← Back to Users</a>
+</div>
