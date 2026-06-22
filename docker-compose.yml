@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: sindhu-api
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    ports:
+      - "127.0.0.1:3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - sindhu-net
+
+  web:
+    build:
+      context: .
+      dockerfile: ionic-project/Dockerfile
+    container_name: sindhu-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    networks:
+      - sindhu-net
+
+networks:
+  sindhu-net:
+    driver: bridge
