@@ -6,9 +6,28 @@ if [[ "$EUID" -ne 0 ]]; then
   exit 1
 fi
 
+cleanup_docker_repo_conflicts() {
+  local file
+
+  if [[ -f /etc/apt/sources.list ]]; then
+    sed -i '/download\.docker\.com\/linux\/ubuntu/d' /etc/apt/sources.list
+  fi
+
+  for file in /etc/apt/sources.list.d/*.list; do
+    [[ -e "$file" ]] || continue
+    sed -i '/download\.docker\.com\/linux\/ubuntu/d' "$file"
+    if [[ ! -s "$file" ]]; then
+      rm -f "$file"
+    fi
+  done
+
+  rm -f /etc/apt/keyrings/docker.asc
+}
+
 if command -v docker >/dev/null 2>&1; then
   echo "Docker is already installed"
 else
+  cleanup_docker_repo_conflicts
   apt update
   apt install -y ca-certificates curl gnupg
   install -m 0755 -d /etc/apt/keyrings
