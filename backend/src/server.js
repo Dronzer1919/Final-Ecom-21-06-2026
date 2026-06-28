@@ -48,6 +48,11 @@ app.get('/', (req, res) => {
   });
 });
 
+// Lightweight health check reachable behind the reverse proxy at /api/health
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // API Routes
 const authRoutes = require('./routes/auth.routes');
 app.use('/api/auth', authRoutes);

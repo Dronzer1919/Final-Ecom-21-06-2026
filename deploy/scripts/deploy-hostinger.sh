@@ -3,8 +3,8 @@ set -euo pipefail
 
 APP_ROOT="${APP_ROOT:-/var/www/routeretail}"
 BRANCH="${BRANCH:-dev}"
-FRONTEND_HEALTH_URL="${FRONTEND_HEALTH_URL:-https://app.routeretail.com}"
-API_HEALTH_URL="${API_HEALTH_URL:-https://api.routeretail.com}"
+FRONTEND_HEALTH_URL="${FRONTEND_HEALTH_URL:-https://routeretail.com}"
+API_HEALTH_URL="${API_HEALTH_URL:-https://routeretail.com/api/health}"
 
 log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
@@ -53,9 +53,19 @@ main() {
   log "Validating container status"
   docker compose ps
 
-  log "Reloading host nginx"
-  sudo nginx -t
-  sudo systemctl reload nginx
+  # Reload host nginx best-effort. The reverse-proxy config is static across
+  # deploys, so a failure here (e.g. no passwordless sudo for the deploy user)
+  # must not fail the deployment.
+  if sudo -n true 2>/dev/null; then
+    log "Reloading host nginx"
+    if sudo nginx -t; then
+      sudo systemctl reload nginx
+    else
+      log "WARNING: nginx config test failed; skipping reload"
+    fi
+  else
+    log "Skipping nginx reload (no non-interactive sudo available)"
+  fi
 
   log "Running endpoint checks"
   health_check "$API_HEALTH_URL" "API"

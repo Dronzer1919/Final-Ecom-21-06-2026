@@ -1,0 +1,5 @@
+# Ensure shell scripts always use LF endings so they run on the Linux VPS.
+*.sh text eol=lf
+
+# Normalize text files; let Git decide line endings otherwise.
+* text=auto

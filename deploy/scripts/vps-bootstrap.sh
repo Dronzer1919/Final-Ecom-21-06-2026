@@ -68,7 +68,9 @@ systemctl enable fail2ban
 systemctl restart fail2ban
 
 SSH_CONFIG="/etc/ssh/sshd_config"
-sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin no/' "$SSH_CONFIG"
+# Allow key-based root login (the GitHub Actions deploy logs in as root with a
+# key) while still blocking password-based root login.
+sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin prohibit-password/' "$SSH_CONFIG"
 sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' "$SSH_CONFIG"
 sed -i 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/' "$SSH_CONFIG"
 systemctl restart ssh

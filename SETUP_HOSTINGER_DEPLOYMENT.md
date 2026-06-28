@@ -1,125 +1,102 @@
-# 🚀 Quick Hostinger VPS Deployment Guide
+# 🚀 Hostinger VPS Deployment Guide — routeretail.com
 
-This guide will help you deploy your Ionic E-commerce app to Hostinger VPS with automatic deployment on `dev` branch pushes.
+Deploy the Ionic e-commerce app to a Hostinger VPS with Docker and **automatic
+deployment on every push to the `dev` branch**.
 
-## 📋 Prerequisites
+## Architecture (single domain + /api)
 
-1. **Hostinger VPS** with Ubuntu (recommended 24.04 LTS)
-2. **Domain names** pointed to your VPS IP (e.g., app.yourdomain.com, api.yourdomain.com)
-3. **GitHub repository** with admin access to add secrets
-4. **SSH access** to your VPS
+```
+                          https://routeretail.com
+                                   │
+                        ┌──────────┴───────────┐  host nginx (reverse proxy + SSL)
+                        │                      │
+                 location /            location /api/
+                        │                      │
+              web container (8080)     api container (3000)
+              Ionic SPA (nginx)        Node/Express  ──►  MongoDB (host, 27017)
+```
+
+- Frontend: `https://routeretail.com`
+- Backend API: `https://routeretail.com/api`
+- One SSL certificate covers `routeretail.com` + `www.routeretail.com`.
+
+The auto-deploy flow: **push to `dev` → GitHub Actions SSHes into the VPS →
+`deploy/scripts/deploy-hostinger.sh` pulls code, rebuilds the Docker images,
+restarts containers, reloads nginx, and runs health checks.**
 
 ---
 
-## 🔧 Step 1: Setup GitHub Repository Secrets
+## Step 1 — GitHub repository secrets
 
-Go to your GitHub repository: `https://github.com/Dronzer1919/Final-Ecom-21-06-2026`
+Repo → **Settings → Secrets and variables → Actions → New repository secret**.
+Add these 4 secrets (used by `.github/workflows/deploy-dev.yml`):
 
-Navigate to: **Settings → Secrets and variables → Actions → New repository secret**
-
-Add these 4 secrets:
-
-| Secret Name | Value | Description |
-|------------|-------|-------------|
-| `VPS_HOST` | Your VPS IP address | e.g., `123.45.67.89` |
-| `VPS_USERNAME` | Your VPS username | e.g., `root` or your user |
-| `VPS_SSH_KEY` | Your private SSH key | Entire content of your `~/.ssh/id_rsa` |
-| `VPS_APP_DIR` | `/var/www/routeretail` | App directory on VPS |
-
-### How to get your SSH Key:
-
-On your local machine:
-```bash
-cat ~/.ssh/id_rsa
-```
-
-Copy the entire output (including `-----BEGIN` and `-----END` lines) and paste it as the value for `VPS_SSH_KEY`.
+| Secret | Value |
+|--------|-------|
+| `VPS_HOST` | Your VPS IP, e.g. `123.45.67.89` |
+| `VPS_USERNAME` | SSH user, e.g. `deploy` (or `root`) |
+| `VPS_SSH_KEY` | The **private** key whose public key is on the VPS (full `-----BEGIN...END-----`, no passphrase) |
+| `VPS_APP_DIR` | `/var/www/routeretail` |
 
 ---
 
-## 🖥️ Step 2: Initial VPS Setup
+## Step 2 — Point DNS at the VPS
 
-SSH into your Hostinger VPS:
+In the Hostinger DNS panel for `routeretail.com`, add two **A** records:
+
+| Type | Name | Value |
+|------|------|-------|
+| A | `@`   | YOUR_VPS_IP |
+| A | `www` | YOUR_VPS_IP |
+
+Wait for propagation, then verify: `nslookup routeretail.com` should return your VPS IP.
+
+---
+
+## Step 3 — One-time VPS setup
+
+SSH in (`ssh root@YOUR_VPS_IP`) and run:
 
 ```bash
-ssh root@YOUR_VPS_IP
-```
-
-### 2.1 Clone Your Repository
-
-```bash
-# Create directory
+# Clone the repo into the app directory
 sudo mkdir -p /var/www/routeretail
-sudo chown -R $USER:$USER /var/www/routeretail
-
-# Clone repository
+sudo chown -R "$USER":"$USER" /var/www/routeretail
 cd /var/www/routeretail
-git clone https://github.com/Dronzer1919/Final-Ecom-21-06-2026.git .
+git clone <YOUR_REPO_URL> .
 git checkout dev
-
-# Make scripts executable
 chmod +x deploy/scripts/*.sh
-```
 
-### 2.2 Run Bootstrap Script
-
-This installs Docker, MongoDB, Nginx, SSL tools, and security:
-
-```bash
+# Install Docker, Nginx, firewall, fail2ban, certbot, and a 'deploy' user
 sudo bash deploy/scripts/vps-bootstrap.sh
+
+# Install MongoDB locally (the api container reaches it via host.docker.internal)
 sudo bash deploy/scripts/install-mongodb-local.sh
 ```
 
-**What this does:**
-- ✅ Installs Docker and Docker Compose
-- ✅ Installs MongoDB locally
-- ✅ Installs Nginx as reverse proxy
-- ✅ Sets up firewall (UFW) for ports 22, 80, 443
-- ✅ Installs fail2ban for security
-- ✅ Installs Certbot for SSL certificates
+> After bootstrap, log out and back in (or `newgrp docker`) so the `deploy`
+> user picks up docker-group permissions. If you set `VPS_USERNAME=deploy`,
+> make sure that user's `authorized_keys` contains the public key for `VPS_SSH_KEY`.
 
----
-
-## 🗄️ Step 3: Configure MongoDB
-
-### 3.1 Create MongoDB Admin User
+### Create MongoDB users
 
 ```bash
 mongosh
 ```
-
-In the MongoDB shell:
-
 ```javascript
 use admin
-db.createUser({
-  user: "mongoAdmin",
-  pwd: "YOUR_STRONG_ADMIN_PASSWORD",
-  roles: [
-    { role: "userAdminAnyDatabase", db: "admin" },
-    { role: "readWriteAnyDatabase", db: "admin" }
-  ]
-})
-```
+db.createUser({ user: "mongoAdmin", pwd: "STRONG_ADMIN_PW",
+  roles: [{ role: "userAdminAnyDatabase", db: "admin" },
+          { role: "readWriteAnyDatabase", db: "admin" }] })
 
-### 3.2 Create Application Database User
-
-```javascript
 use ecommerce
-db.createUser({
-  user: "ecomUser",
-  pwd: "YOUR_STRONG_DB_PASSWORD",
-  roles: [{ role: "readWrite", db: "ecommerce" }]
-})
-
+db.createUser({ user: "ecomUser", pwd: "STRONG_DB_PW",
+  roles: [{ role: "readWrite", db: "ecommerce" }] })
 exit
 ```
 
-**💡 Remember these credentials - you'll need them in the next step!**
-
 ---
 
-## ⚙️ Step 4: Configure Backend Environment
+## Step 4 — Backend environment file
 
 ```bash
 cd /var/www/routeretail/backend
@@ -127,288 +104,86 @@ cp .env.production.example .env
 nano .env
 ```
 
-Update the following values in the `.env` file:
+Set at minimum:
 
 ```env
 NODE_ENV=production
 PORT=3000
-
-# IMPORTANT: Replace with MongoDB credentials from Step 3.2
-MONGODB_URI=mongodb://ecomUser:YOUR_STRONG_DB_PASSWORD@host.docker.internal:27017/ecommerce?authSource=ecommerce
-
-# Generate random secrets (see below)
-JWT_SECRET=your_super_secure_random_jwt_secret_key_minimum_32_characters
-JWT_REFRESH_SECRET=your_super_secure_random_refresh_secret_key_minimum_32_characters
-JWT_EXPIRE=1d
-JWT_REFRESH_EXPIRE=7d
-
-# Generate random encryption keys (see below)
-ENCRYPTION_KEY=your_32_character_encryption_key
-ENCRYPTION_IV=your_16_char_iv
-
-# Replace with your actual domains
-CORS_ORIGINS=https://app.yourdomain.com,https://yourdomain.com,https://www.yourdomain.com
+MONGODB_URI=mongodb://ecomUser:STRONG_DB_PW@host.docker.internal:27017/ecommerce?authSource=ecommerce
+CORS_ORIGINS=https://routeretail.com,https://www.routeretail.com
+JWT_SECRET=...            # openssl rand -base64 48
+JWT_REFRESH_SECRET=...    # openssl rand -base64 48
+ENCRYPTION_KEY=...        # 32 chars
+ENCRYPTION_IV=...         # 16 chars
 ```
 
-### Generate Secure Random Keys
-
-On your VPS, run these commands to generate secure keys:
-
-```bash
-# JWT Secret (64 characters)
-openssl rand -base64 48
-
-# JWT Refresh Secret (64 characters)
-openssl rand -base64 48
-
-# Encryption Key (32 characters)
-openssl rand -base64 24
-
-# Encryption IV (16 characters)
-openssl rand -base64 12
-```
-
-Copy the output and paste into your `.env` file. Press `Ctrl+X`, then `Y`, then `Enter` to save.
+`backend/.env` is git-ignored and never baked into the image — it lives only on the VPS.
 
 ---
 
-## 🌐 Step 5: Configure Nginx Reverse Proxy
-
-### 5.1 Setup Nginx Configuration
+## Step 5 — Host Nginx reverse proxy
 
 ```bash
-sudo cp /var/www/routeretail/deploy/nginx/routeretail.hostinger.conf /etc/nginx/sites-available/routeretail
-sudo ln -s /etc/nginx/sites-available/routeretail /etc/nginx/sites-enabled/routeretail
+sudo cp /var/www/routeretail/deploy/nginx/routeretail.hostinger.conf \
+        /etc/nginx/sites-available/routeretail
+sudo ln -sf /etc/nginx/sites-available/routeretail /etc/nginx/sites-enabled/routeretail
 sudo rm -f /etc/nginx/sites-enabled/default
-```
-
-### 5.2 Test and Reload Nginx
-
-```bash
-sudo nginx -t
-sudo systemctl reload nginx
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
 ---
 
-## 🔐 Step 6: Configure DNS and SSL
-
-### 6.1 Set DNS Records in Hostinger
-
-In your Hostinger control panel, add these A records:
-
-| Type | Name | Value |
-|------|------|-------|
-| A | app | YOUR_VPS_IP |
-| A | api | YOUR_VPS_IP |
-
-Wait 5-10 minutes for DNS propagation.
-
-### 6.2 Check DNS Propagation
+## Step 6 — First Docker build + SSL
 
 ```bash
-nslookup app.yourdomain.com
-nslookup api.yourdomain.com
-```
+cd /var/www/routeretail
+docker compose up -d --build
+docker compose ps        # both sindhu-api and sindhu-web should be Up
 
-Both should show your VPS IP.
-
-### 6.3 Install SSL Certificates
-
-**Replace `yourdomain.com` with your actual domain:**
-
-```bash
-sudo certbot --nginx -d app.yourdomain.com -d api.yourdomain.com --non-interactive --agree-tos -m your-email@example.com
-```
-
-### 6.4 Test Auto-Renewal
-
-```bash
+# Issue the certificate (also rewrites the nginx config for HTTPS + redirect)
+sudo certbot --nginx -d routeretail.com -d www.routeretail.com \
+  --non-interactive --agree-tos -m rushimore302@gmail.com
 sudo certbot renew --dry-run
 ```
 
----
-
-## 🐳 Step 7: First Docker Deployment
-
-Build and start your containers:
+Verify:
 
 ```bash
-cd /var/www/routeretail
-docker compose up -d --build
+curl -i https://routeretail.com/api/health   # -> {"success":true,"status":"ok",...}
 ```
-
-### Check Container Status
-
-```bash
-docker compose ps
-docker compose logs api
-docker compose logs web
-```
-
-You should see both containers running.
+Open `https://routeretail.com` in a browser — the app should load.
 
 ---
 
-## ✅ Step 8: Verify Deployment
+## Step 7 — Test automatic deployment
 
-### 8.1 Check API Health
-
-```bash
-curl -i https://api.yourdomain.com
-```
-
-You should see a response from your backend.
-
-### 8.2 Check Frontend
-
-Open your browser and visit:
-- `https://app.yourdomain.com` - Your Ionic app should load
-
----
-
-## 🔄 Step 9: Test Automatic Deployment
-
-Now that everything is set up, test the automatic deployment:
-
-### 9.1 Make a Change and Push
-
-On your local machine:
+From your machine:
 
 ```bash
-cd "c:\Users\MSI Brand\OneDrive\Desktop\ionic-ecom - Copy"
 git checkout dev
-
-# Make a small test change
-echo "# Deployment test" >> README.md
-
-# Commit and push
-git add .
-git commit -m "Test automatic deployment"
+git commit --allow-empty -m "Test auto deploy"
 git push origin dev
 ```
 
-### 9.2 Watch GitHub Actions
+Watch **GitHub → Actions → "Deploy Dev to Hostinger Docker"**. On success the VPS
+has rebuilt and your changes are live.
 
-1. Go to: `https://github.com/Dronzer1919/Final-Ecom-21-06-2026/actions`
-2. You should see a new workflow running: "Deploy Dev to Hostinger Docker"
-3. Click on it to see the progress
+---
 
-### 9.3 Check VPS Logs
-
-On your VPS, you can watch the deployment in real-time:
+## Everyday commands (on the VPS)
 
 ```bash
 cd /var/www/routeretail
-docker compose logs -f
+docker compose ps
+docker compose logs -f api          # or: web
+docker compose up -d --build        # manual redeploy
+sudo tail -f /var/log/nginx/routeretail_error.log
+sudo bash deploy/scripts/backup-mongodb.sh
 ```
 
-Press `Ctrl+C` to exit.
+## Troubleshooting
 
----
-
-## 🎉 SUCCESS!
-
-Your automatic deployment is now configured! Every time you push to the `dev` branch:
-
-1. ✅ GitHub Actions detects the push
-2. ✅ Connects to your VPS via SSH
-3. ✅ Pulls latest code
-4. ✅ Rebuilds Docker containers
-5. ✅ Restarts services
-6. ✅ Verifies deployment health
-7. ✅ Your website is live with latest changes!
-
----
-
-## 🛠️ Useful Commands
-
-### View Container Logs
-```bash
-docker compose logs api --tail 100
-docker compose logs web --tail 100
-```
-
-### Restart Containers
-```bash
-docker compose restart
-```
-
-### Rebuild Containers
-```bash
-docker compose down
-docker compose up -d --build
-```
-
-### Check Nginx Logs
-```bash
-sudo tail -f /var/log/nginx/routeretail_app_error.log
-sudo tail -f /var/log/nginx/routeretail_api_error.log
-```
-
-### MongoDB Backup
-```bash
-sudo bash /var/www/routeretail/deploy/scripts/backup-mongodb.sh
-```
-
----
-
-## 🚨 Troubleshooting
-
-### Deployment fails with SSH error
-- Verify GitHub secrets are correct
-- Check SSH key has no passphrase
-- Ensure VPS firewall allows port 22
-
-### Containers won't start
-- Check `.env` file exists in `backend/`
-- Verify MongoDB credentials are correct
-- Check logs: `docker compose logs`
-
-### Site not accessible
-- Verify DNS records point to VPS IP
-- Check Nginx is running: `sudo systemctl status nginx`
-- Test SSL: `sudo certbot certificates`
-
-### Database connection errors
-- Verify MongoDB is running: `sudo systemctl status mongod`
-- Check MongoDB credentials in `backend/.env`
-- Test connection: `mongosh -u ecomUser -p`
-
----
-
-## 📞 Need Help?
-
-If you encounter issues, check:
-1. GitHub Actions logs
-2. Docker container logs: `docker compose logs`
-3. Nginx error logs: `sudo tail -f /var/log/nginx/error.log`
-4. MongoDB logs: `sudo journalctl -u mongod -f`
-
----
-
-## 🔄 Regular Maintenance
-
-### Update System Packages
-```bash
-sudo apt update && sudo apt upgrade -y
-```
-
-### Clean Docker Resources
-```bash
-docker system prune -a --volumes
-```
-
-### Monitor Disk Space
-```bash
-df -h
-```
-
-### Check Security Updates
-```bash
-sudo unattended-upgrades --dry-run
-```
-
----
-
-**🎊 Congratulations! Your app is now live and will auto-deploy on every push to `dev` branch!**
+- **Actions SSH fails** → check the 4 secrets; key must have no passphrase; port 22 open (UFW allows it).
+- **Containers won't start** → `backend/.env` missing or bad `MONGODB_URI`; see `docker compose logs`.
+- **502 from /api** → api container down, or Mongo auth wrong (`host.docker.internal` requires the `extra_hosts` mapping already in `docker-compose.yml`).
+- **Frontend loads but API calls fail** → confirm `environment.prod.ts` `apiUrl` is `https://routeretail.com/api` and `CORS_ORIGINS` matches the site URL.

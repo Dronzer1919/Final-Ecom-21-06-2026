@@ -1,131 +1,106 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# One-shot VPS setup for RouteRetail Docker deployment.
-# Run this on VPS after cloning repo:
-#   chmod +x deploy/scripts/run-vps-docker-setup.sh
+# One-shot VPS setup for routeretail.com (single domain + /api, Dockerized Mongo).
+# Run from the cloned project root as root:
+#   cd /var/www/routeretail
 #   bash deploy/scripts/run-vps-docker-setup.sh
+#
+# Optional overrides:
+#   SKIP_CERTBOT=1   -> skip SSL issuance (use if DNS hasn't propagated yet)
 
 APP_ROOT="${APP_ROOT:-$PWD}"
-APP_DOMAIN="${APP_DOMAIN:-app.routeretail.com}"
-API_DOMAIN="${API_DOMAIN:-api.routeretail.com}"
-CERTBOT_EMAIL="${CERTBOT_EMAIL:-admin@routeretail.com}"
-
-# Set SKIP_CERTBOT=1 if DNS is not ready yet.
+DOMAIN="${DOMAIN:-routeretail.com}"
+WWW_DOMAIN="${WWW_DOMAIN:-www.routeretail.com}"
+CERTBOT_EMAIL="${CERTBOT_EMAIL:-rushimore302@gmail.com}"
 SKIP_CERTBOT="${SKIP_CERTBOT:-0}"
 
-# Set MONGO_URI only if you want to override automatic default.
-MONGO_URI="${MONGO_URI:-}"
-
-log() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
-}
-
-warn() {
-  echo "[WARN] $*"
-}
-
-require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || {
-    echo "[ERROR] Missing command: $1" >&2
-    exit 1
-  }
-}
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"; }
+warn() { echo "[WARN] $*"; }
 
 ensure_env_value() {
-  local key="$1"
-  local value="$2"
-  local file="$3"
-
+  local key="$1" value="$2" file="$3"
   if grep -q "^${key}=" "$file"; then
     sed -i "s|^${key}=.*|${key}=${value}|" "$file"
   else
-    printf "\n%s=%s\n" "$key" "$value" >> "$file"
+    printf "%s=%s\n" "$key" "$value" >> "$file"
   fi
 }
 
 main() {
-  log "Starting RouteRetail VPS setup at: $APP_ROOT"
-
-  require_cmd bash
-  require_cmd sudo
-  require_cmd grep
-  require_cmd sed
-  require_cmd git
-
-  if [[ ! -f "$APP_ROOT/docker-compose.yml" ]]; then
-    echo "[ERROR] docker-compose.yml not found in $APP_ROOT" >&2
-    echo "Run this from your cloned project root." >&2
+  if [[ "$EUID" -ne 0 ]]; then
+    echo "[ERROR] Run as root: bash deploy/scripts/run-vps-docker-setup.sh" >&2
     exit 1
   fi
 
-  log "Step 1/9: Installing Docker (if missing)"
-  sudo bash "$APP_ROOT/deploy/scripts/install-docker-hostinger.sh"
+  if [[ ! -f "$APP_ROOT/docker-compose.yml" ]]; then
+    echo "[ERROR] docker-compose.yml not found in $APP_ROOT. Run from the project root." >&2
+    exit 1
+  fi
 
-  log "Step 2/9: Applying base VPS hardening and packages"
-  sudo bash "$APP_ROOT/deploy/scripts/vps-bootstrap.sh"
+  log "Step 1/6: Installing Docker"
+  bash "$APP_ROOT/deploy/scripts/install-docker-hostinger.sh"
 
-  log "Step 3/9: Installing/ensuring MongoDB local service"
-  sudo bash "$APP_ROOT/deploy/scripts/install-mongodb-local.sh"
+  log "Step 2/6: Base VPS hardening (nginx, firewall, fail2ban, certbot)"
+  bash "$APP_ROOT/deploy/scripts/vps-bootstrap.sh"
 
-  log "Step 4/9: Preparing backend environment file"
+  log "Step 3/6: Generating backend/.env (secrets auto-generated, kept only on this VPS)"
   if [[ ! -f "$APP_ROOT/backend/.env" ]]; then
     cp "$APP_ROOT/backend/.env.production.example" "$APP_ROOT/backend/.env"
   fi
-
-  if [[ -z "$MONGO_URI" ]]; then
-    MONGO_URI="mongodb://host.docker.internal:27017/ecommerce"
-  fi
-
   ensure_env_value "NODE_ENV" "production" "$APP_ROOT/backend/.env"
   ensure_env_value "PORT" "3000" "$APP_ROOT/backend/.env"
-  ensure_env_value "MONGODB_URI" "$MONGO_URI" "$APP_ROOT/backend/.env"
-  ensure_env_value "CORS_ORIGINS" "https://$APP_DOMAIN,https://$API_DOMAIN,https://routeretail.com,https://www.routeretail.com" "$APP_ROOT/backend/.env"
+  ensure_env_value "MONGODB_URI" "mongodb://mongo:27017/ecommerce" "$APP_ROOT/backend/.env"
+  ensure_env_value "CORS_ORIGINS" "https://${DOMAIN},https://${WWW_DOMAIN}" "$APP_ROOT/backend/.env"
 
-  if grep -q "PUT_YOUR_MONGODB_URI_HERE" "$APP_ROOT/backend/.env"; then
-    echo "[ERROR] backend/.env still has placeholder Mongo URI" >&2
-    exit 1
+  # Generate strong secrets only if they are still placeholders / empty.
+  if grep -qE "^JWT_SECRET=(your_|$)" "$APP_ROOT/backend/.env"; then
+    ensure_env_value "JWT_SECRET" "$(openssl rand -base64 48 | tr -d '\n')" "$APP_ROOT/backend/.env"
   fi
+  if grep -qE "^JWT_REFRESH_SECRET=(your_|$)" "$APP_ROOT/backend/.env"; then
+    ensure_env_value "JWT_REFRESH_SECRET" "$(openssl rand -base64 48 | tr -d '\n')" "$APP_ROOT/backend/.env"
+  fi
+  if grep -qE "^ENCRYPTION_KEY=(your_|$)" "$APP_ROOT/backend/.env"; then
+    ensure_env_value "ENCRYPTION_KEY" "$(openssl rand -hex 16)" "$APP_ROOT/backend/.env"   # 32 chars
+  fi
+  if grep -qE "^ENCRYPTION_IV=(your_|$)" "$APP_ROOT/backend/.env"; then
+    ensure_env_value "ENCRYPTION_IV" "$(openssl rand -hex 8)" "$APP_ROOT/backend/.env"      # 16 chars
+  fi
+  chmod 600 "$APP_ROOT/backend/.env"
 
-  log "Step 5/9: Configuring host Nginx reverse proxy"
-  sudo cp "$APP_ROOT/deploy/nginx/routeretail.hostinger.conf" /etc/nginx/sites-available/routeretail
-  sudo ln -s /etc/nginx/sites-available/routeretail /etc/nginx/sites-enabled/routeretail 2>/dev/null || true
-  sudo rm -f /etc/nginx/sites-enabled/default
-  sudo nginx -t
-  sudo systemctl reload nginx
+  log "Step 4/6: Configuring host Nginx reverse proxy"
+  cp "$APP_ROOT/deploy/nginx/routeretail.hostinger.conf" /etc/nginx/sites-available/routeretail
+  ln -sf /etc/nginx/sites-available/routeretail /etc/nginx/sites-enabled/routeretail
+  rm -f /etc/nginx/sites-enabled/default
+  nginx -t
+  systemctl reload nginx
 
-  log "Step 6/9: Building and starting Docker services"
+  log "Step 5/6: Building and starting containers (mongo + api + web)"
   cd "$APP_ROOT"
   docker compose down || true
   docker compose up -d --build
-
-  log "Step 7/9: Service status and logs"
   docker compose ps
-  docker compose logs --tail 80 api || true
-  docker compose logs --tail 40 web || true
-
-  log "Step 8/9: Setting up daily MongoDB backups"
-  sudo bash "$APP_ROOT/deploy/scripts/setup-cron-backup.sh"
 
   if [[ "$SKIP_CERTBOT" == "1" ]]; then
-    warn "Skipping certbot because SKIP_CERTBOT=1"
-    warn "Run later: sudo certbot --nginx -d $APP_DOMAIN -d $API_DOMAIN"
+    warn "Skipping certbot (SKIP_CERTBOT=1). Issue SSL later with:"
+    warn "  certbot --nginx -d ${DOMAIN} -d ${WWW_DOMAIN} --agree-tos -m ${CERTBOT_EMAIL}"
   else
-    log "Step 9/9: Issuing SSL certificates"
-    sudo certbot --nginx -d "$APP_DOMAIN" -d "$API_DOMAIN" --non-interactive --agree-tos -m "$CERTBOT_EMAIL" || {
-      warn "Certbot failed. Usually DNS not propagated yet. Re-run later:"
-      warn "sudo certbot --nginx -d $APP_DOMAIN -d $API_DOMAIN"
-    }
-    sudo certbot renew --dry-run || true
+    log "Step 6/6: Issuing SSL certificate for ${DOMAIN} + ${WWW_DOMAIN}"
+    if certbot --nginx -d "${DOMAIN}" -d "${WWW_DOMAIN}" \
+         --non-interactive --agree-tos -m "${CERTBOT_EMAIL}" --redirect; then
+      certbot renew --dry-run || true
+    else
+      warn "Certbot failed (usually DNS not propagated yet). Re-run later:"
+      warn "  certbot --nginx -d ${DOMAIN} -d ${WWW_DOMAIN} --agree-tos -m ${CERTBOT_EMAIL} --redirect"
+    fi
   fi
 
-  log "Setup completed"
+  log "Setup complete."
   echo
-  echo "Next checks:"
+  echo "Verify:"
   echo "  docker compose ps"
-  echo "  sudo nginx -t"
-  echo "  curl -I https://$APP_DOMAIN"
-  echo "  curl -I https://$API_DOMAIN"
+  echo "  curl -i https://${DOMAIN}/api/health"
+  echo "  open https://${DOMAIN} in a browser"
 }
 
 main

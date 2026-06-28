@@ -1,4 +1,20 @@
 services:
+  mongo:
+    image: mongo:7
+    container_name: sindhu-mongo
+    restart: unless-stopped
+    command: ["--bind_ip_all"]
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - sindhu-net
+
   api:
     build:
       context: .
@@ -9,8 +25,9 @@ services:
       - backend/.env
     ports:
       - "127.0.0.1:3000:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      mongo:
+        condition: service_healthy
     networks:
       - sindhu-net
 
@@ -28,3 +45,6 @@ services:
 networks:
   sindhu-net:
     driver: bridge
+
+volumes:
+  mongo-data:
