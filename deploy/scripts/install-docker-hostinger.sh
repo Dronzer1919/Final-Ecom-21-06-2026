@@ -10,18 +10,21 @@ cleanup_docker_repo_conflicts() {
   local file
 
   if [[ -f /etc/apt/sources.list ]]; then
-    sed -i '/download\.docker\.com\/linux\/ubuntu/d' /etc/apt/sources.list
+    sed -i '/download\.docker\.com/d' /etc/apt/sources.list
   fi
 
-  for file in /etc/apt/sources.list.d/*.list; do
+  # Remove any sources.list.d entry referencing Docker, whether it's a classic
+  # .list file or a deb822 .sources file (Hostinger images ship the latter).
+  for file in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
     [[ -e "$file" ]] || continue
-    sed -i '/download\.docker\.com\/linux\/ubuntu/d' "$file"
-    if [[ ! -s "$file" ]]; then
+    if grep -q 'download\.docker\.com' "$file"; then
       rm -f "$file"
     fi
   done
 
-  rm -f /etc/apt/keyrings/docker.asc
+  # Drop existing Docker keyrings so we re-add a single consistent one
+  # (also avoids the interactive "Overwrite? (y/N)" gpg prompt).
+  rm -f /etc/apt/keyrings/docker.asc /etc/apt/keyrings/docker.gpg
 }
 
 if command -v docker >/dev/null 2>&1; then
@@ -31,7 +34,7 @@ else
   apt update
   apt install -y ca-certificates curl gnupg
   install -m 0755 -d /etc/apt/keyrings
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
   chmod a+r /etc/apt/keyrings/docker.gpg
 
   . /etc/os-release
