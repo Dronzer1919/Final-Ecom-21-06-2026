@@ -13,7 +13,6 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: secrets.VPS_HOST != '' && secrets.VPS_USERNAME != '' && secrets.VPS_SSH_KEY != '' && secrets.VPS_APP_DIR != ''
     steps:
       - name: Deploy over SSH using Docker Compose
         uses: appleboy/ssh-action@v1.2.0
