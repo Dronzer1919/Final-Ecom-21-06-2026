@@ -17,13 +17,15 @@
       align-items: center;
       justify-content: space-between;
       gap: 2rem;
-      padding-inline: 1.5rem;
+      padding-left: 1.5rem;
+      padding-right: 2.5rem;
     }
 
     .brand-name {
       font-size: 1.5rem;
       font-weight: 700;
       color: $primary-color;
+      cursor: pointer;
     }
 
     .header-center {
@@ -228,7 +230,8 @@
     padding: 0;
 
     .container {
-      padding-inline: 1.5rem;
+      padding-left: 1.5rem;
+      padding-right: 2.5rem;
     }
 
     .nav-menu {
@@ -257,6 +260,16 @@
           right: 0;
           height: 3px;
           background: rgba(255,255,255,0.9);
+        }
+
+        &.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          pointer-events: auto;
+
+          &:hover {
+            opacity: 0.5;
+          }
         }
       }
     }

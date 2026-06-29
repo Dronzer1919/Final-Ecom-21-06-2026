@@ -155,7 +155,7 @@ export class CheckoutComponent implements OnInit {
       key: environment.razorpayKeyId,
       amount: Math.round(this.total * 100), // Amount in paise
       currency: 'INR',
-      name: 'United Goals',
+      name: 'RouteRetail',
       description: 'Order Payment',
       order_id: orderData.razorpayOrderId,
       handler: (response: any) => {
