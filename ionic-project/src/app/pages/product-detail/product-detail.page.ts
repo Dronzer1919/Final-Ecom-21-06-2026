@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService, Product } from '../../services/product';
-import { CartService } from '../../services/cart';
+import { CartService } from '../../services/cart.service';
 import { WishlistService } from '../../services/wishlist';
 import { ToastService } from '../../services/toast.service';
 import { finalize } from 'rxjs/operators';
@@ -105,7 +105,15 @@ export class ProductDetailPage implements OnInit {
 
   addToCart(): void {
     if (!this.product) return;
-    for (let i = 0; i < this.quantity; i++) this.cartService.addToCart(this.product);
+    this.cartService.addToCart({
+      productId: this.product._id || this.product.id || '',
+      name: this.product.name,
+      price: this.product.price,
+      image: (this.product.images && this.product.images[0]) || '',
+      discountValue: this.product.discountValue,
+      discountType: this.product.discountType,
+      quantity: this.quantity
+    });
     this.toastService.success(`${this.quantity} item(s) added to cart!`);
   }
 
@@ -135,7 +143,7 @@ export class ProductDetailPage implements OnInit {
       : (this.product.category as any)?.name || '';
   }
 
-  get cartItemCount(): number { return this.cartService.cartCount(); }
+  get cartItemCount(): number { return this.cartService.itemCount(); }
   get wishlistCount(): number { return this.wishlistService.wishlistCount(); }
 
   viewCart(): void { this.router.navigate(['/cart']); }

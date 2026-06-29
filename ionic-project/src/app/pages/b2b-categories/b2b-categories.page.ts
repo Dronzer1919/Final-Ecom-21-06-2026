@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
-import { AppHeaderComponent } from '../../components/app-header/app-header.component';
+import { HeaderComponent } from '../../components/header/header.component';
 import { B2BSectionsGridComponent, SectionItem } from './components/b2b-sections-grid/b2b-sections-grid.component';
 import { B2BSubcategoriesGridComponent, SubcategoryItem } from './components/b2b-subcategories-grid/b2b-subcategories-grid.component';
 import { B2BSubSubCategoriesGridComponent, SubSubCategoryItem } from './components/b2b-subsubcategories-grid/b2b-subsubcategories-grid.component';
@@ -16,7 +16,7 @@ type View = 'sections' | 'subcategories' | 'subsubcategories';
     CommonModule,
     RouterModule,
     IonContent,
-    AppHeaderComponent,
+    HeaderComponent,
     B2BSectionsGridComponent,
     B2BSubcategoriesGridComponent,
     B2BSubSubCategoriesGridComponent

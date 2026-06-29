@@ -42,17 +42,19 @@
       <app-theme-button type="primary" (clicked)="continueShopping()">Continue Shopping</app-theme-button>
     </div>
 
-    <div *ngIf="!isLoading && cartItems.length > 0" class="cart-content">
-      <div class="cart-items">
+    <div *ngIf="!isLoading && cartItems.length > 0" class="cart-content" [class.table-layout]="cartItems.length > 5">
+
+      <!-- ── CARD VIEW (≤5 items) ── -->
+      <div class="cart-items" *ngIf="cartItems.length <= 5">
         <div *ngFor="let item of cartItems" class="cart-item">
           <div class="item-image">
-            <img [src]="getProductImage(item)" [alt]="item.product.name">
+            <img [src]="getProductImage(item)" [alt]="item.name">
           </div>
           <div class="item-details">
-            <h3 class="item-name">{{ item.product.name }}</h3>
+            <h3 class="item-name">{{ item.name }}</h3>
             <p class="item-price">₹{{ getDiscountedPrice(item) | number:'1.2-2' }}</p>
-            <span class="item-original" *ngIf="item.product.discountValue && item.product.discountValue > 0">
-              ₹{{ item.product.price | number:'1.2-2' }}
+            <span class="item-original" *ngIf="item.discountValue && item.discountValue > 0">
+              ₹{{ item.price | number:'1.2-2' }}
             </span>
           </div>
           <div class="item-actions">
@@ -75,9 +77,57 @@
         </div>
       </div>
 
+      <!-- ── TABLE VIEW (>5 items) ── -->
+      <div class="table-wrap" *ngIf="cartItems.length > 5">
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th>Unit Price</th>
+              <th>Qty</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of cartItems; let i = index">
+              <td class="row-num">{{ i + 1 }}</td>
+              <td class="product-cell">
+                <img [src]="getProductImage(item)" [alt]="item.name" class="table-thumb">
+                <div class="product-info">
+                  <span class="product-name">{{ item.name }}</span>
+                  <span class="product-original" *ngIf="item.discountValue && item.discountValue > 0">
+                    ₹{{ item.price | number:'1.2-2' }}
+                  </span>
+                </div>
+              </td>
+              <td class="price-cell">₹{{ getDiscountedPrice(item) | number:'1.2-2' }}</td>
+              <td class="qty-cell">
+                <div class="quantity-controls">
+                  <button class="qty-btn" (click)="decrementQuantity(getProductId(item))">−</button>
+                  <span class="quantity">{{ item.quantity }}</span>
+                  <button class="qty-btn" (click)="incrementQuantity(getProductId(item))">+</button>
+                </div>
+              </td>
+              <td class="total-cell">₹{{ (getDiscountedPrice(item) * item.quantity) | number:'1.2-2' }}</td>
+              <td class="action-cell">
+                <button class="remove-btn" (click)="removeItem(getProductId(item))">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <div class="cart-summary">
         <div class="summary-box">
-          <h2>Order Summary</h2>
+          <div class="order-summary-title">Order Summary</div>
           <div class="summary-row">
             <span>Subtotal ({{ cartService.itemCount() }} items)</span>
             <span>₹{{ cartService.subtotal() | number:'1.2-2' }}</span>
@@ -104,3 +154,14 @@
 
   </div>
 </div>
+
+@if (removeConfirmId) {
+  <app-confirm-dialog
+    title="Remove Item"
+    message="Remove this item from your cart?"
+    confirmLabel="Yes, Remove"
+    cancelLabel="Cancel"
+    (confirmed)="confirmRemove()"
+    (cancelled)="cancelRemove()">
+  </app-confirm-dialog>
+}

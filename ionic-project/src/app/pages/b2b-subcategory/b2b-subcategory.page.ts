@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { IonContent } from '@ionic/angular/standalone';
-import { AppHeaderComponent } from '../../components/app-header/app-header.component';
+import { HeaderComponent } from '../../components/header/header.component';
 import { B2BCatalogService, B2BSubcategory, B2BCategory } from '../../services/b2b-catalog.service';
-import { CartService } from '../../services/cart';
+import { CartService } from '../../services/cart.service';
 import { environment } from '../../../environments/environment';
 import { lastValueFrom } from 'rxjs';
 
@@ -24,7 +24,7 @@ interface ProductItem {
 @Component({
   selector: 'app-b2b-subcategory',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, IonContent, AppHeaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, IonContent, HeaderComponent],
   templateUrl: './b2b-subcategory.page.html',
   styleUrls: ['./b2b-subcategory.page.scss']
 })
@@ -122,12 +122,11 @@ export class B2BSubcategoryPage implements OnInit {
   addToCart(product: ProductItem, event: Event): void {
     event.stopPropagation();
     this.cartService.addToCart({
-      id: product.productId,
+      productId: product.productId,
       name: product.productName,
       price: product.priceRange.min,
-      image: product.image,
-      category: product.category
-    } as any, 1);
+      image: product.image
+    });
   }
 
   goBack(): void {

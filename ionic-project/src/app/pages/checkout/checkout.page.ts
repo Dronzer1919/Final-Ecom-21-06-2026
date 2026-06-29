@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CartService } from '../../services/cart';
+import { CartService } from '../../services/cart.service';
 import { OrderService } from '../../services/order.service';
 import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
@@ -56,11 +56,9 @@ export class CheckoutPage implements OnInit {
   get total() { return this.cartService.total(); }
 
   getDiscountedPrice(item: any): number {
-    const p = item.product;
-    if (p.discountPrice) return p.discountPrice;
-    if (p.discountType === 'percentage' && p.discountValue) return p.price - (p.price * (p.discountValue / 100));
-    if (p.discountType === 'fixed' && p.discountValue) return p.price - p.discountValue;
-    return p.price;
+    if (!item.discountValue || item.discountValue === 0) return item.price;
+    if (item.discountType === 'percentage') return item.price - (item.price * item.discountValue / 100);
+    return item.price - item.discountValue;
   }
 
   selectPaymentMethod(method: 'cod' | 'online'): void {
@@ -110,8 +108,8 @@ export class CheckoutPage implements OnInit {
     const orderData: any = {
       userId,
       items: this.cartItems.map(item => ({
-        productId: item.product._id || item.product.id || '',
-        name: item.product.name,
+        productId: item.productId,
+        name: item.name,
         price: this.getDiscountedPrice(item),
         quantity: item.quantity
       })),
@@ -155,7 +153,7 @@ export class CheckoutPage implements OnInit {
       key: rzpKey,
       amount: Math.round(this.total * 100),
       currency: 'INR',
-      name: 'United Goals',
+      name: 'RouteRetail',
       description: 'Order Payment',
       order_id: orderData.razorpayOrderId,
       handler: (response: any) => this.verifyPayment(orderData._id, response),

@@ -62,6 +62,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   displayCategories: Category[] = [];
   displayBrands: Brand[] = [];
+  brandLogoErrors = new Set<number>();
 
   private bannerInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -95,17 +96,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       products: this.productService.getAllProducts(1, 100, undefined, true)
     }).pipe(
       finalize(() => {
-        // 10 second delay to preview all shimmer effects — remove when done testing
+        this.loading = false;
+        this.cdr.detectChanges();
         setTimeout(() => {
-          this.loading = false;
-          this.cdr.detectChanges();
-          setTimeout(() => {
-            this.setupTopProductsObserver();
-            this.setupDealsObserver();
-            this.setupFrequentlyBoughtObserver();
-            this.setupFooterObserver();
-          }, 50);
-        }, 10000);
+          this.setupTopProductsObserver();
+          this.setupDealsObserver();
+          this.setupFrequentlyBoughtObserver();
+          this.setupFooterObserver();
+        }, 50);
       })
     ).subscribe({
       next: (results) => {
@@ -115,10 +113,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.displayBannerSlides = [...this.bannerSlides, this.bannerSlides[0] ?? null].filter(Boolean) as Banner[];
         this.startBannerAutoSlide();
         
-        // Process categories - show all active categories
+        // Process categories — duplicate for seamless scroll only when > 5
         this.featuredCategories = results.categories.data.categories;
-        // Duplicate for seamless infinite scroll
-        this.displayCategories = [...this.featuredCategories, ...this.featuredCategories];
+        this.displayCategories = this.featuredCategories.length > 5
+          ? [...this.featuredCategories, ...this.featuredCategories]
+          : [...this.featuredCategories];
         
         // Process brands
         this.topBrands = results.brands.data.brands.slice(0, 6);
@@ -285,19 +284,54 @@ export class HomeComponent implements OnInit, OnDestroy {
     return product.price;
   }
 
+  // Single default image used whenever a real image is missing
+  readonly defaultImage = 'assets/images/product-placeholder.svg';
+
+  // Pastel colors for brand avatars — one distinct shade per slot
+  private readonly brandAvatarColors = [
+    '#FFD6D6', '#D6ECFF', '#D6FFD6', '#FFE8D6',
+    '#EDD6FF', '#FFFBD6', '#D6FFFF', '#FFD6F0',
+  ];
+
   getCategoryImage(category: Category): string {
-    return category.image || 'assets/images/category-placeholder.jpg';
+    return category.image || this.defaultImage;
   }
 
   getBrandLogo(brand: Brand): string {
-    return brand.logo || 'assets/images/brand-placeholder.jpg';
+    return brand.logo || this.defaultImage;
   }
 
   getProductImage(product: Product): string {
-    return product.images && product.images.length > 0 
-      ? product.images[0] 
-      : 'assets/images/product-placeholder.jpg';
+    return product.images && product.images.length > 0
+      ? product.images[0]
+      : this.defaultImage;
   }
+
+  getBrandInitials(name: string): string {
+    return name.trim().charAt(0).toUpperCase();
+  }
+
+  getBrandAvatarColor(index: number): string {
+    return this.brandAvatarColors[index % this.brandAvatarColors.length];
+  }
+
+  onBrandImageError(_event: Event, index: number): void {
+    this.brandLogoErrors.add(index);
+    this.cdr.detectChanges();
+  }
+
+  get shouldScrollCategories(): boolean {
+    return this.featuredCategories.length > 5;
+  }
+
+  // Fallback when an image URL is set but fails to load
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img && img.src.indexOf(this.defaultImage) === -1) {
+      img.src = this.defaultImage;
+    }
+  }
+
 
   // Cart functionality
   get cartItemCount(): number {

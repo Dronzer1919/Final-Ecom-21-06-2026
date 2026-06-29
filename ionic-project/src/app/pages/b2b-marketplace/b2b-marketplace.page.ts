@@ -4,10 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
-import { CartService } from '../../services/cart';
+import { CartService } from '../../services/cart.service';
 import { WishlistService } from '../../services/wishlist';
 import { AppHeaderComponent } from '../../components/app-header/app-header.component';
-import { Product } from '../../services/product';
 import { ShimmerComponent } from '../../components/shimmer';
 import { environment } from '../../../environments/environment';
 
@@ -173,24 +172,16 @@ export class B2BMarketplacePage implements OnInit {
     if (event) {
       event.stopPropagation();
     }
-    const cartProduct: Product = {
-      id: product.productId + '-' + product.supplier.supplierId,
+    this.cartService.addToCart({
+      productId: product.productId + '-' + product.supplier.supplierId,
       name: product.productName + ' - ' + product.supplier.supplierName,
       price: product.supplier.price,
-      image: product.image,
-      category: product.category
-    };
-    this.cartService.addToCart(cartProduct);
+      image: product.image
+    });
   }
 
   toggleView(mode: 'grid' | 'list'): void {
-    if (this.viewMode !== mode) {
-      this.isLoading = true;
-      this.viewMode = mode;
-      setTimeout(() => {
-        this.isLoading = false;
-      }, 500);
-    }
+    this.viewMode = mode;
   }
 
   toggleRow(supplierId: string): void {

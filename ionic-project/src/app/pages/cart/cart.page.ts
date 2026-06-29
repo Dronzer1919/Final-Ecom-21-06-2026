@@ -1,21 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { CartService } from '../../services/cart';
+import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../auth/services/auth';
 import { ToastService } from '../../services/toast.service';
 import { ThemeButtonComponent } from '../../components/buttons/theme-button/theme-button.component';
 import { ShimmerComponent } from '../../components/shimmer';
+import { ConfirmDialogComponent } from '../../dashboard/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, ThemeButtonComponent, ShimmerComponent],
+  imports: [CommonModule, ThemeButtonComponent, ShimmerComponent, ConfirmDialogComponent],
   templateUrl: './cart.page.html',
   styleUrls: ['./cart.page.scss']
 })
 export class CartPage implements OnInit {
   isLoading = true;
+  removeConfirmId: string | null = null;
 
   constructor(
     public cartService: CartService,
@@ -25,9 +27,7 @@ export class CartPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    setTimeout(() => {
-      this.isLoading = false;
-    }, 800);
+    this.isLoading = false;
   }
 
   get cartItems() {
@@ -35,23 +35,19 @@ export class CartPage implements OnInit {
   }
 
   getProductId(item: any): string {
-    return item.product._id || item.product.id || '';
+    return item.productId || '';
   }
 
   getProductImage(item: any): string {
-    return item.product.image || (item.product.images && item.product.images[0]) || 'assets/images/placeholder.png';
+    return item.image || 'assets/images/placeholder.png';
   }
 
   getDiscountedPrice(item: any): number {
-    const p = item.product;
-    if (p.discountPrice) return p.discountPrice;
-    if (p.discountType === 'percentage' && p.discountValue) {
-      return p.price - (p.price * (p.discountValue / 100));
+    if (!item.discountValue || item.discountValue === 0) return item.price;
+    if (item.discountType === 'percentage') {
+      return item.price - (item.price * item.discountValue / 100);
     }
-    if (p.discountType === 'fixed' && p.discountValue) {
-      return p.price - p.discountValue;
-    }
-    return p.price;
+    return item.price - item.discountValue;
   }
 
   incrementQuantity(productId: string): void {
@@ -63,9 +59,18 @@ export class CartPage implements OnInit {
   }
 
   removeItem(productId: string): void {
-    if (confirm('Remove this item from cart?')) {
-      this.cartService.removeFromCart(productId);
+    this.removeConfirmId = productId;
+  }
+
+  confirmRemove(): void {
+    if (this.removeConfirmId) {
+      this.cartService.removeFromCart(this.removeConfirmId);
+      this.removeConfirmId = null;
     }
+  }
+
+  cancelRemove(): void {
+    this.removeConfirmId = null;
   }
 
   proceedToCheckout(): void {

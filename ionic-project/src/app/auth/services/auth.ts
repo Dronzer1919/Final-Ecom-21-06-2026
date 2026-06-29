@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { tap, delay } from 'rxjs/operators';
+import { tap, delay, catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface User {
@@ -19,6 +19,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   phone?: string;
+  role?: string;
 }
 
 export interface LoginRequest {
@@ -63,19 +64,24 @@ export class AuthService {
   }
 
   register(data: RegisterRequest): Observable<AuthResponse> {
-    return of({
-      success: true,
-      message: 'Registration successful',
-      user: {
-        id: Date.now().toString(),
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        createdAt: new Date()
-      },
-      token: 'mock_token_' + Date.now()
+    return this.http.post<any>(`${environment.apiUrl}/auth/register`, {
+      fullName: data.fullName,
+      email: data.email,
+      password: data.password,
+      phone: data.phone,
+      role: 'enduser'
     }).pipe(
-      delay(1000),
+      map(res => {
+        const token = res.token || res.data?.token;
+        const user: User = res.user || res.data?.user || {
+          id: res.data?.user?._id || res._id || '',
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          createdAt: new Date()
+        };
+        return { success: true, message: res.message || 'Registration successful', user, token } as AuthResponse;
+      }),
       tap(response => {
         if (response.success && response.user && response.token) {
           this.setSession(response.user, response.token);

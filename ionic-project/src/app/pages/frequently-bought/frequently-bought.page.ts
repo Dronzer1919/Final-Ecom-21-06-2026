@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, ElementRef }
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProductService, Product } from '../../services/product';
-import { CartService } from '../../services/cart';
+import { CartService } from '../../services/cart.service';
 import { WishlistService } from '../../services/wishlist';
 import { ToastService } from '../../services/toast.service';
 import { finalize, takeUntil } from 'rxjs/operators';
@@ -140,7 +140,14 @@ export class FrequentlyBoughtPage implements OnInit, AfterViewChecked, OnDestroy
 
   addToCart(product: Product, event: Event): void {
     event.stopPropagation();
-    this.cartService.addToCart(product);
+    this.cartService.addToCart({
+      productId: product._id || product.id || '',
+      name: product.name,
+      price: product.price,
+      image: (product.images && product.images[0]) || '',
+      discountValue: product.discountValue,
+      discountType: product.discountType
+    });
     this.toastService.success('Product added to cart!', 2200);
   }
 

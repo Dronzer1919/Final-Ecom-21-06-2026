@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { WishlistService } from '../../services/wishlist';
-import { CartService } from '../../services/cart';
+import { CartService } from '../../services/cart.service';
 import { ToastService } from '../../services/toast.service';
 import { Product } from '../../services/product';
 import { ThemeButtonComponent } from '../../components/buttons/theme-button/theme-button.component';
@@ -67,13 +67,27 @@ export class WishlistPage {
 
   addToCart(product: Product, event: Event): void {
     event.stopPropagation();
-    this.cartService.addToCart(product);
+    this.cartService.addToCart({
+      productId: product._id || product.id || '',
+      name: product.name,
+      price: product.price,
+      image: (product.images && product.images[0]) || '',
+      discountValue: product.discountValue,
+      discountType: product.discountType
+    });
     this.toastService.success('Product added to cart!');
   }
 
   moveToCart(product: Product, event: Event): void {
     event.stopPropagation();
-    this.cartService.addToCart(product);
+    this.cartService.addToCart({
+      productId: product._id || product.id || '',
+      name: product.name,
+      price: product.price,
+      image: (product.images && product.images[0]) || '',
+      discountValue: product.discountValue,
+      discountType: product.discountType
+    });
     this.wishlistService.removeFromWishlist(this.getProductId(product));
     this.toastService.success('Moved to cart!');
   }

@@ -1,20 +1,20 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService, Theme, ThemeOption } from '../../services/theme.service';
+import { CartService } from '../../services/cart.service';
+import { WishlistService } from '../../services/wishlist';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  @Input() wishlistCount = 0;
-  @Input() cartItemCount = 0;
   @Input() activeRoute = 'home';
-
+  // Kept for backward compat but counts now come from services
   @Output() accountClick = new EventEmitter<void>();
   @Output() wishlistClick = new EventEmitter<void>();
   @Output() cartClick = new EventEmitter<void>();
@@ -23,7 +23,12 @@ export class HeaderComponent {
   themes: ThemeOption[];
   currentTheme: Theme;
 
-  constructor(private router: Router, private themeService: ThemeService) {
+  constructor(
+    private router: Router,
+    private themeService: ThemeService,
+    public cartService: CartService,
+    public wishlistService: WishlistService
+  ) {
     this.themes = this.themeService.availableThemes;
     this.currentTheme = this.themeService.getCurrentTheme();
   }
@@ -40,10 +45,6 @@ export class HeaderComponent {
     this.themeDropdownOpen = false;
   }
 
-  getThemeLabel(theme: Theme): string {
-    return this.themes.find(t => t.name === theme)?.label ?? theme;
-  }
-
   @HostListener('document:click')
   closeDropdown(): void {
     this.themeDropdownOpen = false;
@@ -51,17 +52,5 @@ export class HeaderComponent {
 
   navigateToUrl(url: string): void {
     this.router.navigateByUrl(url);
-  }
-
-  onAccountClick(): void {
-    this.accountClick.emit();
-  }
-
-  onWishlistClick(): void {
-    this.wishlistClick.emit();
-  }
-
-  onCartClick(): void {
-    this.cartClick.emit();
   }
 }

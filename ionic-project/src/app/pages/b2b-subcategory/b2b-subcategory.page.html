@@ -114,7 +114,11 @@
               </td>
               <td class="name-cell">{{product.productName}}</td>
               <td class="price-cell">
-                ₹{{product.priceRange.min}} – ₹{{product.priceRange.max}}
+                @if (product.priceRange.min === product.priceRange.max) {
+                  ₹{{product.priceRange.min}}
+                } @else {
+                  ₹{{product.priceRange.min}} – ₹{{product.priceRange.max}}
+                }
               </td>
               <td>{{product.unit}}</td>
               <td>
@@ -174,7 +178,13 @@
               <div class="card-price-block">
                 <span class="card-price-label">PRICE RANGE</span>
                 <div class="card-price-row">
-                  <span class="card-price">₹{{product.priceRange.min}} – ₹{{product.priceRange.max}}</span>
+                  <span class="card-price">
+                    @if (product.priceRange.min === product.priceRange.max) {
+                      ₹{{product.priceRange.min}}
+                    } @else {
+                      ₹{{product.priceRange.min}} – ₹{{product.priceRange.max}}
+                    }
+                  </span>
                   <span class="card-unit">/ {{product.unit}}</span>
                 </div>
               </div>
